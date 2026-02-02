@@ -1,0 +1,158 @@
+/* ---------- Root and global styles ---------- */
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #242424; /* dark theme background */
+  color: rgba(255, 255, 255, 0.87);
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+/* ---------- Button styles ---------- */
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+/* ---------- Buy button ---------- */
+.buy-button {
+  background-color: #646cff;
+  color: #fff;
+  border: none;
+  padding: 0.6em 1.2em;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s, transform 0.2s;
+}
+.buy-button:hover {
+  background-color: #535bf2;
+  transform: scale(1.05);
+}
+
+/* ---------- Cart floating button ---------- */
+.cart-button {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  background-color: #646cff;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 3em;
+  height: 3em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.2em;
+  transition: background-color 0.3s, transform 0.2s;
+  z-index: 1000;
+}
+.cart-button:hover {
+  background-color: #535bf2;
+  transform: scale(1.1);
+}
+
+/* ---------- Product card styles ---------- */
+.product-card {
+  background-color: #1a1a1a;
+  border-radius: 8px;
+  padding: 1em;
+  margin: 1em;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 250px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  transition: transform 0.2s;
+}
+.product-card:hover {
+  transform: translateY(-5px);
+}
+.product-card img {
+  max-width: 100%;
+  border-radius: 6px;
+  margin-bottom: 0.5em;
+}
+.product-card h2 {
+  margin: 0.5em 0;
+  font-size: 1.2em;
+}
+.product-card p {
+  flex-grow: 1;
+  font-size: 0.9em;
+  margin-bottom: 0.5em;
+}
+.product-card .price {
+  font-weight: 600;
+  margin-bottom: 0.5em;
+}
+
+/* ---------- Dark/Light theme adjustments ---------- */
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button, .buy-button {
+    background-color: #f9f9f9;
+    color: #213547;
+  }
+  .cart-button {
+    background-color: #747bff;
+    color: #fff;
+  }
+  .product-card {
+    background-color: #f9f9f9;
+    color: #213547;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+}
