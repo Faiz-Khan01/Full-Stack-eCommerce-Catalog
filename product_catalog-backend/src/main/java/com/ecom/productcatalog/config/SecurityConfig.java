@@ -28,6 +28,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // ✅ PUBLIC ENDPOINTS
                         .requestMatchers(
+                                "/",
                                 "/api/auth/**",
                                 "/api/products/**",
                                 "/api/categories/**",
