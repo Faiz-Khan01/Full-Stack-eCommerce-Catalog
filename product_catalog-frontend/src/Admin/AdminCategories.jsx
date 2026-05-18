@@ -7,7 +7,7 @@ const AdminCategories = () => {
 
   // Fetch categories
   const fetchCategories = () => {
-    fetch("http://localhost:8082/api/admin/categories")
+    fetch("https://full-stack-ecommerce-catalog-13.onrender.com/api/admin/categories")
       .then((res) => res.json())
       .then((data) => setCategories(data));
   };
@@ -17,7 +17,7 @@ const AdminCategories = () => {
   }, []);
 
   const addCategory = () => {
-    fetch("http://localhost:8082/api/admin/categories", {
+    fetch("https://full-stack-ecommerce-catalog-13.onrender.com/api/admin/categories", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name }),
@@ -28,7 +28,7 @@ const AdminCategories = () => {
   };
 
   const updateCategory = (id) => {
-    fetch(`http://localhost:8082/api/admin/categories/${id}`, {
+    fetch(`https://full-stack-ecommerce-catalog-13.onrender.com/api/admin/categories/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name }),
@@ -40,7 +40,7 @@ const AdminCategories = () => {
   };
 
   const deleteCategory = (id) => {
-    fetch(`http://localhost:8082/api/admin/categories/${id}`, {
+    fetch(`https://full-stack-ecommerce-catalog-13.onrender.com/api/admin/categories/${id}`, {
       method: "DELETE",
     }).then(fetchCategories);
   };
@@ -93,3 +93,4 @@ const AdminCategories = () => {
 };
 
 export default AdminCategories;
+

@@ -2,7 +2,7 @@
 import React from "react";
 
 const ProductList = ({ products, onAddToCart, onBuyNow }) => {
-  const API_BASE_URL = "http://localhost:8082";
+  const API_BASE_URL = "https://full-stack-ecommerce-catalog-13.onrender.com";
 
   return (
     <div className="row">

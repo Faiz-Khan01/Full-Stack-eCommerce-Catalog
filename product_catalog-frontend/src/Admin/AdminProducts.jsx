@@ -13,14 +13,14 @@ const AdminProducts = () => {
   });
 
   const fetchProducts = () => {
-    fetch("http://localhost:8082/api/admin/products")
+    fetch("https://full-stack-ecommerce-catalog-13.onrender.com/api/admin/products")
       .then((res) => res.json())
       .then((data) => setProducts(data))
       .catch(err => console.error("Error fetching products:", err));
   };
 
   const fetchCategories = () => {
-    fetch("http://localhost:8082/api/admin/categories")
+    fetch("https://full-stack-ecommerce-catalog-13.onrender.com/api/admin/categories")
       .then((res) => res.json())
       .then((data) => setCategories(data))
       .catch(err => console.error("Error fetching categories:", err));
@@ -39,8 +39,8 @@ const AdminProducts = () => {
     }
 
     const url = form.id
-      ? `http://localhost:8082/api/admin/products/${form.id}`
-      : "http://localhost:8082/api/admin/products";
+      ? `https://full-stack-ecommerce-catalog-13.onrender.com/api/admin/products/${form.id}`
+      : "https://full-stack-ecommerce-catalog-13.onrender.com/api/admin/products";
     const method = form.id ? "PUT" : "POST";
 
     fetch(url, {
@@ -75,7 +75,7 @@ const AdminProducts = () => {
 
   const deleteProduct = (id) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
-      fetch(`http://localhost:8082/api/admin/products/${id}`, { method: "DELETE" })
+      fetch(`https://full-stack-ecommerce-catalog-13.onrender.com/api/admin/products/${id}`, { method: "DELETE" })
         .then(() => fetchProducts())
         .catch(err => alert("Error deleting product"));
     }

@@ -14,7 +14,7 @@ const Checkout = () => {
   const [email, setEmail] = useState("");
 
   const navigate = useNavigate();
-  const API_BASE_URL = 'http://localhost:8082/api';
+  const API_BASE_URL = 'https://full-stack-ecommerce-catalog-13.onrender.com/api';
 
   // 1. Fetch product details on load
   useEffect(() => {

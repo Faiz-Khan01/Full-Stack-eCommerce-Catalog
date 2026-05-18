@@ -4,7 +4,7 @@ import ProductList from "../components/ProductList";
 import Swal from "sweetalert2";
 
 // Updated to match your application.properties port
-const API_BASE_URL = 'http://localhost:8082/api';
+const API_BASE_URL = 'https://full-stack-ecommerce-catalog-13.onrender.com/api';
 
 const Home = ({ searchTerm, selectedCategory, sortOrder }) => {
   const [products, setProducts] = useState([]);
@@ -16,7 +16,7 @@ const Home = ({ searchTerm, selectedCategory, sortOrder }) => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        // Hits http://localhost:8082/api/products
+        // Hits https://full-stack-ecommerce-catalog-13.onrender.com/api/products
         const res = await fetch(`${API_BASE_URL}/products`);
         if (!res.ok) throw new Error("Could not fetch products");
         const data = await res.json();
@@ -33,7 +33,7 @@ const Home = ({ searchTerm, selectedCategory, sortOrder }) => {
   // 2. Logic: Add to Cart (The "Handshake" with Backend)
   const handleAddToCart = async (productId) => {
     try {
-      // Logic: Calls POST http://localhost:8082/api/cart/add/{productId}
+      // Logic: Calls POST https://full-stack-ecommerce-catalog-13.onrender.com/api/cart/add/{productId}
       const res = await fetch(`${API_BASE_URL}/cart/add/${productId}`, { 
         method: 'POST',
         headers: {

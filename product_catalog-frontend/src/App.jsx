@@ -22,7 +22,7 @@ import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 // Ensure this matches your Spring Boot server port (8080 or 8081)
-const API_BASE_URL = "http://localhost:8082/api";
+const API_BASE_URL = "https://full-stack-ecommerce-catalog-13.onrender.com/api";
 
 function App() {
   // --- Global States ---

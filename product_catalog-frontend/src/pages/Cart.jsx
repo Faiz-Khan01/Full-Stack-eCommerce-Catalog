@@ -8,8 +8,8 @@ const Cart = () => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
 
-  const API_BASE_URL = "http://localhost:8082/api/cart";
-  const IMAGE_BASE_URL = "http://localhost:8082";
+  const API_BASE_URL = "https://full-stack-ecommerce-catalog-13.onrender.com/api/cart";
+  const IMAGE_BASE_URL = "https://full-stack-ecommerce-catalog-13.onrender.com";
 
   // 1. Fetch and Group Cart Items
   const fetchCart = async () => {

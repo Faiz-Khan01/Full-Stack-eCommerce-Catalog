@@ -17,3 +17,4 @@ const CategoryFilter = ({ categories, selectedCategory, onSelect }) => {
 };
 
 export default CategoryFilter;
+

@@ -9,7 +9,7 @@ const Orders = () => {
     if (user) {
       // NOTE: In a real app, you should fetch by user email or ID:
       // fetch(`http://localhost:8080/api/orders/user/${user.email}`)
-      fetch(`http://localhost:8082/api/orders`)
+      fetch(`https://full-stack-ecommerce-catalog-13.onrender.com/api/orders`)
         .then((res) => res.json())
         .then((data) => {
           // Sort orders: Newest first

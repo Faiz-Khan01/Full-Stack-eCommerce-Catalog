@@ -8,7 +8,7 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:8082/api/auth/register", {
+      const res = await fetch("https://full-stack-ecommerce-catalog-13.onrender.com/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(user),

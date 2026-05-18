@@ -19,7 +19,7 @@ const PaymentComponent = ({ orderId, amount, userEmail, onPaymentSuccess }) => {
       };
 
       const orderResponse = await axios.post(
-        'http://localhost:8082/api/payment/create-order',
+        'https://full-stack-ecommerce-catalog-13.onrender.com/api/payment/create-order',
         paymentRequest
       );
 
@@ -37,7 +37,7 @@ const PaymentComponent = ({ orderId, amount, userEmail, onPaymentSuccess }) => {
           // Step 3: Verify payment on backend
           try {
             const verifyResponse = await axios.post(
-              'http://localhost:8082/api/payment/verify',
+              'https://full-stack-ecommerce-catalog-13.onrender.com/api/payment/verify',
               {
                 razorpayOrderId: razorpayOrderId,
                 razorpayPaymentId: response.razorpay_payment_id,
@@ -112,3 +112,4 @@ const PaymentComponent = ({ orderId, amount, userEmail, onPaymentSuccess }) => {
 };
 
 export default PaymentComponent;
+
