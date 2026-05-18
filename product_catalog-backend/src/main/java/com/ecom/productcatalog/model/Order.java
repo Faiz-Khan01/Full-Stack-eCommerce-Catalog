@@ -14,12 +14,22 @@ public class Order {
     private Double totalAmount;
     private Date orderDate;
 
+    @Column(name = "payment_status")
+    private String paymentStatus; // PENDING, CAPTURED, FAILED
+
+    @Column(name = "payment_method")
+    private String paymentMethod; // razorpay, etc.
+
+    @Column(name = "razorpay_order_id")
+    private String razorpayOrderId;
+
     // Constructors
     public Order() {}
     public Order(String userEmail, Double totalAmount, Date orderDate) {
         this.userEmail = userEmail;
         this.totalAmount = totalAmount;
         this.orderDate = orderDate;
+        this.paymentStatus = "PENDING";
     }
 
     // Getters and Setters
@@ -30,4 +40,10 @@ public class Order {
     public void setTotalAmount(Double totalAmount) { this.totalAmount = totalAmount; }
     public Date getOrderDate() { return orderDate; }
     public void setOrderDate(Date orderDate) { this.orderDate = orderDate; }
+    public String getPaymentStatus() { return paymentStatus; }
+    public void setPaymentStatus(String paymentStatus) { this.paymentStatus = paymentStatus; }
+    public String getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
+    public String getRazorpayOrderId() { return razorpayOrderId; }
+    public void setRazorpayOrderId(String razorpayOrderId) { this.razorpayOrderId = razorpayOrderId; }
 }

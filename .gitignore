@@ -1,0 +1,9 @@
+# Ignore build/output directories and IDE files
+/product_catalog-backend/bin/
+/product_catalog-backend/target/
+/product_catalog-backend/.idea/
+/product_catalog-frontend/node_modules/
+/product_catalog-frontend/dist/
+*.log
+.DS_Store
+
