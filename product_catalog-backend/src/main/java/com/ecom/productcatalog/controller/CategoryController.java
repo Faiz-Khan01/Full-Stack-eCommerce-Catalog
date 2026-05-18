@@ -8,7 +8,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/categories")
-@CrossOrigin(origins = "http://localhost:5173") // allow your React dev server
+@CrossOrigin(origins = {"https://techstore-catalog.vercel.app"})
 public class CategoryController {
 
     private final CategoryRepository categoryRepository;

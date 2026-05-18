@@ -12,7 +12,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/cart")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = {"https://techstore-catalog.vercel.app"})
 public class CartController {
 
     private final ProductService productService;
