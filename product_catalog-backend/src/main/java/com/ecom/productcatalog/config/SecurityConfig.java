@@ -27,14 +27,16 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         // ✅ PUBLIC ENDPOINTS
-                        .requestMatchers(
-                                "/",
-                                "/api/auth/**",
-                                "/api/products/**",
-                                "/api/categories/**",
-                                "/api/cart/**",
-                                "/images/**"
-                        ).permitAll()
+                      .requestMatchers(
+                      "/",
+                      "/api/auth/**",
+                      "/api/products/**",
+                      "/products/**",       // 👈 Agar /api nahi hai toh ye line add karein
+                      "/api/categories/**",
+                      "/categories/**",     // 👈 Same categories ke liye bhi
+                      "/api/cart/**",
+                      "/images/**"
+                      ).permitAll()
 
                         // 🔐 PROTECTED ENDPOINTS
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
