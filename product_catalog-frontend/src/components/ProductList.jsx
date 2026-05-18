@@ -1,8 +1,10 @@
 // ProductList.js
 import React from "react";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://full-stack-ecommerce-catalog-13.onrender.com";
+
 const ProductList = ({ products, onAddToCart, onBuyNow }) => {
-  const API_BASE_URL = "https://full-stack-ecommerce-catalog-13.onrender.com";
+  const API_BASE_URL = BASE_URL;
 
   return (
     <div className="row">

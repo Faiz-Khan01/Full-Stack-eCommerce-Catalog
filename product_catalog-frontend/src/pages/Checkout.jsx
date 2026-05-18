@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://full-stack-ecommerce-catalog-13.onrender.com';
+const API_BASE_URL = `${BASE_URL}/api`;
+
 const Checkout = () => {
   const { productId } = useParams();
   const [product, setProduct] = useState(null);
@@ -14,7 +17,6 @@ const Checkout = () => {
   const [email, setEmail] = useState("");
 
   const navigate = useNavigate();
-  const API_BASE_URL = 'https://full-stack-ecommerce-catalog-13.onrender.com/api';
 
   // 1. Fetch product details on load
   useEffect(() => {

@@ -2,14 +2,15 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://full-stack-ecommerce-catalog-13.onrender.com";
+const API_BASE_URL = `${BASE_URL}/api/cart`;
+const IMAGE_BASE_URL = BASE_URL;
+
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
-
-  const API_BASE_URL = "https://full-stack-ecommerce-catalog-13.onrender.com/api/cart";
-  const IMAGE_BASE_URL = "https://full-stack-ecommerce-catalog-13.onrender.com";
 
   // 1. Fetch and Group Cart Items
   const fetchCart = async () => {

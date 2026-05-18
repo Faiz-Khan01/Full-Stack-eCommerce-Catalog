@@ -3,8 +3,7 @@ import { useNavigate } from "react-router-dom";
 import ProductList from "../components/ProductList";
 import Swal from "sweetalert2";
 
-// Updated to match your application.properties port
-const API_BASE_URL = 'https://full-stack-ecommerce-catalog-13.onrender.com/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://full-stack-ecommerce-catalog-13.onrender.com/api';
 
 const Home = ({ searchTerm, selectedCategory, sortOrder }) => {
   const [products, setProducts] = useState([]);

@@ -21,8 +21,8 @@ import AdminLogin from "./Admin/AdminLogin";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-// Ensure this matches your Spring Boot server port (8080 or 8081)
-const API_BASE_URL = "https://full-stack-ecommerce-catalog-13.onrender.com/api";
+// Use Vite environment variable when available, otherwise fallback to live Render URL.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://full-stack-ecommerce-catalog-13.onrender.com/api";
 
 function App() {
   // --- Global States ---
