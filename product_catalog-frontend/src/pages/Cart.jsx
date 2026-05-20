@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
-// FIX 1: Corrected fallback URLs (Removed -13)
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
   "https://full-stack-ecommerce-catalog.onrender.com/api";
@@ -31,32 +30,40 @@ const Cart = () => {
   const fetchCart = async () => {
     try {
       setLoading(true);
+      
+      if (!user?.email) {
+        setCartItems([]);
+        setLoading(false);
+        return;
+      }
 
-      // FIX 2: Added Auth Headers for token verification
-      const res = await fetch(`${API_BASE_URL}/cart`, {
+      const res = await fetch(`${API_BASE_URL}/cart?email=${encodeURIComponent(user.email)}`, {
         headers: getAuthHeaders("GET"),
       });
 
       if (!res.ok) throw new Error("Failed to fetch cart");
 
-      const data = await res.json();
+      const response = await res.json();
+      const data = response.data || response;
+
+      // Handle both new format (with wrapper) and direct array
+      const cartArray = Array.isArray(data) ? data : (response.success ? response.data : []);
 
       // Group items by product id
-      const grouped = data.reduce((acc, item) => {
+      const grouped = cartArray.reduce((acc, item) => {
         const found = acc.find((i) => i.id === item.id);
-
         if (found) {
           found.quantity += 1;
         } else {
           acc.push({ ...item, quantity: 1 });
         }
-
         return acc;
       }, []);
 
       setCartItems(grouped);
     } catch (error) {
       console.error("Cart Error:", error);
+      Swal.fire("Error", error.message || "Failed to load cart", "error");
     } finally {
       setLoading(false);
     }
@@ -69,12 +76,11 @@ const Cart = () => {
   // Add quantity
   const handleIncrease = async (productId) => {
     try {
-      // FIX 2: Added Auth Headers
-      await fetch(`${API_BASE_URL}/cart/add/${productId}`, {
+      const res = await fetch(`${API_BASE_URL}/cart/add/${productId}?email=${encodeURIComponent(user.email)}`, {
         method: "POST",
         headers: getAuthHeaders("POST"),
       });
-
+      if (!res.ok) throw new Error("Failed to increment quantity");
       fetchCart();
     } catch (error) {
       console.error(error);
@@ -88,12 +94,11 @@ const Cart = () => {
     }
 
     try {
-      // FIX 2: Added Auth Headers
-      await fetch(`${API_BASE_URL}/cart/remove/${productId}`, {
+      const res = await fetch(`${API_BASE_URL}/cart/remove/${productId}?email=${encodeURIComponent(user.email)}`, {
         method: "DELETE",
         headers: getAuthHeaders("DELETE"),
       });
-
+      if (!res.ok) throw new Error("Failed to decrement quantity");
       fetchCart();
     } catch (error) {
       console.error(error);
@@ -112,11 +117,12 @@ const Cart = () => {
     if (!result.isConfirmed) return;
 
     try {
-      // FIX 2: Added Auth Headers
-      await fetch(`${API_BASE_URL}/cart/remove/${productId}`, {
+      const res = await fetch(`${API_BASE_URL}/cart/remove/${productId}?email=${encodeURIComponent(user.email)}`, {
         method: "DELETE",
         headers: getAuthHeaders("DELETE"),
       });
+
+      if (!res.ok) throw new Error("Failed to remove item");
 
       Swal.fire({
         icon: "success",
@@ -137,20 +143,24 @@ const Cart = () => {
   const handleCheckout = async () => {
     if (!user?.email) {
       Swal.fire("Login required", "Please login first", "info");
+      navigate("/login");
       return;
     }
 
     try {
-      // FIX 2: Added Auth Headers to secure checkout endpoint
       const res = await fetch(
-        `${API_BASE_URL}/cart/buy?email=${user.email}`,
+        `${API_BASE_URL}/cart/buy?email=${encodeURIComponent(user.email)}`,
         {
           method: "POST",
           headers: getAuthHeaders("POST"),
         }
       );
 
-      if (!res.ok) throw new Error("Checkout failed");
+      const response = await res.json();
+
+      if (!res.ok) {
+        throw new Error(response.error || response.message || "Checkout failed");
+      }
 
       Swal.fire({
         icon: "success",
@@ -160,14 +170,17 @@ const Cart = () => {
       setCartItems([]);
       navigate("/order-success");
     } catch (error) {
+      console.error("Checkout Error:", error);
       Swal.fire("Error", error.message, "error");
     }
   };
 
-  // Total
   const total = cartItems
     .reduce((sum, item) => sum + item.price * item.quantity, 0)
     .toFixed(2);
+
+  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const totalProducts = cartItems.length;
 
   if (loading) {
     return (
@@ -243,11 +256,18 @@ const Cart = () => {
                       </button>
                     </td>
 
-                    <td>₹{item.price}</td>
+                    <td>
+                      {new Intl.NumberFormat("en-IN", {
+                        style: "currency",
+                        currency: "INR",
+                      }).format(item.price)}
+                    </td>
 
                     <td>
-                      {" "}
-                      ₹{(item.price * item.quantity).toFixed(2)}
+                      {new Intl.NumberFormat("en-IN", {
+                        style: "currency",
+                        currency: "INR",
+                      }).format(item.price * item.quantity)}
                     </td>
 
                     <td>
@@ -264,8 +284,20 @@ const Cart = () => {
             </table>
           </div>
 
+          <div className="mt-4 mb-3">
+            <p className="text-muted">
+              <strong>{totalProducts}</strong> product{totalProducts !== 1 ? "s" : ""} ({totalItems} item{totalItems !== 1 ? "s" : ""})
+            </p>
+          </div>
+
           <div className="d-flex justify-content-between mt-4">
-            <h4>Total: ₹{total}</h4>
+            <h4>
+              Total:{" "}
+              {new Intl.NumberFormat("en-IN", {
+                style: "currency",
+                currency: "INR",
+              }).format(total)}
+            </h4>
 
             <button
               className="btn btn-success btn-lg"

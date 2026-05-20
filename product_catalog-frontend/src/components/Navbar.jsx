@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import CategoryFilter from "./CategoryFilter";
 
-// FIX: Removed the incorrect "-13" from the default fallback URL
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
   "https://full-stack-ecommerce-catalog.onrender.com/api";
@@ -17,35 +16,67 @@ const Navbar = ({
   onSortChange,
 }) => {
   const [cartCount, setCartCount] = useState(0);
-
   const navigate = useNavigate();
-
   const user = JSON.parse(localStorage.getItem("user"));
 
   // Fetch Cart Count
   useEffect(() => {
     const fetchCartCount = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/cart`);
+        const userData = JSON.parse(localStorage.getItem("user"));
+        const token = localStorage.getItem("token");
+        
+        if (!userData?.email) {
+          setCartCount(0);
+          return;
+        }
+
+        const headers = {};
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+        }
+
+        const res = await fetch(`${API_BASE_URL}/cart?email=${encodeURIComponent(userData.email)}`, {
+          headers
+        });
 
         if (!res.ok) {
           throw new Error(`Cart API error: ${res.status}`);
         }
 
-        const data = await res.json();
-
-        setCartCount(Array.isArray(data) ? data.length : 0);
+        const response = await res.json();
+        
+        // Handle both new JSON wrapper format and direct array
+        const data = response.data || response;
+        const cartArray = Array.isArray(data) ? data : (response.success ? response.data : []);
+        
+        // Count total items
+        const totalItems = Array.isArray(cartArray) ? cartArray.length : 0;
+        setCartCount(totalItems);
       } catch (err) {
         console.error("Cart error:", err);
         setCartCount(0);
       }
     };
 
+    // Fetch immediately
     fetchCartCount();
 
-    const interval = setInterval(fetchCartCount, 5000);
+    // Listen for cart updates with immediate refresh
+    const handleCartUpdate = () => {
+      console.log("Cart updated, refreshing count...");
+      fetchCartCount();
+    };
 
-    return () => clearInterval(interval);
+    window.addEventListener("cartUpdated", handleCartUpdate);
+
+    // Also poll every 1 second for real-time feel
+    const interval = setInterval(fetchCartCount, 1000);
+
+    return () => {
+      window.removeEventListener("cartUpdated", handleCartUpdate);
+      clearInterval(interval);
+    };
   }, []);
 
   // Logout
@@ -140,7 +171,6 @@ const Navbar = ({
                         Login
                       </Link>
                     </li>
-
                     <li>
                       <Link className="dropdown-item" to="/signup">
                         Signup
@@ -161,12 +191,13 @@ const Navbar = ({
                       </Link>
                     </li>
 
+                    {/* FIX: Correctly wrapped list items and closed the tag properly */}
                     {user.role?.toLowerCase() === "admin" && (
                       <li>
-                        <Link className="dropdown-item" to="/admin">
+                        <Link className="dropdown-item fw-bold text-primary" to="/admin">
                           Admin Dashboard
                         </Link>
-                      </>
+                      </li>
                     )}
 
                     <li>

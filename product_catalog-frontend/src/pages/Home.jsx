@@ -48,39 +48,39 @@ const Home = ({
     fetchProducts();
   }, []);
 
-  // Add To Cart (Secure Endpoint - Requires JWT Token)
+  // Add To Cart
   const handleAddToCart = async (productId) => {
     const token = localStorage.getItem("token");
-
-    // Checking if user is logged in
-    if (!token) {
-      Swal.fire({
-        title: "Login Required",
-        text: "Please login first to add items to the cart.",
-        icon: "info",
-        showCancelButton: true,
-        confirmButtonText: "Login Now",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          navigate("/login");
-        }
-      });
-      return;
-    }
+    const user = JSON.parse(localStorage.getItem("user"));
 
     try {
-      // FIX 2: Added Bearer token inside Auth headers
-      const res = await fetch(`${API_BASE_URL}/cart/add/${productId}`, {
+      const headers = {
+        "Content-Type": "application/json",
+      };
+
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
+      if (!user?.email) {
+        Swal.fire({
+          title: "Login Required",
+          text: "Please log in to add items to cart",
+          icon: "info",
+        });
+        navigate("/login");
+        return;
+      }
+
+      const res = await fetch(`${API_BASE_URL}/cart/add/${productId}?email=${encodeURIComponent(user.email)}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
+        headers,
       });
 
       if (!res.ok) {
+        const errorData = await res.json();
         if (res.status === 403) throw new Error("Session expired. Please log in again.");
-        throw new Error(`Cart error: ${res.status}`);
+        throw new Error(errorData.error || `Cart error: ${res.status}`);
       }
 
       Swal.fire({
@@ -92,6 +92,10 @@ const Home = ({
         timer: 1500,
         showConfirmButton: false,
       });
+
+      // Trigger cart count update by dispatching custom event
+      console.log("Dispatching cartUpdated event");
+      window.dispatchEvent(new Event("cartUpdated"));
     } catch (err) {
       console.error("Cart error:", err);
       Swal.fire({

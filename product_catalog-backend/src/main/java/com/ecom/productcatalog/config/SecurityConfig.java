@@ -23,7 +23,6 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthFilter jwtAuthFilter;
 
-    // ✅ FIX 1: FULL CORS CONFIG (THIS FIXES YOUR ERROR)
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
@@ -47,35 +46,29 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-
-                // ✅ FIX 2: ENABLE CORS PROPERLY
                 .cors(Customizer.withDefaults())
-
                 .sessionManagement(sm ->
                         sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-
                 .authorizeHttpRequests(auth -> auth
-                        // PUBLIC ENDPOINTS
+                        // PUBLIC ENDPOINTS (No token required)
                         .requestMatchers(
                                 "/",
                                 "/api/auth/**",
                                 "/api/products/**",
                                 "/api/categories/**",
-                                "/api/cart/**",
                                 "/api/images/**",
+                                "/api/cart/**",
                                 "/images/**"
                         ).permitAll()
 
-                        // PROTECTED
+                        // PROTECTED ENDPOINTS (Valid token mandatory)
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/orders/**").authenticated()
-                        .requestMatchers("/api/profile/**").authenticated()
+                        .requestMatchers("/api/users/**").authenticated()
 
                         .anyRequest().authenticated()
                 )
-
-                // JWT FILTER
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

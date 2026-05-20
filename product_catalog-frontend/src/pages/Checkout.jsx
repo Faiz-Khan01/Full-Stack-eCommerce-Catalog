@@ -72,22 +72,34 @@ const Checkout = () => {
     }
 
     try {
-      // FIX 2: Added Auth Headers to the purchase request
-      const res = await fetch(
-        `${API_BASE_URL}/cart/buy/${productId}`,
+      // Add product to cart first
+      const addRes = await fetch(
+        `${API_BASE_URL}/cart/add/${productId}?email=${encodeURIComponent(email)}`,
         {
           method: "POST",
           headers: getAuthHeaders("POST"),
-          body: JSON.stringify({
-            email,
-            mobile,
-            address,
-            paymentMethod
-          })
         }
       );
 
-      if (!res.ok) throw new Error("Order failed");
+      if (!addRes.ok) {
+        const errorData = await addRes.json();
+        throw new Error(errorData.error || "Failed to add product to cart");
+      }
+
+      // Then proceed with checkout
+      const checkoutRes = await fetch(
+        `${API_BASE_URL}/cart/buy?email=${encodeURIComponent(email)}`,
+        {
+          method: "POST",
+          headers: getAuthHeaders("POST"),
+        }
+      );
+
+      const checkoutData = await checkoutRes.json();
+
+      if (!checkoutRes.ok) {
+        throw new Error(checkoutData.error || "Order failed");
+      }
 
       Swal.fire({
         icon: "success",
@@ -97,7 +109,8 @@ const Checkout = () => {
 
       navigate("/order-success");
     } catch (error) {
-      Swal.fire("Error", error.message, "error");
+      console.error("Checkout error:", error);
+      Swal.fire("Error", error.message || "Failed to place order", "error");
     }
   };
 

@@ -147,7 +147,6 @@ const Login = () => {
                 {/* Submit */}
                 <button
                   type="submit"
-                  type="submit"
                   className="btn btn-primary w-100 fw-bold py-2"
                   disabled={loading}
                 >
