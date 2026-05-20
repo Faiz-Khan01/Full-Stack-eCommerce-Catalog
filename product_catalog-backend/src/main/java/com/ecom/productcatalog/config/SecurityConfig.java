@@ -29,7 +29,7 @@ public class SecurityConfig {
 
         config.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                "https://your-vercel-domain.vercel.app"
+                "https://techstore-catalog-git-main-faiz-khan01s-projects.vercel.app"
         ));
 
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
