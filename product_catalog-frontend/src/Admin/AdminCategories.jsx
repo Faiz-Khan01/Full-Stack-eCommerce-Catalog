@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://full-stack-ecommerce-catalog-13.onrender.com/api';
+
 const AdminCategories = () => {
   const [categories, setCategories] = useState([]);
   const [name, setName] = useState("");
@@ -7,7 +9,7 @@ const AdminCategories = () => {
 
   // Fetch categories
   const fetchCategories = () => {
-    fetch("https://full-stack-ecommerce-catalog-13.onrender.com/api/admin/categories")
+    fetch(`${API_BASE_URL}/admin/categories`)
       .then((res) => res.json())
       .then((data) => setCategories(data));
   };
@@ -17,7 +19,7 @@ const AdminCategories = () => {
   }, []);
 
   const addCategory = () => {
-    fetch("https://full-stack-ecommerce-catalog-13.onrender.com/api/admin/categories", {
+    fetch(`${API_BASE_URL}/admin/categories`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name }),
@@ -28,7 +30,7 @@ const AdminCategories = () => {
   };
 
   const updateCategory = (id) => {
-    fetch(`https://full-stack-ecommerce-catalog-13.onrender.com/api/admin/categories/${id}`, {
+    fetch(`${API_BASE_URL}/admin/categories/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name }),
@@ -40,7 +42,7 @@ const AdminCategories = () => {
   };
 
   const deleteCategory = (id) => {
-    fetch(`https://full-stack-ecommerce-catalog-13.onrender.com/api/admin/categories/${id}`, {
+    fetch(`${API_BASE_URL}/admin/categories/${id}`, {
       method: "DELETE",
     }).then(fetchCategories);
   };

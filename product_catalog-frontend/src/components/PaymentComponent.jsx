@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://full-stack-ecommerce-catalog-13.onrender.com/api';
+const RAZORPAY_KEY_ID = process.env.REACT_APP_RAZORPAY_KEY_ID || 'rzp_test_your_key_id';
+
 const PaymentComponent = ({ orderId, amount, userEmail, onPaymentSuccess }) => {
   const [loading, setLoading] = useState(false);
-  const RAZORPAY_KEY_ID = process.env.REACT_APP_RAZORPAY_KEY_ID || 'rzp_test_your_key_id';
 
   const initiatePayment = async () => {
     setLoading(true);
@@ -19,7 +21,7 @@ const PaymentComponent = ({ orderId, amount, userEmail, onPaymentSuccess }) => {
       };
 
       const orderResponse = await axios.post(
-        'https://full-stack-ecommerce-catalog-13.onrender.com/api/payment/create-order',
+        `${API_BASE_URL}/payment/create-order`,
         paymentRequest
       );
 
@@ -37,7 +39,7 @@ const PaymentComponent = ({ orderId, amount, userEmail, onPaymentSuccess }) => {
           // Step 3: Verify payment on backend
           try {
             const verifyResponse = await axios.post(
-              'https://full-stack-ecommerce-catalog-13.onrender.com/api/payment/verify',
+              `${API_BASE_URL}/payment/verify`,
               {
                 razorpayOrderId: razorpayOrderId,
                 razorpayPaymentId: response.razorpay_payment_id,

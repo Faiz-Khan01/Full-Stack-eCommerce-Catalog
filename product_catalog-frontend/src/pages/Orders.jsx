@@ -1,61 +1,99 @@
 import { useEffect, useState } from "react";
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  "https://full-stack-ecommerce-catalog-13.onrender.com/api";
+
 const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const user = JSON.parse(localStorage.getItem("user"));
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    if (user) {
-      // NOTE: In a real app, you should fetch by user email or ID:
-      // fetch(`http://localhost:8080/api/orders/user/${user.email}`)
-      fetch(`https://full-stack-ecommerce-catalog-13.onrender.com/api/orders`)
-        .then((res) => res.json())
-        .then((data) => {
-          // Sort orders: Newest first
-          const sortedData = data.sort((a, b) => b.id - a.id);
-          setOrders(sortedData);
+    const fetchOrders = async () => {
+      try {
+        if (!user?.email || !token) {
           setLoading(false);
-        })
-        .catch(err => {
-          console.error("Error fetching orders:", err);
-          setLoading(false);
-        });
-    }
-  }, []);
+          return;
+        }
 
-  if (loading) return <div className="container mt-5 text-center"><h4>Loading your orders...</h4></div>;
+        const res = await fetch(
+          `${API_BASE_URL}/orders/user/${user.email}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!res.ok) throw new Error("Failed to fetch orders");
+
+        const data = await res.json();
+
+        const sorted = data.sort((a, b) => b.id - a.id);
+
+        setOrders(sorted);
+      } catch (error) {
+        console.error("Orders Error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, [user, token]);
+
+  if (loading) {
+    return (
+      <div className="text-center mt-5">
+        <div className="spinner-border text-primary" />
+      </div>
+    );
+  }
 
   return (
-    <div className="container mt-4">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>📦 My Orders</h2>
-        <span className="badge bg-secondary">Total Orders: {orders.length}</span>
-      </div>
+    <div className="container py-4">
+      <h2 className="mb-4">📦 My Orders</h2>
 
       {orders.length === 0 ? (
-        <div className="alert alert-info shadow-sm">
-          You haven't placed any orders yet. <a href="/">Start Shopping</a>
+        <div className="alert alert-info">
+          No orders found
         </div>
       ) : (
-        <div className="table-responsive card shadow-sm border-0">
-          <table className="table table-hover mb-0">
+        <div className="table-responsive">
+          <table className="table table-hover">
             <thead className="table-dark">
               <tr>
-                <th className="ps-4">Order ID</th>
+                <th>Order ID</th>
                 <th>Date</th>
-                <th>Total Paid</th>
-                <th className="text-center">Status</th>
+                <th>Total</th>
+                <th>Status</th>
               </tr>
             </thead>
+
             <tbody>
               {orders.map((order) => (
-                <tr key={order.id} className="align-middle">
-                  <td className="ps-4 fw-bold text-primary">#{order.id}</td>
-                  <td>{order.orderDate ? new Date(order.orderDate).toLocaleDateString() : 'N/A'}</td>
-                  <td className="fw-bold">${order.totalAmount ? order.totalAmount.toFixed(2) : '0.00'}</td>
-                  <td className="text-center">
-                    <span className="badge rounded-pill bg-success px-3">Success</span>
+                <tr key={order.id}>
+                  <td>#{order.id}</td>
+
+                  <td>
+                    {order.orderDate
+                      ? new Date(
+                          order.orderDate
+                        ).toLocaleDateString()
+                      : "N/A"}
+                  </td>
+
+                  <td>
+                    ₹{Number(order.totalAmount || 0).toFixed(2)}
+                  </td>
+
+                  <td>
+                    <span className="badge bg-success">
+                      Success
+                    </span>
                   </td>
                 </tr>
               ))}

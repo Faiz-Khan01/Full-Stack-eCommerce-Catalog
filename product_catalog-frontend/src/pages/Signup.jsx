@@ -1,67 +1,167 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import Swal from "sweetalert2";
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  "https://full-stack-ecommerce-catalog-13.onrender.com/api";
 
 const Signup = () => {
-  const [user, setUser] = useState({ name: "", email: "", password: "" });
   const navigate = useNavigate();
 
+  const [user, setUser] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+
+  // Handle Input Change
+  const handleChange = (e) => {
+    setUser({
+      ...user,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  // Handle Signup
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const res = await fetch("https://full-stack-ecommerce-catalog-13.onrender.com/api/auth/register", {
+      setLoading(true);
+
+      const res = await fetch(`${API_BASE_URL}/auth/register`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(user),
       });
-      if (res.ok) {
-        alert("Registration successful! Please login.");
-        navigate("/login");
-      } else {
-        alert("Registration failed. Email might already exist.");
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Registration failed");
       }
-    } catch (err) {
-      console.error("Signup error:", err);
+
+      Swal.fire({
+        icon: "success",
+        title: "Account Created",
+        text: "Please login to continue",
+      });
+
+      navigate("/login");
+    } catch (error) {
+      console.error("Signup Error:", error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Signup Failed",
+        text: error.message,
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="container mt-5">
+    <div className="container py-5">
       <div className="row justify-content-center">
-        <div className="col-md-4 card p-4 shadow border-0">
-          <h3 className="text-center mb-4">Create Account</h3>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-              <input 
-                className="form-control" 
-                placeholder="Full Name" 
-                onChange={(e) => setUser({...user, name: e.target.value})} 
-                required 
-              />
+        <div className="col-md-5 col-lg-4">
+          <div className="card shadow border-0">
+            <div className="card-body p-4">
+              {/* Heading */}
+              <div className="text-center mb-4">
+                <h2 className="fw-bold text-primary">
+                  Create Account
+                </h2>
+
+                <p className="text-muted">
+                  Join TechStore today
+                </p>
+              </div>
+
+              {/* Form */}
+              <form onSubmit={handleSubmit}>
+                {/* Name */}
+                <div className="mb-3">
+                  <label className="form-label fw-semibold">
+                    Full Name
+                  </label>
+
+                  <input
+                    type="text"
+                    name="name"
+                    className="form-control"
+                    placeholder="Enter your name"
+                    required
+                    value={user.name}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                {/* Email */}
+                <div className="mb-3">
+                  <label className="form-label fw-semibold">
+                    Email Address
+                  </label>
+
+                  <input
+                    type="email"
+                    name="email"
+                    className="form-control"
+                    placeholder="Enter email"
+                    required
+                    value={user.email}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                {/* Password */}
+                <div className="mb-4">
+                  <label className="form-label fw-semibold">
+                    Password
+                  </label>
+
+                  <input
+                    type="password"
+                    name="password"
+                    className="form-control"
+                    placeholder="Create password"
+                    required
+                    value={user.password}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                {/* Submit */}
+                <button
+                  type="submit"
+                  className="btn btn-warning w-100 fw-bold py-2"
+                  disabled={loading}
+                >
+                  {loading ? "Creating Account..." : "Sign Up"}
+                </button>
+              </form>
+
+              {/* Login Link */}
+              <div className="text-center mt-4">
+                <span className="text-muted">
+                  Already have an account?
+                </span>
+
+                <Link
+                  to="/login"
+                  className="ms-2 text-decoration-none fw-bold"
+                >
+                  Login
+                </Link>
+              </div>
             </div>
-            <div className="mb-3">
-              <input 
-                className="form-control" 
-                type="email" 
-                placeholder="Email" 
-                onChange={(e) => setUser({...user, email: e.target.value})} 
-                required 
-              />
-            </div>
-            <div className="mb-3">
-              <input 
-                className="form-control" 
-                type="password" 
-                placeholder="Password" 
-                onChange={(e) => setUser({...user, password: e.target.value})} 
-                required 
-              />
-            </div>
-            <button className="btn btn-warning w-100 fw-bold">Sign Up</button>
-          </form>
-          <p className="text-center mt-3">
-            Already have an account? <Link to="/login">Login</Link>
-          </p>
-        </div>  
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -11,7 +11,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
-@CrossOrigin(origins = {"https://techstore-catalog.vercel.app"})
 public class OrderController {
 
     @Autowired
@@ -20,6 +19,11 @@ public class OrderController {
     @GetMapping
     public List<Order> getAllOrders() {
         return orderRepository.findAll();
+    }
+
+    @GetMapping("/user/{email}")
+    public List<Order> getOrdersByUserEmail(@PathVariable String email) {
+        return orderRepository.findByUserEmail(email);
     }
 
     // Improved placeOrder with better error handling

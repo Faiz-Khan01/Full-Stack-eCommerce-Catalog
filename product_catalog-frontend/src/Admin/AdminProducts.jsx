@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://full-stack-ecommerce-catalog-13.onrender.com/api';
+
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -13,14 +15,14 @@ const AdminProducts = () => {
   });
 
   const fetchProducts = () => {
-    fetch("https://full-stack-ecommerce-catalog-13.onrender.com/api/admin/products")
+    fetch(`${API_BASE_URL}/admin/products`)
       .then((res) => res.json())
       .then((data) => setProducts(data))
       .catch(err => console.error("Error fetching products:", err));
   };
 
   const fetchCategories = () => {
-    fetch("https://full-stack-ecommerce-catalog-13.onrender.com/api/admin/categories")
+    fetch(`${API_BASE_URL}/admin/categories`)
       .then((res) => res.json())
       .then((data) => setCategories(data))
       .catch(err => console.error("Error fetching categories:", err));
@@ -39,8 +41,8 @@ const AdminProducts = () => {
     }
 
     const url = form.id
-      ? `https://full-stack-ecommerce-catalog-13.onrender.com/api/admin/products/${form.id}`
-      : "https://full-stack-ecommerce-catalog-13.onrender.com/api/admin/products";
+      ? `${API_BASE_URL}/admin/products/${form.id}`
+      : `${API_BASE_URL}/admin/products`;
     const method = form.id ? "PUT" : "POST";
 
     fetch(url, {
@@ -75,7 +77,7 @@ const AdminProducts = () => {
 
   const deleteProduct = (id) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
-      fetch(`https://full-stack-ecommerce-catalog-13.onrender.com/api/admin/products/${id}`, { method: "DELETE" })
+      fetch(`${API_BASE_URL}/admin/products/${id}`, { method: "DELETE" })
         .then(() => fetchProducts())
         .catch(err => alert("Error deleting product"));
     }

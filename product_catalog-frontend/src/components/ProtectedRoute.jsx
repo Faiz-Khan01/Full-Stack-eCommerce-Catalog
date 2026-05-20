@@ -1,24 +1,28 @@
 import { Navigate } from "react-router-dom";
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
-  // Get the string from localStorage and turn it back into an object
+  // Get user from localStorage
   const user = JSON.parse(localStorage.getItem("user"));
 
+  // If user not logged in
   if (!user) {
-    // If no user object exists, redirect to login
     return <Navigate to="/login" replace />;
   }
 
-  // Ensure user.role exists before calling .toLowerCase() to avoid errors
-  const userRole = user.role ? user.role.toLowerCase() : "";
+  // Safe role check
+  const userRole = user.role?.toLowerCase() || "";
+
+  // Check authorization
   const isAuthorized = allowedRoles.includes(userRole);
 
+  // Unauthorized
   if (!isAuthorized) {
-    alert("Access Denied: You do not have permission to view this page.");
+    alert("Access Denied!");
     return <Navigate to="/" replace />;
   }
 
+  // Authorized
   return children;
 };
 
-export default ProtectedRoute;  
+export default ProtectedRoute;

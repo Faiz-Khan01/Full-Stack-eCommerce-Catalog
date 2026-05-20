@@ -1,80 +1,182 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import Swal from "sweetalert2";
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  "https://full-stack-ecommerce-catalog-13.onrender.com/api";
 
 const Login = () => {
-  const [credentials, setCredentials] = useState({ email: "", password: "" });
   const navigate = useNavigate();
 
+  const [credentials, setCredentials] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+
+  // Handle Login
   const handleLogin = async (e) => {
     e.preventDefault();
+
     try {
-      const res = await fetch("https://full-stack-ecommerce-catalog-13.onrender.com/api/auth/login", {
+      setLoading(true);
+
+      const res = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(credentials),
       });
 
       const data = await res.json();
 
-      if (res.ok) {
-        // 1. Store Security Token
-        localStorage.setItem("token", data.token);
-
-        // 2. Store User Profile
-        const userObj = { 
-          role: data.role || "USER",
-          name: data.name || "User",
-          email: data.email 
-        }; 
-        localStorage.setItem("user", JSON.stringify(userObj));
-        
-        // 3. Role-based Redirect
-        if (userObj.role.toLowerCase() === "admin") {
-          navigate("/admin");
-        } else {
-          navigate("/profile");
-        }
-      } else {
-        // This now correctly accesses the JSON 'message' from Java
-        alert(data.message || "Invalid email or password");
+      if (!res.ok) {
+        throw new Error(data.message || "Login failed");
       }
-    } catch (err) {
-      console.error("Login Connection Error:", err);
-      alert("Cannot connect to server. Please ensure Spring Boot is running on port 8080.");
+
+      // Save Token
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+
+      // Save User
+      const userData = {
+        name: data.name || "User",
+        email: data.email,
+        role: data.role || "USER",
+      };
+
+      localStorage.setItem("user", JSON.stringify(userData));
+
+      // Success Alert
+      Swal.fire({
+        icon: "success",
+        title: "Login Successful",
+        toast: true,
+        position: "top-end",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      // Redirect
+      if (userData.role.toLowerCase() === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
+
+      // Refresh navbar state
+      window.location.reload();
+    } catch (error) {
+      console.error("Login Error:", error);
+
+      Swal.fire({
+        icon: "error",
+        title: "Login Failed",
+        text: error.message,
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="container mt-5">
+    <div className="container py-5">
       <div className="row justify-content-center">
-        <div className="col-md-4 card p-4 shadow border-0">
-          <h3 className="text-center mb-4 fw-bold text-primary">Login</h3>
-          <form onSubmit={handleLogin}>
-            <div className="mb-3">
-              <label className="form-label small fw-bold">Email Address</label>
-              <input 
-                type="email" 
-                className="form-control" 
-                placeholder="email@example.com" 
-                onChange={(e) => setCredentials({...credentials, email: e.target.value})} 
-                required 
-              />
+        <div className="col-md-5 col-lg-4">
+          <div className="card shadow border-0">
+            <div className="card-body p-4">
+              {/* Heading */}
+              <div className="text-center mb-4">
+                <h2 className="fw-bold text-primary">
+                  Welcome Back
+                </h2>
+                <p className="text-muted">
+                  Login to your account
+                </p>
+              </div>
+
+              {/* Form */}
+              <form onSubmit={handleLogin}>
+                {/* Email */}
+                <div className="mb-3">
+                  <label className="form-label fw-semibold">
+                    Email Address
+                  </label>
+
+                  <input
+                    type="email"
+                    className="form-control"
+                    placeholder="Enter email"
+                    required
+                    value={credentials.email}
+                    onChange={(e) =>
+                      setCredentials({
+                        ...credentials,
+                        email: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+
+                {/* Password */}
+                <div className="mb-4">
+                  <label className="form-label fw-semibold">
+                    Password
+                  </label>
+
+                  <input
+                    type="password"
+                    className="form-control"
+                    placeholder="Enter password"
+                    required
+                    value={credentials.password}
+                    onChange={(e) =>
+                      setCredentials({
+                        ...credentials,
+                        password: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+
+                {/* Submit */}
+                <button
+                  type="submit"
+                  className="btn btn-primary w-100 fw-bold py-2"
+                  disabled={loading}
+                >
+                  {loading ? "Logging in..." : "Login"}
+                </button>
+              </form>
+
+              {/* Signup */}
+              <div className="text-center mt-4">
+                <span className="text-muted">
+                  Don&apos;t have an account?
+                </span>
+
+                <Link
+                  to="/signup"
+                  className="ms-2 text-decoration-none fw-bold"
+                >
+                  Sign Up
+                </Link>
+              </div>
+
+              {/* Admin Login */}
+              <div className="text-center mt-3">
+                <Link
+                  to="/admin-login"
+                  className="small text-danger text-decoration-none"
+                >
+                  Admin Login
+                </Link>
+              </div>
             </div>
-            <div className="mb-3">
-              <label className="form-label small fw-bold">Password</label>
-              <input 
-                type="password" 
-                className="form-control" 
-                placeholder="Enter password" 
-                onChange={(e) => setCredentials({...credentials, password: e.target.value})} 
-                required 
-              />
-            </div>
-            <button className="btn btn-primary w-100 fw-bold py-2 mt-2">Login</button>
-          </form>
-          <div className="text-center mt-4">
-            <span className="text-muted">New here? </span>
-            <Link to="/signup" className="text-decoration-none fw-bold">Sign Up</Link>
           </div>
         </div>
       </div>

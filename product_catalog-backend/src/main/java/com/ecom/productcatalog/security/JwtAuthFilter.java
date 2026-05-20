@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -28,7 +29,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
-        // No token → allow public endpoints
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -43,11 +43,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String email = jwtUtils.getEmailFromToken(token);
 
+        // ✅  ADD AUTHORITY (VERY IMPORTANT)
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(
                         email,
                         null,
-                        List.of()
+                        List.of(new SimpleGrantedAuthority("ROLE_USER"))
                 );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
