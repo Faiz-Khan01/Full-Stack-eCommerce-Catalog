@@ -28,14 +28,14 @@ const Navbar = ({
         const res = await fetch(`${API_BASE_URL}/cart`);
 
         if (!res.ok) {
-          throw new Error("Failed to fetch cart");
+          throw new Error(`Cart API error: ${res.status}`);
         }
 
         const data = await res.json();
 
         setCartCount(Array.isArray(data) ? data.length : 0);
-      } catch (error) {
-        console.error("Cart Error:", error);
+      } catch (err) {
+        console.error("Cart error:", err);
         setCartCount(0);
       }
     };
@@ -57,8 +57,9 @@ const Navbar = ({
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark shadow sticky-top">
       <div className="container-fluid px-lg-5">
+
         {/* Logo */}
-        <Link className="navbar-brand fw-bold text-warning fs-3" to="/">
+        <Link className="navbar-brand fw-bold fs-3 text-warning" to="/">
           🛍️ TechStore
         </Link>
 
@@ -74,8 +75,9 @@ const Navbar = ({
 
         {/* Navbar Content */}
         <div className="collapse navbar-collapse" id="navbarContent">
+
           {/* Search */}
-          <div className="flex-grow-1 mx-lg-4 my-3 my-lg-0">
+          <div className="flex-grow-1 mx-lg-4 my-2 my-lg-0">
             <input
               type="text"
               className="form-control"
@@ -86,7 +88,7 @@ const Navbar = ({
           </div>
 
           {/* Filters */}
-          <div className="d-flex gap-2 me-lg-4 mb-3 mb-lg-0">
+          <div className="d-flex gap-2 me-lg-4">
             <CategoryFilter
               categories={categories}
               selectedCategory={selectedCategory}
@@ -94,7 +96,7 @@ const Navbar = ({
             />
 
             <select
-              className="form-select"
+              className="form-select form-select-sm"
               value={sortOrder}
               onChange={(e) => onSortChange(e.target.value)}
             >
@@ -105,6 +107,7 @@ const Navbar = ({
 
           {/* Right Section */}
           <div className="d-flex align-items-center gap-3">
+
             {/* Cart */}
             <Link
               to="/cart"
@@ -121,7 +124,7 @@ const Navbar = ({
             {/* User Dropdown */}
             <div className="dropdown">
               <button
-                className="btn btn-outline-light dropdown-toggle"
+                className="btn btn-outline-light btn-sm dropdown-toggle"
                 type="button"
                 data-bs-toggle="dropdown"
               >
@@ -181,6 +184,7 @@ const Navbar = ({
                 )}
               </ul>
             </div>
+
           </div>
         </div>
       </div>

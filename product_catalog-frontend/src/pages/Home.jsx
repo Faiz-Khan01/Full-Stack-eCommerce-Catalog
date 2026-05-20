@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-
 import ProductList from "../components/ProductList";
 
 const API_BASE_URL =
@@ -27,14 +26,16 @@ const Home = ({
         const res = await fetch(`${API_BASE_URL}/products`);
 
         if (!res.ok) {
-          throw new Error("Failed to fetch products");
+          throw new Error(`Failed to fetch products: ${res.status}`);
         }
 
         const data = await res.json();
 
         setProducts(data || []);
-      } catch (error) {
-        console.error("Product Fetch Error:", error);
+      } catch (err) {
+        console.error("Fetch error:", err);
+
+        setProducts([]);
 
         Swal.fire({
           icon: "error",
@@ -52,32 +53,33 @@ const Home = ({
   // Add To Cart
   const handleAddToCart = async (productId) => {
     try {
-      const res = await fetch(
-        `${API_BASE_URL}/cart/add/${productId}`,
-        {
-          method: "POST",
-        }
-      );
+      const res = await fetch(`${API_BASE_URL}/cart/add/${productId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       if (!res.ok) {
-        throw new Error("Cart request failed");
+        throw new Error(`Cart error: ${res.status}`);
       }
 
       Swal.fire({
+        title: "Added!",
+        text: "Item added to cart successfully",
         icon: "success",
-        title: "Added to Cart",
         toast: true,
         position: "top-end",
         timer: 1500,
         showConfirmButton: false,
       });
-    } catch (error) {
-      console.error("Cart Error:", error);
+    } catch (err) {
+      console.error("Cart error:", err);
 
       Swal.fire({
-        icon: "error",
-        title: "Failed",
+        title: "Error",
         text: "Could not add item to cart",
+        icon: "error",
       });
     }
   };
@@ -87,26 +89,25 @@ const Home = ({
     navigate(`/checkout/${productId}`);
   };
 
-  // Filter Products
+  // Filter + Sort Products
   const filteredProducts = products
     .filter((product) => {
-      // Search Filter
       const matchesSearch = product.name
         ?.toLowerCase()
         .includes(searchTerm.toLowerCase());
 
-      // Category Filter
       const matchesCategory = selectedCategory
-        ? product.category?.id === Number(selectedCategory)
+        ? product.category?.id === Number(selectedCategory) ||
+          product.categoryId === Number(selectedCategory)
         : true;
 
       return matchesSearch && matchesCategory;
     })
-    .sort((a, b) => {
-      return sortOrder === "asc"
+    .sort((a, b) =>
+      sortOrder === "asc"
         ? a.price - b.price
-        : b.price - a.price;
-    });
+        : b.price - a.price
+    );
 
   // Loading UI
   if (loading) {
@@ -120,11 +121,22 @@ const Home = ({
   return (
     <div className="bg-light min-vh-100 py-4">
       <div className="container-fluid px-lg-5">
-        <ProductList
-          products={filteredProducts}
-          onAddToCart={handleAddToCart}
-          onBuyNow={handleBuyNow}
-        />
+
+        {filteredProducts.length > 0 ? (
+          <ProductList
+            products={filteredProducts}
+            onAddToCart={handleAddToCart}
+            onBuyNow={handleBuyNow}
+          />
+        ) : (
+          <div className="text-center mt-5 py-5">
+            <h3>No products found matching your search.</h3>
+            <p className="text-muted">
+              Try adjusting filters or search terms.
+            </p>
+          </div>
+        )}
+
       </div>
     </div>
   );
