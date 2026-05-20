@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import ProductList from "../components/ProductList";
 
+// FIX 1: Corrected production fallback URL (Removed -13)
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
-  "https://full-stack-ecommerce-catalog-13.onrender.com/api";
+  "https://full-stack-ecommerce-catalog.onrender.com/api";
 
 const Home = ({
   searchTerm = "",
@@ -17,7 +18,7 @@ const Home = ({
 
   const navigate = useNavigate();
 
-  // Fetch Products
+  // Fetch Products (Public Endpoint - No Token Needed)
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -30,13 +31,10 @@ const Home = ({
         }
 
         const data = await res.json();
-
         setProducts(data || []);
       } catch (err) {
         console.error("Fetch error:", err);
-
         setProducts([]);
-
         Swal.fire({
           icon: "error",
           title: "Error",
@@ -50,17 +48,38 @@ const Home = ({
     fetchProducts();
   }, []);
 
-  // Add To Cart
+  // Add To Cart (Secure Endpoint - Requires JWT Token)
   const handleAddToCart = async (productId) => {
+    const token = localStorage.getItem("token");
+
+    // Checking if user is logged in
+    if (!token) {
+      Swal.fire({
+        title: "Login Required",
+        text: "Please login first to add items to the cart.",
+        icon: "info",
+        showCancelButton: true,
+        confirmButtonText: "Login Now",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/login");
+        }
+      });
+      return;
+    }
+
     try {
+      // FIX 2: Added Bearer token inside Auth headers
       const res = await fetch(`${API_BASE_URL}/cart/add/${productId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
         },
       });
 
       if (!res.ok) {
+        if (res.status === 403) throw new Error("Session expired. Please log in again.");
         throw new Error(`Cart error: ${res.status}`);
       }
 
@@ -75,10 +94,9 @@ const Home = ({
       });
     } catch (err) {
       console.error("Cart error:", err);
-
       Swal.fire({
         title: "Error",
-        text: "Could not add item to cart",
+        text: err.message || "Could not add item to cart",
         icon: "error",
       });
     }
@@ -86,6 +104,12 @@ const Home = ({
 
   // Buy Now
   const handleBuyNow = (productId) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      Swal.fire("Login required", "Please login first to buy products", "info");
+      navigate("/login");
+      return;
+    }
     navigate(`/checkout/${productId}`);
   };
 

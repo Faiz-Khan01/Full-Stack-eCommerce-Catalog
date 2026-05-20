@@ -2,9 +2,10 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Swal from "sweetalert2";
 
+// FIX: Corrected production fallback URL (Removed -13)
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
-  "https://full-stack-ecommerce-catalog-13.onrender.com/api";
+  "https://full-stack-ecommerce-catalog.onrender.com/api";
 
 const Signup = () => {
   const navigate = useNavigate();

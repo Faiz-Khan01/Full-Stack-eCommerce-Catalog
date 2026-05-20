@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 
+// FIX 1: Corrected production fallback URL (Removed -13)
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
-  "https://full-stack-ecommerce-catalog-13.onrender.com/api";
+  "https://full-stack-ecommerce-catalog.onrender.com/api";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -10,17 +11,20 @@ const Orders = () => {
 
   const user = JSON.parse(localStorage.getItem("user"));
   const token = localStorage.getItem("token");
+  
+  // Extracting email to safe reference for useEffect
+  const userEmail = user?.email;
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        if (!user?.email || !token) {
+        if (!userEmail || !token) {
           setLoading(false);
           return;
         }
 
         const res = await fetch(
-          `${API_BASE_URL}/orders/user/${user.email}`,
+          `${API_BASE_URL}/orders/user/${userEmail}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -32,8 +36,8 @@ const Orders = () => {
 
         const data = await res.json();
 
+        // Sort by latest order ID
         const sorted = data.sort((a, b) => b.id - a.id);
-
         setOrders(sorted);
       } catch (error) {
         console.error("Orders Error:", error);
@@ -43,7 +47,8 @@ const Orders = () => {
     };
 
     fetchOrders();
-  }, [user, token]);
+  // FIX 2: Using userEmail string instead of whole user object to avoid reference loops
+  }, [userEmail, token]);
 
   if (loading) {
     return (
@@ -80,9 +85,7 @@ const Orders = () => {
 
                   <td>
                     {order.orderDate
-                      ? new Date(
-                          order.orderDate
-                        ).toLocaleDateString()
+                      ? new Date(order.orderDate).toLocaleDateString()
                       : "N/A"}
                   </td>
 

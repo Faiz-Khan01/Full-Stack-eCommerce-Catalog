@@ -1,10 +1,18 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Success = () => {
   const navigate = useNavigate();
-  // Generate a random order ID for display purposes
-  const orderNumber = Math.floor(Math.random() * 900000) + 100000;
+  const location = useLocation();
+
+  // FIX 1: Try to read the actual order ID passed from the checkout redirection state
+  // If not available (e.g., direct link visit), fallback to a realistic random number
+  const realOrderId = location.state?.orderId;
+  const fallbackOrderNumber = React.useMemo(() => {
+    return Math.floor(Math.random() * 900000) + 100000;
+  }, []);
+
+  const displayOrderId = realOrderId ? realOrderId : fallbackOrderNumber;
 
   return (
     <div className="container mt-5 mb-5 text-center">
@@ -12,9 +20,9 @@ const Success = () => {
         <div className="col-md-6">
           <div className="card shadow border-0 p-5">
             <div className="mb-4">
-              {/* Large green success checkmark */}
+              {/* FIX 2: Cleaned up dual-icon rendering for sharp look */}
               <div className="display-1 text-success">
-                <i className="bi bi-check-circle-fill">✅</i>
+                <span role="img" aria-label="success-checkmark">✅</span>
               </div>
             </div>
             
@@ -25,7 +33,9 @@ const Success = () => {
             
             <div className="bg-light p-3 rounded mb-4 border">
               <span className="text-muted d-block">Order Number:</span>
-              <span className="fw-bold fs-4 text-primary">#TS-{orderNumber}</span>
+              <span className="fw-bold fs-4 text-primary">
+                #TS-{displayOrderId}
+              </span>
             </div>
 
             <p className="small text-muted mb-4">

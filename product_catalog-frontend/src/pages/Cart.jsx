@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
+// FIX 1: Corrected fallback URLs (Removed -13)
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
-  "https://full-stack-ecommerce-catalog-13.onrender.com/api";
+  "https://full-stack-ecommerce-catalog.onrender.com/api";
 
 const BASE_URL_NO_API =
   import.meta.env.VITE_API_BASE_URL?.replace("/api", "") ||
-  "https://full-stack-ecommerce-catalog-13.onrender.com";
+  "https://full-stack-ecommerce-catalog.onrender.com";
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -17,12 +18,24 @@ const Cart = () => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
 
+  // Helper function to get JWT token headers
+  const getAuthHeaders = (method = "GET") => {
+    const token = localStorage.getItem("token");
+    return {
+      ...(method !== "GET" ? { "Content-Type": "application/json" } : {}),
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    };
+  };
+
   // Fetch Cart
   const fetchCart = async () => {
     try {
       setLoading(true);
 
-      const res = await fetch(`${API_BASE_URL}/cart`);
+      // FIX 2: Added Auth Headers for token verification
+      const res = await fetch(`${API_BASE_URL}/cart`, {
+        headers: getAuthHeaders("GET"),
+      });
 
       if (!res.ok) throw new Error("Failed to fetch cart");
 
@@ -56,8 +69,10 @@ const Cart = () => {
   // Add quantity
   const handleIncrease = async (productId) => {
     try {
+      // FIX 2: Added Auth Headers
       await fetch(`${API_BASE_URL}/cart/add/${productId}`, {
         method: "POST",
+        headers: getAuthHeaders("POST"),
       });
 
       fetchCart();
@@ -73,8 +88,10 @@ const Cart = () => {
     }
 
     try {
+      // FIX 2: Added Auth Headers
       await fetch(`${API_BASE_URL}/cart/remove/${productId}`, {
         method: "DELETE",
+        headers: getAuthHeaders("DELETE"),
       });
 
       fetchCart();
@@ -95,8 +112,10 @@ const Cart = () => {
     if (!result.isConfirmed) return;
 
     try {
+      // FIX 2: Added Auth Headers
       await fetch(`${API_BASE_URL}/cart/remove/${productId}`, {
         method: "DELETE",
+        headers: getAuthHeaders("DELETE"),
       });
 
       Swal.fire({
@@ -122,10 +141,12 @@ const Cart = () => {
     }
 
     try {
+      // FIX 2: Added Auth Headers to secure checkout endpoint
       const res = await fetch(
         `${API_BASE_URL}/cart/buy?email=${user.email}`,
         {
           method: "POST",
+          headers: getAuthHeaders("POST"),
         }
       );
 
@@ -192,11 +213,11 @@ const Cart = () => {
                         src={
                           item.imageUrl
                             ? `${BASE_URL_NO_API}${item.imageUrl}`
-                            : "https://placehold.co/80"
+                            : "https://placehold.co/120"
                         }
                         alt={item.name}
-                        width="60"
-                        height="60"
+                        width="120"
+                        height="120"
                         style={{ objectFit: "cover" }}
                       />
                       {item.name}
@@ -225,6 +246,7 @@ const Cart = () => {
                     <td>₹{item.price}</td>
 
                     <td>
+                      {" "}
                       ₹{(item.price * item.quantity).toFixed(2)}
                     </td>
 

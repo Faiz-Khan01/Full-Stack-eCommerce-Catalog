@@ -1,8 +1,9 @@
 import React from "react";
 
+// FIX: Removed the incorrect "-13" from the default fallback URL
 const BASE_URL =
   import.meta.env.VITE_API_BASE_URL?.replace("/api", "") ||
-  "https://full-stack-ecommerce-catalog-13.onrender.com";
+  "https://full-stack-ecommerce-catalog.onrender.com";
 
 const ProductList = ({
   products = [],

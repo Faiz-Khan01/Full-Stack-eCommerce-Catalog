@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
+// FIX 1: Corrected fallback URLs (Removed -13)
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
-  "https://full-stack-ecommerce-catalog-13.onrender.com/api";
+  "https://full-stack-ecommerce-catalog.onrender.com/api";
 
 const BASE_URL_NO_API =
   import.meta.env.VITE_API_BASE_URL?.replace("/api", "") ||
-  "https://full-stack-ecommerce-catalog-13.onrender.com";
+  "https://full-stack-ecommerce-catalog.onrender.com";
 
 const Checkout = () => {
   const { productId } = useParams();
@@ -23,10 +24,20 @@ const Checkout = () => {
   const [address, setAddress] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("cod");
 
+  // Helper function to get JWT token headers
+  const getAuthHeaders = (method = "GET") => {
+    const token = localStorage.getItem("token");
+    return {
+      ...(method !== "GET" ? { "Content-Type": "application/json" } : {}),
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    };
+  };
+
   // Fetch Product
   useEffect(() => {
     const fetchProduct = async () => {
       try {
+        setLoading(true);
         const res = await fetch(
           `${API_BASE_URL}/products/${productId}`
         );
@@ -61,10 +72,18 @@ const Checkout = () => {
     }
 
     try {
+      // FIX 2: Added Auth Headers to the purchase request
       const res = await fetch(
         `${API_BASE_URL}/cart/buy/${productId}`,
         {
           method: "POST",
+          headers: getAuthHeaders("POST"),
+          body: JSON.stringify({
+            email,
+            mobile,
+            address,
+            paymentMethod
+          })
         }
       );
 
@@ -73,6 +92,7 @@ const Checkout = () => {
       Swal.fire({
         icon: "success",
         title: "Order Placed!",
+        text: paymentMethod === "cod" ? "Pay on delivery" : "Proceeding with verification"
       });
 
       navigate("/order-success");
@@ -139,23 +159,29 @@ const Checkout = () => {
             <div className="form-check">
               <input
                 type="radio"
+                name="paymentOpt"
+                id="codOpt"
+                className="form-check-input"
                 checked={paymentMethod === "cod"}
                 onChange={() => setPaymentMethod("cod")}
               />
-              <label className="ms-2">Cash on Delivery</label>
+              <label className="form-check-label" htmlFor="codOpt">Cash on Delivery</label>
             </div>
 
             <div className="form-check mb-3">
               <input
                 type="radio"
+                name="paymentOpt"
+                id="upiOpt"
+                className="form-check-input"
                 checked={paymentMethod === "upi"}
                 onChange={() => setPaymentMethod("upi")}
               />
-              <label className="ms-2">UPI / Online</label>
+              <label className="form-check-label" htmlFor="upiOpt">UPI / Online</label>
             </div>
 
             <button className="btn btn-success w-100">
-              Place Order ₹{product.price}
+              Place Order ₹{Number(product.price).toFixed(2)}
             </button>
           </form>
         </div>
@@ -171,6 +197,7 @@ const Checkout = () => {
               }
               className="img-fluid mb-3"
               alt={product.name}
+              style={{ maxHeight: "300px", objectFit: "cover", borderRadius: "5px" }}
             />
 
             <h5>{product.name}</h5>
@@ -179,7 +206,7 @@ const Checkout = () => {
             <hr />
 
             <h4 className="text-primary">
-              ₹{product.price}
+              ₹{Number(product.price).toFixed(2)}
             </h4>
           </div>
         </div>

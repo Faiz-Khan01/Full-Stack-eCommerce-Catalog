@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://full-stack-ecommerce-catalog-13.onrender.com/api';
+// FIX 1: Corrected default fallback URL (Removed -13)
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  "https://full-stack-ecommerce-catalog.onrender.com/api";
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
@@ -14,18 +17,32 @@ const AdminProducts = () => {
     category: { id: "" },
   });
 
+  // Helper function to get token and headers
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem("token"); // Ensure 'token' is saved here during login
+    return {
+      "Content-Type": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    };
+  };
+
   const fetchProducts = () => {
-    fetch(`${API_BASE_URL}/admin/products`)
-      .then((res) => res.json())
+    // FIX 3: Added Auth Headers for JWT authentication
+    fetch(`${API_BASE_URL}/admin/products`, { headers: getAuthHeaders() })
+      .then((res) => {
+        if (res.status === 403) throw new Error("403 Forbidden - Check JWT Token");
+        return res.json();
+      })
       .then((data) => setProducts(data))
-      .catch(err => console.error("Error fetching products:", err));
+      .catch((err) => console.error("Error fetching products:", err));
   };
 
   const fetchCategories = () => {
-    fetch(`${API_BASE_URL}/admin/categories`)
+    // FIX 3: Added Auth Headers
+    fetch(`${API_BASE_URL}/admin/categories`, { headers: getAuthHeaders() })
       .then((res) => res.json())
       .then((data) => setCategories(data))
-      .catch(err => console.error("Error fetching categories:", err));
+      .catch((err) => console.error("Error fetching categories:", err));
   };
 
   useEffect(() => {
@@ -34,7 +51,6 @@ const AdminProducts = () => {
   }, []);
 
   const saveProduct = () => {
-    // Validation
     if (!form.name || !form.price || !form.category.id) {
       alert("Please fill in Name, Price, and Category");
       return;
@@ -45,9 +61,10 @@ const AdminProducts = () => {
       : `${API_BASE_URL}/admin/products`;
     const method = form.id ? "PUT" : "POST";
 
+    // FIX 3: Added Auth Headers
     fetch(url, {
       method,
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
       body: JSON.stringify(form),
     })
       .then((res) => {
@@ -56,10 +73,10 @@ const AdminProducts = () => {
           setForm({ id: null, name: "", price: "", description: "", imageUrl: "", category: { id: "" } });
           fetchProducts();
         } else {
-          alert("Server error. Check if Category ID exists.");
+          alert("Server error. Check if Category ID exists or if you have Admin access.");
         }
       })
-      .catch(err => alert("Failed to connect to server"));
+      .catch((err) => alert("Failed to connect to server"));
   };
 
   const editProduct = (product) => {
@@ -71,15 +88,18 @@ const AdminProducts = () => {
       imageUrl: product.imageUrl,
       category: { id: product.category.id },
     });
-    // Scroll to top to see the form
     window.scrollTo(0, 0);
   };
 
   const deleteProduct = (id) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
-      fetch(`${API_BASE_URL}/admin/products/${id}`, { method: "DELETE" })
+      // FIX 3: Added Auth Headers
+      fetch(`${API_BASE_URL}/admin/products/${id}`, { 
+        method: "DELETE",
+        headers: getAuthHeaders()
+      })
         .then(() => fetchProducts())
-        .catch(err => alert("Error deleting product"));
+        .catch((err) => alert("Error deleting product"));
     }
   };
 
@@ -121,10 +141,10 @@ const AdminProducts = () => {
           </div>
         </div>
         {form.imageUrl && (
-            <div className="mt-2 text-center">
-                <p className="text-muted small">Preview:</p>
-                <img src={form.imageUrl} alt="preview" style={{height: '80px', borderRadius: '5px'}} />
-            </div>
+          <div className="mt-2 text-center">
+            <p className="text-muted small">Preview:</p>
+            <img src={form.imageUrl} alt="preview" style={{ height: '80px', borderRadius: '5px' }} />
+          </div>
         )}
       </div>
 
@@ -143,10 +163,11 @@ const AdminProducts = () => {
           <tbody>
             {products.map((prod) => (
               <tr key={prod.id}>
-                <td><img src={prod.imageUrl} alt={prod.name} style={{width: '50px', height: '50px', objectFit: 'cover'}} /></td>
+                <td><img src={prod.imageUrl} alt={prod.name} style={{ width: '50px', height: '50px', objectFit: 'cover' }} /></td>
                 <td className="fw-bold">{prod.name}</td>
-                <td className="text-success fw-bold">${prod.price.toFixed(2)}</td>
-                <td><span className="badge bg-info text-dark">{prod.category.name}</span></td>
+                {/* FIX 2: Changed currency symbol from $ to ₹ */}
+                <td className="text-success fw-bold">₹{Number(prod.price).toFixed(2)}</td>
+                <td><span className="badge bg-info text-dark">{prod.category?.name || "N/A"}</span></td>
                 <td className="text-center">
                   <button className="btn btn-outline-primary btn-sm me-2" onClick={() => editProduct(prod)}>Edit</button>
                   <button className="btn btn-outline-danger btn-sm" onClick={() => deleteProduct(prod.id)}>Delete</button>

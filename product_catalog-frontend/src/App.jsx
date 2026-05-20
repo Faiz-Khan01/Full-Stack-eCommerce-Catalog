@@ -21,9 +21,10 @@ import AdminLogin from "./Admin/AdminLogin";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 
+// FIX: Cleaned up the production fallback URL globally (Removed -13)
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
-  "https://full-stack-ecommerce-catalog-13.onrender.com/api";
+  "https://full-stack-ecommerce-catalog.onrender.com/api";
 
 function App() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -31,11 +32,14 @@ function App() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
 
-  // fetch categories
+  // Fetch categories on mount
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const res = await fetch(`${API_BASE_URL}/categories`);
+        if (!res.ok) {
+          throw new Error(`Category fetch failed with status: ${res.status}`);
+        }
         const data = await res.json();
         setCategories(data || []);
       } catch (err) {

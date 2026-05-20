@@ -2,8 +2,11 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://full-stack-ecommerce-catalog-13.onrender.com/api';
-const RAZORPAY_KEY_ID = process.env.REACT_APP_RAZORPAY_KEY_ID || 'rzp_test_your_key_id';
+// FIX 1: Corrected the default live Render backend URL (Removed -13)
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://full-stack-ecommerce-catalog.onrender.com/api';
+
+// FIX 2: Changed process.env to import.meta.env and prefix to VITE_ for Vite compatibility
+const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_your_key_id';
 
 const PaymentComponent = ({ orderId, amount, userEmail, onPaymentSuccess }) => {
   const [loading, setLoading] = useState(false);
@@ -114,4 +117,3 @@ const PaymentComponent = ({ orderId, amount, userEmail, onPaymentSuccess }) => {
 };
 
 export default PaymentComponent;
-

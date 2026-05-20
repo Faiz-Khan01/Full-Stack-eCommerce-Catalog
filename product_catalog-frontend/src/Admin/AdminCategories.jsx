@@ -1,17 +1,34 @@
 import { useEffect, useState } from "react";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://full-stack-ecommerce-catalog-13.onrender.com/api';
+// FIX 1: Corrected default fallback URL (Removed -13)
+const API_BASE_URL = 
+  import.meta.env.VITE_API_BASE_URL || 
+  'https://full-stack-ecommerce-catalog.onrender.com/api';
 
 const AdminCategories = () => {
   const [categories, setCategories] = useState([]);
   const [name, setName] = useState("");
   const [editing, setEditing] = useState(null);
 
+  // Helper function to get token and set request headers
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem("token"); // Assumes token is saved here on login
+    return {
+      "Content-Type": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    };
+  };
+
   // Fetch categories
   const fetchCategories = () => {
-    fetch(`${API_BASE_URL}/admin/categories`)
-      .then((res) => res.json())
-      .then((data) => setCategories(data));
+    // FIX 2: Added Auth Headers to prevent 403 Forbidden
+    fetch(`${API_BASE_URL}/admin/categories`, { headers: getAuthHeaders() })
+      .then((res) => {
+        if (res.status === 403) throw new Error("403 Forbidden - Check Admin Token");
+        return res.json();
+      })
+      .then((data) => setCategories(data))
+      .catch((err) => console.error("Error fetching categories:", err));
   };
 
   useEffect(() => {
@@ -19,32 +36,62 @@ const AdminCategories = () => {
   }, []);
 
   const addCategory = () => {
+    if (!name.trim()) {
+      alert("Category name cannot be empty");
+      return;
+    }
+
+    // FIX 2: Added Auth Headers
     fetch(`${API_BASE_URL}/admin/categories`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
       body: JSON.stringify({ name }),
-    }).then(() => {
-      setName("");
-      fetchCategories();
-    });
+    }).then((res) => {
+      if (res.ok) {
+        setName("");
+        fetchCategories();
+      } else {
+        alert("Failed to add category. Check permissions.");
+      }
+    }).catch(err => console.error(err));
   };
 
   const updateCategory = (id) => {
+    if (!name.trim()) {
+      alert("Category name cannot be empty");
+      return;
+    }
+
+    // FIX 2: Added Auth Headers
     fetch(`${API_BASE_URL}/admin/categories/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
       body: JSON.stringify({ name }),
-    }).then(() => {
-      setName("");
-      setEditing(null);
-      fetchCategories();
-    });
+    }).then((res) => {
+      if (res.ok) {
+        setName("");
+        setEditing(null);
+        fetchCategories();
+      } else {
+        alert("Failed to update category.");
+      }
+    }).catch(err => console.error(err));
   };
 
   const deleteCategory = (id) => {
-    fetch(`${API_BASE_URL}/admin/categories/${id}`, {
-      method: "DELETE",
-    }).then(fetchCategories);
+    if (window.confirm("Are you sure you want to delete this category?")) {
+      // FIX 2: Added Auth Headers
+      fetch(`${API_BASE_URL}/admin/categories/${id}`, {
+        method: "DELETE",
+        headers: getAuthHeaders()
+      }).then((res) => {
+        if (res.ok) {
+          fetchCategories();
+        } else {
+          alert("Failed to delete category.");
+        }
+      }).catch(err => console.error(err));
+    }
   };
 
   return (
@@ -95,4 +142,3 @@ const AdminCategories = () => {
 };
 
 export default AdminCategories;
-

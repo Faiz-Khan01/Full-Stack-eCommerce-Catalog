@@ -2,9 +2,10 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import CategoryFilter from "./CategoryFilter";
 
+// FIX: Removed the incorrect "-13" from the default fallback URL
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
-  "https://full-stack-ecommerce-catalog-13.onrender.com/api";
+  "https://full-stack-ecommerce-catalog.onrender.com/api";
 
 const Navbar = ({
   searchTerm,
@@ -165,7 +166,7 @@ const Navbar = ({
                         <Link className="dropdown-item" to="/admin">
                           Admin Dashboard
                         </Link>
-                      </li>
+                      </>
                     )}
 
                     <li>
