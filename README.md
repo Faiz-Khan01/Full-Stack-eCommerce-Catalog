@@ -1,110 +1,304 @@
-🛒 Full-Stack eCommerce Catalog
+# 🛒 Full-Stack eCommerce Catalog
 
-A modern full-stack eCommerce catalog application built using React, Spring Boot, and MySQL, designed to deliver a seamless online shopping experience with features like product browsing, cart management, secure authentication, and online payments.
+A modern **Full-Stack eCommerce Catalog** application built with **React.js, Spring Boot, and MySQL** that delivers a seamless online shopping experience. The platform enables users to browse products, manage their shopping cart, securely authenticate, and complete online purchases using **Razorpay Payment Gateway**.
 
-The platform provides a smooth and responsive UI for customers while ensuring a robust and scalable backend architecture for handling products, users, orders, and transactions efficiently.
+Designed with a production-ready architecture, the application integrates a responsive React frontend with a scalable Spring Boot backend using secure REST APIs, JWT authentication, and persistent MySQL storage.
 
-Built with a production-ready mindset, the system integrates frontend and backend services with secure REST APIs, persistent database storage, and role-based access control, making it suitable for real-world eCommerce use cases.
+---
 
-⚙️ Tech Stack
+# 🚀 Features
 
-💻 Frontend
+* 🛍️ Browse products with category-based filtering and search
+* 🛒 Persistent shopping cart for each authenticated user
+* 🔐 Secure JWT Authentication & Authorization
+* 🔑 Google OAuth 2.0 Sign-In
+* 💳 Razorpay Payment Gateway Integration
+* 📦 Order placement and order history
+* 👤 User profile management
+* 📱 Responsive UI for desktop and mobile devices
+* ⚡ RESTful API architecture
+* 🔒 Role-based access control (Admin/User)
 
-React.js
-Axios
-Tailwind CSS / CSS3
-JavaScript
+---
 
-🔧 Backend
+# 🛠️ Tech Stack
 
-Java
-Spring Boot
-Spring Security
-REST APIs
-JWT Authentication
+## Frontend
 
-🗄️ Database
+* React.js
+* JavaScript
+* Axios
+* Tailwind CSS
+* HTML5
+* CSS3
 
-MySQL
+## Backend
 
-💳 Payments
+* Java
+* Spring Boot
+* Spring Security
+* Spring MVC
+* Hibernate / JPA
+* RESTful APIs
+* Maven
 
-Razorpay
-Secure payment gateway integration (Cards, UPI, NetBanking, Wallets)
+## Database
 
-🏗️ System Modules
+* MySQL
 
-🛍️ Product Catalog Module
+## Authentication
 
-View all products
-Product search and filtering
-Product details page
+* JWT Authentication
+* Google OAuth 2.0
+* Role-Based Authorization
 
-🛒 Cart Module
+## Payment
 
-Add/remove products
-Per-user cart management
-Persistent cart storage in database
+* Razorpay Payment Gateway
+* Payment Verification
+* Secure Checkout
 
-👤 User Module
+## Tools
 
-User registration & login
-Profile management
-Secure authentication system
+* Git & GitHub
+* Postman
+* IntelliJ IDEA
+* VS Code
 
-📦 Order Module
+---
 
-Place orders
-Order history tracking
-Order status management
+# 🏗️ System Architecture
 
-💳 Payment Module (New)
+```text
+React.js Frontend
+        │
+        ▼
+REST API Communication
+        │
+        ▼
+Spring Boot Backend
+        │
+        ▼
+MySQL Database
+```
 
-Secure checkout using Razorpay payment gateway
-UPI / Card / NetBanking integration
-Payment verification via backend (Spring Boot)
-Order confirmation after successful payment
-Handling payment failure & retries
+### Authentication Flow
 
-🔐 Authentication Module
+```text
+User Login
+      │
+JWT Authentication / Google OAuth
+      │
+Security Validation
+      │
+Protected APIs
+```
 
-JWT-based authentication
-Role-based access (User/Admin)
-Secure API access control
+### Payment Flow
 
-🌐 System Design
+```text
+Customer Checkout
+        │
+Create Razorpay Order
+        │
+Complete Payment
+        │
+Backend Payment Verification
+        │
+Order Confirmation
+```
 
-React Frontend → Interactive shopping UI
-Spring Boot Backend → Business logic & APIs
-MySQL Database → Persistent storage
-REST APIs → Communication layer
-JWT Security → Authentication & authorization
-Razorpay → Secure payment processing layer
-CORS Configuration → Frontend-backend integration (including Vercel deployment support)
+---
 
-🚀 Features
+# 📚 Modules
 
-Full product catalog system
-Per-user persistent cart system
-Secure login & registration
-Order placement and tracking
-Secure online payments via Razorpay
-Responsive UI for all devices
-Scalable backend architecture
-Production-ready deployment support
+## 🛍️ Product Catalog
 
-📈 Project Highlights
+* View all products
+* Product details
+* Category filtering
+* Product search
 
-Complete end-to-end eCommerce workflow
-Database-driven cart system per user
-Secure authentication using JWT
-Payment gateway integration (Razorpay)
-Clean separation of frontend and backend
-Deployment-ready configuration (CORS + Vercel support)
-Real-world scalable architecture
+---
 
-👨‍💻 Author
-Faiz Khan
+## 🛒 Cart Management
 
-💬 Open to Feedback and Collaboration
-Always open to suggestions, improvements, and collaboration in Full-Stack Development, Spring Boot, and Scalable Web Applications 🚀
+* Add products
+* Remove products
+* Update quantity
+* Persistent user cart
+* Database-backed cart storage
+
+---
+
+## 👤 User Module
+
+* Registration
+* Login
+* Google Sign-In
+* Profile Management
+* Order History
+
+---
+
+## 📦 Order Module
+
+* Place Orders
+* View Order History
+* Order Status Tracking
+* Purchase Summary
+
+---
+
+## 💳 Payment Module
+
+* Razorpay Payment Gateway
+* Secure Checkout
+* UPI Payments
+* Card Payments
+* Net Banking
+* Wallet Payments
+* Backend Payment Verification
+* Failed Payment Handling
+* Automatic Order Confirmation
+
+---
+
+## 🔐 Security
+
+* JWT Authentication
+* Google OAuth 2.0
+* Role-Based Authorization
+* Protected REST APIs
+* Secure Password Encryption
+* Spring Security
+
+---
+
+# 🌐 REST APIs
+
+The backend exposes REST APIs for:
+
+* Authentication
+* User Management
+* Product Management
+* Cart Management
+* Order Processing
+* Payment Processing
+
+Example Endpoints:
+
+| Method | Endpoint                | Description           |
+| ------ | ----------------------- | --------------------- |
+| POST   | `/auth/register`        | Register User         |
+| POST   | `/auth/login`           | User Login            |
+| GET    | `/products`             | Get Products          |
+| GET    | `/products/{id}`        | Product Details       |
+| POST   | `/cart/add`             | Add to Cart           |
+| POST   | `/orders`               | Place Order           |
+| POST   | `/payment/create-order` | Create Razorpay Order |
+| POST   | `/payment/verify`       | Verify Payment        |
+
+---
+
+# 📈 Project Highlights
+
+* ✅ Complete Full-Stack eCommerce Application
+* ✅ Spring Boot REST API Development
+* ✅ React.js Responsive Frontend
+* ✅ JWT Authentication
+* ✅ Google OAuth 2.0 Login
+* ✅ Razorpay Payment Gateway Integration
+* ✅ Persistent Database Cart
+* ✅ Secure Order Processing
+* ✅ Role-Based Authorization
+* ✅ MVC Architecture
+* ✅ Production-Ready Backend
+* ✅ Deployment Configuration with CORS Support
+
+---
+
+# 📂 Project Structure
+
+```text
+TechStore
+│
+├── backend
+│   ├── controller
+│   ├── service
+│   ├── repository
+│   ├── entity
+│   ├── security
+│   └── config
+│
+├── frontend
+│   ├── components
+│   ├── pages
+│   ├── services
+│   ├── assets
+│   └── hooks
+│
+└── README.md
+```
+
+---
+
+# ⚙️ Installation
+
+## Prerequisites
+
+* Java 17+
+* Node.js
+* MySQL
+* Maven
+
+### Clone Repository
+
+```bash
+git clone https://github.com/Faiz-Khan01/TechStore.git
+```
+
+### Backend
+
+```bash
+cd backend
+mvn spring-boot:run
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm start
+```
+
+---
+
+# 🔮 Future Enhancements
+
+* Wishlist
+* Product Reviews & Ratings
+* Coupon & Discount System
+* Inventory Management
+* Email Notifications
+* Admin Dashboard Analytics
+* Docker Support
+* AWS Deployment
+* CI/CD Pipeline
+
+---
+
+# 👨‍💻 Author
+
+**Faiz Khan**
+
+Java Backend Developer | Full-Stack Developer
+
+---
+
+# 🤝 Contributing
+
+Contributions, suggestions, and feedback are always welcome.
+
+If you found this project useful, please consider giving it a ⭐ on GitHub.
