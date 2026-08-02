@@ -80,10 +80,19 @@ const Cart = () => {
         method: "POST",
         headers: getAuthHeaders("POST"),
       });
-      if (!res.ok) throw new Error("Failed to increment quantity");
+      if (!res.ok) {
+        const errorData = await res.json();
+        if (res.status === 403) throw new Error("Session expired. Please log in again.");
+        throw new Error(errorData.error || `Cart error: ${res.status}`);
+      }
       fetchCart();
     } catch (error) {
       console.error(error);
+      Swal.fire({
+        title: "Error",
+        text: error.message || "Could not increase quantity",
+        icon: "error",
+      });
     }
   };
 

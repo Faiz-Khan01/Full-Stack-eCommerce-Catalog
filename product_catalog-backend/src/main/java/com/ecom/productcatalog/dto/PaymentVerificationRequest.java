@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentVerificationRequest {
+    private Long dbOrderId;
     private String razorpayOrderId;
     private String razorpayPaymentId;
     private String razorpaySignature;
+    private String userEmail;
 }
