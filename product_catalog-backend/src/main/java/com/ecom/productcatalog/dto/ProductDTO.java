@@ -1,6 +1,7 @@
 package com.ecom.productcatalog.dto;
 
 import lombok.Data;
+import java.math.BigDecimal; // Import BigDecimal
 
 @Data
 public class ProductDTO {
@@ -8,11 +9,11 @@ public class ProductDTO {
     private String name;
     private String description;
     private String imageUrl;
-    private Double price;
+    private BigDecimal price;
     private Long categoryId;
     private String categoryName;
 
-    public ProductDTO(Long id, String name, String description, String imageUrl, Double price, Long categoryId, String categoryName) {
+    public ProductDTO(Long id, String name, String description, String imageUrl, BigDecimal price, Long categoryId, String categoryName) {
         this.id = id;
         this.name = name;
         this.description = description;

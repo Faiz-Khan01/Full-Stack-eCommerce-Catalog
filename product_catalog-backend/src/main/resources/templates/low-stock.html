@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f5f7fb;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #111827;
+        }
+
+        .email-wrapper {
+            width: 100%;
+            padding: 40px 15px;
+            box-sizing: border-box;
+        }
+
+        .email-container {
+            max-width: 620px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid #e8eaf0;
+            box-shadow: 0 10px 35px rgba(15, 23, 42, 0.08);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            padding: 32px;
+            text-align: center;
+        }
+
+        .warning-icon {
+            width: 58px;
+            height: 58px;
+            margin: 0 auto 16px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            line-height: 58px;
+            font-size: 28px;
+            color: #ffffff;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: #ffffff;
+            font-size: 26px;
+        }
+
+        .header p {
+            margin: 9px 0 0;
+            color: #fee2e2;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 34px;
+        }
+
+        .content h2 {
+            margin: 0 0 10px;
+            font-size: 21px;
+            color: #111827;
+        }
+
+        .description {
+            margin: 0;
+            color: #6b7280;
+            line-height: 1.7;
+            font-size: 14px;
+        }
+
+        .stock-card {
+            margin-top: 28px;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            border-radius: 14px;
+            padding: 22px;
+        }
+
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .details-table td {
+            padding: 14px 0;
+            border-bottom: 1px solid #fed7aa;
+            font-size: 14px;
+        }
+
+        .details-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .label {
+            color: #9a3412;
+        }
+
+        .value {
+            text-align: right;
+            color: #111827;
+            font-weight: 700;
+        }
+
+        .current-stock {
+            color: #dc2626;
+            font-size: 22px;
+        }
+
+        .threshold {
+            color: #92400e;
+        }
+
+        .action-box {
+            margin-top: 25px;
+            padding: 16px 18px;
+            background: #fef2f2;
+            border-radius: 12px;
+            border: 1px solid #fecaca;
+        }
+
+        .action-box p {
+            margin: 0;
+            color: #991b1b;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .footer {
+            padding: 22px 30px;
+            background: #fafafa;
+            border-top: 1px solid #eeeeee;
+            text-align: center;
+        }
+
+        .footer p {
+            margin: 0;
+            color: #9ca3af;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="email-wrapper">
+
+    <div class="email-container">
+
+        <!-- HEADER -->
+
+        <div class="header">
+
+            <div class="warning-icon">
+                ⚠️
+            </div>
+
+            <h1>
+                Low Stock Alert
+            </h1>
+
+            <p>
+                Inventory requires your attention
+            </p>
+
+        </div>
+
+        <!-- CONTENT -->
+
+        <div class="content">
+
+            <h2>
+                Attention Admin,
+            </h2>
+
+            <p class="description">
+                Stock for
+                <strong th:text="'\'' + ${productName} + '\''">
+                    'Product'
+                </strong>
+                has dropped below the safety threshold.
+            </p>
+
+            <!-- STOCK CARD -->
+
+            <div class="stock-card">
+
+                <table class="details-table">
+
+                    <tr>
+
+                        <td class="label">
+                            Product
+                        </td>
+
+                        <td class="value"
+                            th:text="${productName}">
+                            Product
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td class="label">
+                            Current Stock
+                        </td>
+
+                        <td class="value current-stock"
+                            th:text="${currentStock}">
+                            0
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td class="label">
+                            Threshold
+                        </td>
+
+                        <td class="value threshold"
+                            th:text="${threshold}">
+                            10
+                        </td>
+
+                    </tr>
+
+                </table>
+
+            </div>
+
+            <!-- ACTION -->
+
+            <div class="action-box">
+
+                <p>
+                    Please restock soon via the Admin Inventory panel.
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- FOOTER -->
+
+        <div class="footer">
+
+            <p>
+                Product Catalog Admin
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

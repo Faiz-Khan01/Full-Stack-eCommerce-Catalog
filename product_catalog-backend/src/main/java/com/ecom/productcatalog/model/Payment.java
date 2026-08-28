@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -26,7 +27,7 @@ public class Payment {
     private String razorpaySignature;
 
     @Column(name = "order_id")
-    private Long orderId;
+    private String orderId;
 
     @Column(name = "amount")
     private Double amount;
@@ -35,13 +36,16 @@ public class Payment {
     private String currency;
 
     @Column(name = "status")
-    private String status; // CREATED, AUTHORIZED, CAPTURED, FAILED, REFUNDED
+    private String status;
 
     @Column(name = "payment_method")
-    private String paymentMethod; // card, netbanking, upi, wallet, etc.
+    private String paymentMethod;
 
     @Column(name = "user_email")
     private String userEmail;
+
+    @Column(name = "coupon_code")
+    private String couponCode;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

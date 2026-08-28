@@ -1,0 +1,29 @@
+package com.ecom.productcatalog.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class WishlistDTO {
+
+    private Long id;
+
+    private Long productId;
+
+    private String productName;
+
+    private String productDescription;
+
+    private BigDecimal productPrice;
+
+    private String imageUrl;
+
+    private String userEmail;
+
+    private boolean wishlisted;
+}

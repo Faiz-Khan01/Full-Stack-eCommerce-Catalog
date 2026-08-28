@@ -1,0 +1,263 @@
+/* =========================================================
+   PRODUCT DETAIL - THEME SUPPORT
+   ========================================================= */
+
+.premium-product-page {
+  background:
+    radial-gradient(
+      circle at 10% 15%,
+      rgba(99, 102, 241, 0.10),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 90% 85%,
+      rgba(168, 85, 247, 0.10),
+      transparent 30%
+    ),
+    var(--bg);
+  color: var(--text-primary);
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+
+/* Main product card */
+
+.product-main-card {
+  background: var(--card) !important;
+  color: var(--text-primary);
+
+  border-color: var(--border) !important;
+
+  box-shadow:
+    0 30px 80px var(--shadow),
+    0 8px 25px var(--shadow);
+}
+
+
+/* Product image area */
+
+.product-image-section {
+  background:
+    radial-gradient(
+      circle at center,
+      var(--card) 0%,
+      var(--muted-bg) 58%,
+      var(--hover-bg) 100%
+    ) !important;
+}
+
+
+/* Product information */
+
+.product-info-section {
+  color: var(--text-primary);
+}
+
+.product-title {
+  color: var(--text-primary) !important;
+}
+
+.description-block h5 {
+  color: var(--text-primary) !important;
+}
+
+.description-block p {
+  color: var(--text-secondary) !important;
+}
+
+
+/* Category */
+
+.category-badge {
+  background: rgba(99, 102, 241, 0.10) !important;
+  border-color: rgba(99, 102, 241, 0.20) !important;
+  color: #818cf8 !important;
+}
+
+
+/* Rating */
+
+.rating-text {
+  color: var(--text-secondary) !important;
+}
+
+.no-rating {
+  color: var(--text-secondary) !important;
+}
+
+
+/* Divider */
+
+.premium-divider {
+  background:
+    linear-gradient(
+      90deg,
+      var(--border),
+      transparent
+    ) !important;
+}
+
+
+/* Price label */
+
+.price-label {
+  color: var(--text-secondary) !important;
+}
+
+
+/* Trust section */
+
+.trust-row {
+  border-color: var(--border) !important;
+}
+
+.trust-item {
+  color: var(--text-secondary) !important;
+}
+
+
+/* Back button */
+
+.premium-back-button {
+  background: var(--card) !important;
+  color: var(--text-secondary) !important;
+  border-color: var(--border) !important;
+}
+
+.premium-back-button:hover {
+  background: var(--hover-bg) !important;
+  color: #818cf8 !important;
+}
+
+
+/* Wishlist */
+
+.wishlist-button {
+  background: var(--card) !important;
+  color: var(--text-secondary) !important;
+  border-color: var(--border) !important;
+}
+
+.wishlist-button:hover {
+  background: var(--hover-bg) !important;
+  color: #ef4444 !important;
+}
+
+
+/* Reviews */
+
+.reviews-card {
+  background: var(--card) !important;
+  border-color: var(--border) !important;
+  box-shadow: 0 20px 60px var(--shadow) !important;
+}
+
+
+/* =========================================================
+   DARK MODE - PRODUCT DETAIL
+   ========================================================= */
+
+[data-theme="dark"] .premium-product-page {
+  background:
+    radial-gradient(
+      circle at 10% 15%,
+      rgba(99, 102, 241, 0.12),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 90% 85%,
+      rgba(168, 85, 247, 0.10),
+      transparent 30%
+    ),
+    linear-gradient(
+      180deg,
+      #090d16 0%,
+      #0f172a 100%
+    );
+}
+
+
+[data-theme="dark"] .product-main-card {
+  background: #111827 !important;
+  border-color: #1f2937 !important;
+}
+
+
+[data-theme="dark"] .product-image-section {
+  background:
+    radial-gradient(
+      circle at center,
+      #111827 0%,
+      #0f172a 60%,
+      #090d16 100%
+    ) !important;
+}
+
+
+[data-theme="dark"] .image-glow {
+  background: rgba(99, 102, 241, 0.12);
+}
+
+
+[data-theme="dark"] .premium-back-button {
+  background: #111827 !important;
+  color: #94a3b8 !important;
+  border-color: #1f2937 !important;
+}
+
+
+[data-theme="dark"] .wishlist-button {
+  background: #111827 !important;
+  color: #94a3b8 !important;
+  border-color: #1f2937 !important;
+}
+
+
+[data-theme="dark"] .reviews-card {
+  background: #111827 !important;
+  border-color: #1f2937 !important;
+}
+
+
+/* =========================================================
+   PRODUCT REVIEW DARK MODE
+   ========================================================= */
+
+[data-theme="dark"] .product-review-container {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .product-review-container h1,
+[data-theme="dark"] .product-review-container h2,
+[data-theme="dark"] .product-review-container h3,
+[data-theme="dark"] .product-review-container h4,
+[data-theme="dark"] .product-review-container h5,
+[data-theme="dark"] .product-review-container h6 {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .product-review-container p,
+[data-theme="dark"] .product-review-container span {
+  color: var(--text-secondary);
+}
+
+
+/* =========================================================
+   GLOBAL IMAGE BACKGROUND
+   ========================================================= */
+
+[data-theme="dark"] img {
+  color: var(--text-secondary);
+}
+
+
+/* =========================================================
+   DISABLED BUTTONS
+   ========================================================= */
+
+button:disabled {
+  cursor: not-allowed;
+}

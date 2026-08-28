@@ -1,0 +1,87 @@
+server:
+  port: ${PORT:8082}
+
+spring:
+  application:
+    name: productcatalog
+
+  # ==========================================
+  # 1. Database Configuration (MySQL)
+  # ==========================================
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL:jdbc:mysql://localhost:3306/product_catalog?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:Password}
+
+  # JPA / Hibernate Configuration
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    open-in-view: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: false
+
+  # ==========================================
+  # 2. OAuth2 Client Security Configuration
+  # ==========================================
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:google-client-id-placeholder}
+            client-secret: ${GOOGLE_CLIENT_SECRET:google-client-secret-placeholder}
+            scope:
+              - profile
+              - email
+          github:
+            client-id: ${GITHUB_CLIENT_ID:github-client-id-placeholder}
+            client-secret: ${GITHUB_CLIENT_SECRET:github-client-secret-placeholder}
+            scope:
+              - user:email
+              - read:user
+
+  # ==========================================
+  # 3. Email Configuration (SMTP - Gmail)
+  # ==========================================
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:user@gmail.com}
+    password: ${MAIL_PASSWORD:app-password-placeholder}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            trust: ${MAIL_HOST:smtp.gmail.com}
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+# ==========================================
+# 4. Application Security & App Properties
+# ==========================================
+app:
+  frontend:
+    url: ${FRONTEND_URL:http://localhost:5173}
+  admin:
+    email: ${ADMIN_EMAIL:admin@example.com}
+  jwt:
+    secret: ${JWT_SECRET:mySecretKey12345mySecretKey12345mySecretKey12345}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+
+# ==========================================
+# 5. Payment Gateway (Razorpay)
+# ==========================================
+razorpay:
+  key-id: ${RAZORPAY_KEY_ID:rzp_test_placeholder}
+  key-secret: ${RAZORPAY_KEY_SECRET:rzp_secret_placeholder}

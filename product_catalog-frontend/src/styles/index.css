@@ -1,158 +1,591 @@
-/* ---------- Root and global styles ---------- */
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+/* =====================================================
+   GLOBAL RESET
+   ===================================================== */
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+* {
+  box-sizing: border-box;
+}
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-  background-color: #242424; /* dark theme background */
-  color: rgba(255, 255, 255, 0.87);
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  background: var(--bg, #f8fafc);
+  color: var(--text-primary, #0f172a);
+
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+
+/* =====================================================
+   PRODUCT DETAIL ACTION BUTTONS
+   ===================================================== */
+
+.product-detail-container .btn,
+.product-details .btn,
+.product-card .btn,
+.product-detail-actions .btn,
+button.btn-primary,
+button.btn-success {
+  min-height: 38px;
+  padding: 0 14px;
+  font-size: 0.82rem;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+.product-detail-container .btn:hover,
+.product-details .btn:hover,
+.product-card .btn:hover,
+.product-detail-actions .btn:hover,
+button.btn-primary:hover,
+button.btn-success:hover {
+  transform: translateY(-1px);
 }
 
-/* ---------- Button styles ---------- */
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
 
-/* ---------- Buy button ---------- */
-.buy-button {
-  background-color: #646cff;
-  color: #fff;
-  border: none;
-  padding: 0.6em 1.2em;
+/* =====================================================
+   PRODUCT SIZE / CATEGORY BADGE
+   ===================================================== */
+
+.product-size-badge {
+  display: inline-block;
+
+  font-size: 0.65em;
+  font-weight: 600;
+
+  padding: 0.2em 0.5em;
+
   border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.3s, transform 0.2s;
-}
-.buy-button:hover {
-  background-color: #535bf2;
-  transform: scale(1.05);
+  margin-bottom: 0.4em;
+
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  color: var(--text-primary, #0f172a);
+  background: var(--muted-bg, #f8fafc);
+  border: 1px solid var(--border, #e2e8f0);
 }
 
-/* ---------- Cart floating button ---------- */
-.cart-button {
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  background-color: #646cff;
-  color: #fff;
-  border: none;
-  border-radius: 50%;
-  width: 3em;
-  height: 3em;
+
+/* =====================================================
+   PRODUCT DETAIL IMAGE
+   ===================================================== */
+
+.product-detail-image-container {
+  width: 100%;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  font-size: 1.2em;
-  transition: background-color 0.3s, transform 0.2s;
-  z-index: 1000;
-}
-.cart-button:hover {
-  background-color: #535bf2;
-  transform: scale(1.1);
 }
 
-/* ---------- Product card styles ---------- */
-.product-card {
-  background-color: #1a1a1a;
-  border-radius: 8px;
-  padding: 1em;
-  margin: 1em;
-  color: #fff;
+.product-detail-image-container img {
+  max-width: 260px;
+  max-height: 260px;
+
+  width: 100%;
+  height: auto;
+
+  object-fit: contain;
+
+  display: block;
+  margin: 0 auto;
+}
+
+
+/* =====================================================
+   PRODUCT DETAIL IMAGE
+   ===================================================== */
+
+.product-image-wrapper {
+  width: 100%;
+
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  width: 250px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
-  transition: transform 0.2s;
-}
-.product-card:hover {
-  transform: translateY(-5px);
-}
-.product-card img {
-  max-width: 100%;
-  border-radius: 6px;
-  margin-bottom: 0.5em;
-}
-.product-card h2 {
-  margin: 0.5em 0;
-  font-size: 1.2em;
-}
-.product-card p {
-  flex-grow: 1;
-  font-size: 0.9em;
-  margin-bottom: 0.5em;
-}
-.product-card .price {
-  font-weight: 600;
-  margin-bottom: 0.5em;
+  align-items: center;
+  justify-content: center;
+
+  /* Prevent unnecessary vertical expansion */
+  max-height: 360px;
 }
 
-/* ---------- Dark/Light theme adjustments ---------- */
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+.product-main-image {
+  width: 100%;
+  height: 100%;
+
+  max-width: 100%;
+  max-height: 360px;
+
+  object-fit: contain;
+
+  display: block;
+
+  transition:
+    transform 0.35s ease,
+    filter 0.35s ease;
+}
+
+.product-main-image:hover {
+  transform: scale(1.02);
+}
+
+
+/* =====================================================
+   PRODUCT TITLE
+   ===================================================== */
+
+.product-title {
+  color: var(--text-primary, #111827);
+}
+
+
+/* =====================================================
+   PRODUCT DESCRIPTION
+   ===================================================== */
+
+.description-block h5 {
+  color: var(--text-primary, #334155);
+}
+
+.description-block p {
+  color: var(--text-secondary, #64748b);
+}
+
+
+/* =====================================================
+   PRODUCT PRICE
+   ===================================================== */
+
+.product-price {
+  font-weight: 850;
+}
+
+
+/* =====================================================
+   PRODUCT REVIEW FORM
+   ===================================================== */
+
+.product-review-container select.form-select,
+.product-review-container textarea.form-control {
+  font-size: 13px;
+
+  padding: 0.55rem 0.75rem;
+
+  background-color: var(--input-bg, #ffffff);
+  color: var(--text-primary, #0f172a);
+
+  border-color: var(--border, #e2e8f0);
+}
+
+
+/* =====================================================
+   GLOBAL FORM CONTROLS
+   ===================================================== */
+
+.form-control,
+.form-select {
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease;
+
+  background-color: var(--input-bg, #ffffff);
+  color: var(--text-primary, #0f172a);
+
+  border-color: var(--border, #e2e8f0);
+}
+
+.form-control::placeholder {
+  color: var(--text-secondary, #94a3b8);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #6366f1;
+
+  box-shadow:
+    0 0 0 4px rgba(99, 102, 241, 0.10);
+
+  background-color: var(--input-bg, #ffffff);
+  color: var(--text-primary, #0f172a);
+}
+
+
+/* =====================================================
+   REVIEW SUBMIT BUTTON
+   ===================================================== */
+
+form button[type="submit"] {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+}
+
+
+/* =====================================================
+   GLOBAL BUTTON TRANSITION
+   ===================================================== */
+
+.btn {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+
+/* =====================================================
+   PRODUCT DETAIL - COMPACT CARD
+   ===================================================== */
+
+/*
+   These rules specifically make the ProductDetail
+   card shorter.
+
+   Your JSX uses:
+   .premium-product-page
+   .product-main-card
+   .product-image-section
+   .product-image-wrapper
+   .product-info-section
+*/
+
+.premium-product-page .product-main-card {
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.premium-product-page .product-image-section {
+  min-height: 420px;
+  height: 100%;
+
+  padding: 35px;
+}
+
+.premium-product-page .product-image-wrapper {
+  height: 340px;
+  max-height: 340px;
+}
+
+.premium-product-page .product-main-image {
+  max-height: 340px;
+}
+
+.premium-product-page .product-info-section {
+  padding: 38px 40px;
+}
+
+
+/* =====================================================
+   COMPACT PRODUCT TITLE
+   ===================================================== */
+
+.premium-product-page .product-title {
+  font-size: clamp(28px, 3vw, 38px);
+  line-height: 1.08;
+
+  margin-bottom: 0;
+}
+
+
+/* =====================================================
+   COMPACT RATING
+   ===================================================== */
+
+.premium-product-page .rating-section {
+  margin-top: 12px;
+}
+
+
+/* =====================================================
+   COMPACT DIVIDER
+   ===================================================== */
+
+.premium-product-page .premium-divider {
+  margin: 18px 0;
+}
+
+
+/* =====================================================
+   COMPACT PRICE
+   ===================================================== */
+
+.premium-product-page .product-price {
+  font-size: 32px;
+}
+
+
+/* =====================================================
+   COMPACT DESCRIPTION
+   ===================================================== */
+
+.premium-product-page .description-block {
+  margin-top: 18px;
+}
+
+.premium-product-page .description-block h5 {
+  margin-bottom: 6px;
+}
+
+.premium-product-page .description-block p {
+  font-size: 14px;
+  line-height: 1.55;
+
+  /* Prevent extremely long descriptions from
+     making the card unnecessarily tall */
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+
+/* =====================================================
+   COMPACT ACTION BUTTONS
+   ===================================================== */
+
+.premium-product-page .action-area {
+  margin-top: 22px;
+}
+
+.premium-product-page .cart-button,
+.premium-product-page .pay-button {
+  min-height: 48px;
+}
+
+
+/* =====================================================
+   COMPACT TRUST ROW
+   ===================================================== */
+
+.premium-product-page .trust-row {
+  margin-top: 16px;
+  padding-top: 14px;
+}
+
+
+/* =====================================================
+   PRODUCT DETAIL MOBILE
+   ===================================================== */
+
+@media (max-width: 991px) {
+
+  .premium-product-page .product-image-section {
+    min-height: 380px;
+    padding: 30px;
   }
-  a:hover {
-    color: #747bff;
+
+  .premium-product-page .product-image-wrapper {
+    height: 300px;
+    max-height: 300px;
   }
-  button, .buy-button {
-    background-color: #f9f9f9;
-    color: #213547;
+
+  .premium-product-page .product-main-image {
+    max-height: 300px;
   }
-  .cart-button {
-    background-color: #747bff;
-    color: #fff;
+
+  .premium-product-page .product-info-section {
+    padding: 32px;
   }
-  .product-card {
-    background-color: #f9f9f9;
-    color: #213547;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+
+/* =====================================================
+   PRODUCT DETAIL MOBILE
+   ===================================================== */
+
+@media (max-width: 767px) {
+
+  .premium-product-page .product-main-card {
+    border-radius: 20px;
+  }
+
+  .premium-product-page .product-image-section {
+    min-height: 320px;
+    height: 320px;
+
+    padding: 25px 20px;
+  }
+
+  .premium-product-page .product-image-wrapper {
+    height: 260px;
+    max-height: 260px;
+  }
+
+  .premium-product-page .product-main-image {
+    max-height: 260px;
+  }
+
+  .premium-product-page .product-info-section {
+    padding: 28px 22px 30px;
+  }
+
+  .premium-product-page .product-title {
+    font-size: 28px;
+  }
+
+  .premium-product-page .product-price {
+    font-size: 30px;
+  }
+
+  .premium-product-page .description-block p {
+    font-size: 13px;
+    line-height: 1.5;
+
+    -webkit-line-clamp: 3;
+  }
+
+  .premium-product-page .action-area {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .premium-product-page .payment-wrapper {
+    grid-column: span 1;
+  }
+
+  .premium-product-page .trust-row {
+    justify-content: center;
+  }
+}
+
+
+/* =====================================================
+   SMALL MOBILE
+   ===================================================== */
+
+@media (max-width: 400px) {
+
+  .premium-product-page .product-image-section {
+    min-height: 290px;
+    height: 290px;
+
+    padding: 20px 15px;
+  }
+
+  .premium-product-page .product-image-wrapper {
+    height: 235px;
+    max-height: 235px;
+  }
+
+  .premium-product-page .product-main-image {
+    max-height: 235px;
+  }
+
+  .premium-product-page .product-info-section {
+    padding: 25px 18px;
+  }
+
+  .premium-product-page .product-title {
+    font-size: 25px;
+  }
+
+  .premium-product-page .product-price {
+    font-size: 28px;
+  }
+}
+
+
+/* =====================================================
+   DARK MODE
+   ===================================================== */
+
+[data-theme="dark"] .product-size-badge {
+  color: #c7d2fe;
+
+  background: #1e293b;
+  border-color: #334155;
+}
+
+[data-theme="dark"] .product-title {
+  color: #f8fafc;
+}
+
+[data-theme="dark"] .description-block h5 {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .description-block p {
+  color: #94a3b8;
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+  background-color: #1f2937;
+
+  color: #f8fafc;
+
+  border-color: #374151;
+}
+
+[data-theme="dark"] .form-control::placeholder {
+  color: #64748b;
+}
+
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-select:focus {
+  background-color: #1f2937;
+
+  color: #f8fafc;
+
+  border-color: #6366f1;
+}
+
+
+/* =====================================================
+   REDUCED MOTION
+   ===================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+
+    animation-iteration-count: 1 !important;
+
+    transition-duration: 0.01ms !important;
+
+    scroll-behavior: auto !important;
   }
 }

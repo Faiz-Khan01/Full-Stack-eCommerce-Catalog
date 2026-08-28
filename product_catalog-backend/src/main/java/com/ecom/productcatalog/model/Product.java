@@ -1,15 +1,16 @@
 package com.ecom.productcatalog.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import java.math.BigDecimal;
 
 @Entity
-@Getter
-@Setter
+@Table(name = "product")
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(exclude = "category") // CRITICAL: Prevents circular loop
-@ToString(exclude = "category")          // Prevents loop during logging
 public class Product {
 
     @Id
@@ -17,15 +18,27 @@ public class Product {
     private Long id;
 
     private String name;
+
     private String description;
+
     private String imageUrl;
-    private Double price;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal price;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private Category category;
 
-    // Helper getter for JSON serialization
+    @Column(nullable = false)
+    private Integer stockQuantity = 0;
+
+    @Column(nullable = false)
+    private Integer lowStockThreshold = 5;
+
+    private Double averageRating = 0.0;
+
+    // Custom helper method for category ID since category is an object
     public Long getCategoryId() {
         return category != null ? category.getId() : null;
     }

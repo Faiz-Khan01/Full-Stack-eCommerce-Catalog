@@ -5,8 +5,9 @@ import lombok.Data;
 
 @Entity
 @Table(name = "users")
-@Data // Using Lombok to generate getters/setters
+@Data
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,6 +21,11 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    // Default role will be 'USER'. Admin will be 'ADMIN'
     private String role;
+
+    @Column(length = 20)
+    private String phone;
+
+    @Column(length = 255)
+    private String address;
 }

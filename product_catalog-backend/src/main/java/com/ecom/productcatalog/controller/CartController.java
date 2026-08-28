@@ -1,6 +1,6 @@
 package com.ecom.productcatalog.controller;
 
-import com.ecom.productcatalog.model.Product;
+import com.ecom.productcatalog.dto.CartItemDTO;
 import com.ecom.productcatalog.model.CartItem;
 import com.ecom.productcatalog.model.Order;
 import com.ecom.productcatalog.repository.OrderRepository;
@@ -8,10 +8,11 @@ import com.ecom.productcatalog.service.CartService;
 import com.ecom.productcatalog.dto.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal; // Import BigDecimal
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/cart")
@@ -24,27 +25,25 @@ public class CartController {
     @Autowired
     private OrderRepository orderRepository;
 
-    // Get cart items
+    // Get cart items mapped safely to DTOs under an open transaction
     @GetMapping
+    @Transactional(readOnly = true)
     public ResponseEntity<ApiResponse<?>> getCart(@RequestParam(required = false) String email) {
         try {
-            if (email == null || email.isEmpty()) {
+            if (email == null || email.trim().isEmpty()) {
                 return ResponseEntity.badRequest().body(
-                    ApiResponse.error("Email parameter is required")
+                        ApiResponse.error("Email parameter is required")
                 );
             }
-            
-            List<CartItem> cartItems = cartService.getCartItems(email);
-            List<Product> products = cartItems.stream()
-                    .map(CartItem::getProduct)
-                    .collect(Collectors.toList());
-            
+
+            List<CartItemDTO> cartItems = cartService.getCartItemDTOs(email);
+
             return ResponseEntity.ok(
-                ApiResponse.success("Cart fetched successfully", products)
+                    ApiResponse.success("Cart fetched successfully", cartItems)
             );
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(
-                ApiResponse.error("Error fetching cart: " + e.getMessage())
+            return ResponseEntity.ok(
+                    ApiResponse.success("Cart is empty or not created yet", Collections.emptyList())
             );
         }
     }
@@ -56,23 +55,47 @@ public class CartController {
             @RequestParam String email,
             @RequestParam(defaultValue = "1") Integer quantity) {
         try {
-            if (email == null || email.isEmpty()) {
+            if (email == null || email.trim().isEmpty()) {
                 return ResponseEntity.badRequest().body(
-                    ApiResponse.error("Email parameter is required")
+                        ApiResponse.error("Email parameter is required")
                 );
             }
-            
+
             CartItem cartItem = cartService.addToCart(email, productId, quantity);
             return ResponseEntity.ok(
-                ApiResponse.success("Product added to cart successfully", cartItem)
+                    ApiResponse.success("Product added to cart successfully", cartItem)
             );
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(
-                ApiResponse.error(e.getMessage())
+                    ApiResponse.error(e.getMessage())
             );
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(
-                ApiResponse.error("Error adding to cart: " + e.getMessage())
+                    ApiResponse.error("Error adding to cart: " + e.getMessage())
+            );
+        }
+    }
+
+    // Update cart item quantity directly
+    @PutMapping("/update/{productId}")
+    public ResponseEntity<ApiResponse<?>> updateQuantity(
+            @PathVariable Long productId,
+            @RequestParam String email,
+            @RequestParam Integer quantity) {
+        try {
+            if (email == null || email.trim().isEmpty()) {
+                return ResponseEntity.badRequest().body(
+                        ApiResponse.error("Email parameter is required")
+                );
+            }
+
+            CartItemDTO updatedItem = cartService.updateQuantity(email, productId, quantity);
+            return ResponseEntity.ok(
+                    ApiResponse.success("Cart updated successfully", updatedItem)
+            );
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(
+                    ApiResponse.error("Error updating cart: " + e.getMessage())
             );
         }
     }
@@ -83,19 +106,19 @@ public class CartController {
             @PathVariable Long productId,
             @RequestParam String email) {
         try {
-            if (email == null || email.isEmpty()) {
+            if (email == null || email.trim().isEmpty()) {
                 return ResponseEntity.badRequest().body(
-                    ApiResponse.error("Email parameter is required")
+                        ApiResponse.error("Email parameter is required")
                 );
             }
-            
+
             cartService.removeFromCart(email, productId);
             return ResponseEntity.ok(
-                ApiResponse.success("Item removed from cart successfully")
+                    ApiResponse.success("Item removed from cart successfully")
             );
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(
-                ApiResponse.error("Error removing from cart: " + e.getMessage())
+                    ApiResponse.error("Error removing from cart: " + e.getMessage())
             );
         }
     }
@@ -104,34 +127,34 @@ public class CartController {
     @PostMapping("/buy")
     public ResponseEntity<ApiResponse<?>> buyCart(@RequestParam String email) {
         try {
-            if (email == null || email.isEmpty()) {
+            if (email == null || email.trim().isEmpty()) {
                 return ResponseEntity.badRequest().body(
-                    ApiResponse.error("Email parameter is required")
-                );
-            }
-            
-            List<CartItem> cartItems = cartService.getCartItems(email);
-            if (cartItems.isEmpty()) {
-                return ResponseEntity.badRequest().body(
-                    ApiResponse.error("Cart is empty")
+                        ApiResponse.error("Email parameter is required")
                 );
             }
 
-            double total = cartService.getCartTotal(email);
+            List<CartItem> cartItems = cartService.getCartItems(email);
+            if (cartItems.isEmpty()) {
+                return ResponseEntity.badRequest().body(
+                        ApiResponse.error("Cart is empty")
+                );
+            }
+
+            BigDecimal total = cartService.getCartTotal(email); // Changed from double to BigDecimal
             Order order = new Order();
             order.setUserEmail(email);
-            order.setTotalAmount(total);
+            order.setTotalAmount(total); // Ensure Order entity's totalAmount supports BigDecimal
             order.setOrderDate(new Date());
             Order savedOrder = orderRepository.save(order);
-            
+
             cartService.clearCart(email);
-            
+
             return ResponseEntity.ok(
-                ApiResponse.success("Purchase successful", savedOrder)
+                    ApiResponse.success("Purchase successful", savedOrder)
             );
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(
-                ApiResponse.error("Error processing order: " + e.getMessage())
+                    ApiResponse.error("Error processing order: " + e.getMessage())
             );
         }
     }
@@ -140,19 +163,19 @@ public class CartController {
     @DeleteMapping("/clear")
     public ResponseEntity<ApiResponse<?>> clearCart(@RequestParam String email) {
         try {
-            if (email == null || email.isEmpty()) {
+            if (email == null || email.trim().isEmpty()) {
                 return ResponseEntity.badRequest().body(
-                    ApiResponse.error("Email parameter is required")
+                        ApiResponse.error("Email parameter is required")
                 );
             }
-            
+
             cartService.clearCart(email);
             return ResponseEntity.ok(
-                ApiResponse.success("Cart cleared successfully")
+                    ApiResponse.success("Cart cleared successfully")
             );
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(
-                ApiResponse.error("Error clearing cart: " + e.getMessage())
+                    ApiResponse.error("Error clearing cart: " + e.getMessage())
             );
         }
     }

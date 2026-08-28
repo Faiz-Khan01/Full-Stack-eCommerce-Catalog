@@ -7,3 +7,10 @@
 *.log
 .DS_Store
 
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+*.env
+
+

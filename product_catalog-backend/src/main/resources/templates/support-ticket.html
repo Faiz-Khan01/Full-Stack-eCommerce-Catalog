@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f5f7fb;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #111827;
+        }
+
+        .email-wrapper {
+            width: 100%;
+            padding: 40px 15px;
+            box-sizing: border-box;
+        }
+
+        .email-container {
+            max-width: 650px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 12px 40px rgba(15, 23, 42, 0.08);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #111827, #1f2937);
+            padding: 30px 32px;
+        }
+
+        .ticket-icon {
+            display: inline-block;
+            width: 44px;
+            height: 44px;
+            line-height: 44px;
+            text-align: center;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.10);
+            color: #ffffff;
+            font-size: 21px;
+            margin-bottom: 15px;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: #ffffff;
+            font-size: 24px;
+        }
+
+        .header p {
+            margin: 8px 0 0;
+            color: #9ca3af;
+            font-size: 13px;
+        }
+
+        .content {
+            padding: 32px;
+        }
+
+        .ticket-id-box {
+            margin-bottom: 24px;
+            padding: 18px 20px;
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+        }
+
+        .ticket-table {
+            width: 100%;
+        }
+
+        .ticket-label {
+            color: #9ca3af;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .ticket-id {
+            color: #111827;
+            font-size: 19px;
+            font-weight: 700;
+        }
+
+        .priority {
+            display: inline-block;
+            padding: 7px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .details-title {
+            margin: 0 0 14px;
+            font-size: 15px;
+            color: #111827;
+        }
+
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 26px;
+        }
+
+        .details-table td {
+            padding: 11px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 13px;
+        }
+
+        .details-table td:first-child {
+            color: #9ca3af;
+            width: 140px;
+        }
+
+        .details-table td:last-child {
+            color: #111827;
+            font-weight: 600;
+        }
+
+        .message-title {
+            margin: 0 0 12px;
+            font-size: 15px;
+            color: #111827;
+        }
+
+        .customer-message {
+            padding: 20px;
+            background: #f8fafc;
+            border-left: 4px solid #6366f1;
+            border-radius: 10px;
+            color: #374151;
+            font-size: 14px;
+            line-height: 1.7;
+            white-space: pre-line;
+        }
+
+        .action-box {
+            margin-top: 28px;
+            padding: 18px 20px;
+            background: #eef2ff;
+            border-radius: 12px;
+            border: 1px solid #e0e7ff;
+        }
+
+        .action-box p {
+            margin: 0;
+            color: #4338ca;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .footer {
+            padding: 22px 30px;
+            background: #fafafa;
+            border-top: 1px solid #eeeeee;
+            text-align: center;
+        }
+
+        .footer-title {
+            margin: 0 0 5px;
+            color: #6b7280;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .footer-text {
+            margin: 0;
+            color: #9ca3af;
+            font-size: 11px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="email-wrapper">
+
+    <div class="email-container">
+
+        <!-- HEADER -->
+
+        <div class="header">
+
+            <div class="ticket-icon">
+                🎫
+            </div>
+
+            <h1>
+                New Support Ticket
+            </h1>
+
+            <p>
+                A customer has contacted support
+            </p>
+
+        </div>
+
+        <!-- CONTENT -->
+
+        <div class="content">
+
+            <!-- TICKET ID -->
+
+            <div class="ticket-id-box">
+
+                <table class="ticket-table">
+
+                    <tr>
+
+                        <td>
+
+                            <div class="ticket-label">
+                                Ticket ID
+                            </div>
+
+                            <div class="ticket-id"
+                                 th:text="'#' + ${ticketId}">
+                                #123
+                            </div>
+
+                        </td>
+
+                        <td style="text-align:right;">
+
+                            <span class="priority"
+                                  th:style="'background:' + ${priorityBackground} + ';color:' + ${priorityColor} + ';'"
+                                  th:text="${priority}">
+                                HIGH
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+                </table>
+
+            </div>
+
+            <!-- DETAILS -->
+
+            <h3 class="details-title">
+                Support Ticket Details
+            </h3>
+
+            <table class="details-table">
+
+                <tr>
+
+                    <td>
+                        Customer Email
+                    </td>
+
+                    <td th:text="${customerEmail}">
+                        customer@example.com
+                    </td>
+
+                </tr>
+
+                <tr>
+
+                    <td>
+                        Category
+                    </td>
+
+                    <td th:text="${category}">
+                        Order
+                    </td>
+
+                </tr>
+
+                <tr>
+
+                    <td>
+                        Priority
+                    </td>
+
+                    <td th:text="${priority}"
+                        th:style="'color:' + ${priorityColor} + ';'">
+                        HIGH
+                    </td>
+
+                </tr>
+
+                <tr>
+
+                    <td>
+                        Subject
+                    </td>
+
+                    <td th:text="${subject}">
+                        Order issue
+                    </td>
+
+                </tr>
+
+            </table>
+
+            <!-- CUSTOMER MESSAGE -->
+
+            <h3 class="message-title">
+                Customer Message
+            </h3>
+
+            <div class="customer-message"
+                 th:text="${ticketMessage}">
+                Customer message
+            </div>
+
+            <!-- ACTION -->
+
+            <div class="action-box">
+
+                <p>
+                    Please open the Admin Dashboard
+                    to review and manage this support ticket.
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- FOOTER -->
+
+        <div class="footer">
+
+            <p class="footer-title">
+                TechStore Support
+            </p>
+
+            <p class="footer-text">
+                Automated support notification
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

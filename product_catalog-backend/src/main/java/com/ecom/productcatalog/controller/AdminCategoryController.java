@@ -8,8 +8,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/categories")
-@CrossOrigin(origins = {"https://techstore-catalog.vercel.app"})
-
 public class AdminCategoryController {
 
     private final CategoryService categoryService;
