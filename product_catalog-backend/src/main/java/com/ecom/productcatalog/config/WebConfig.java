@@ -16,7 +16,7 @@ public class WebConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
                         .allowedOrigins(
-                                "https://techstore-catalog.vercel.app",
+                                "https://techstore-catalog-vite.vercel.app",
                                 "http://localhost:5173",
                                 "http://localhost:3000"
                         )

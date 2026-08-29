@@ -26,7 +26,7 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthFilter jwtAuthFilter;
 
-    @Value("${app.frontend.url:https://techstore-catalog.vercel.app}")
+    @Value("${app.frontend.url:https://techstore-catalog-vite.vercel.app}")
     private String frontendUrl;
 
     // =========================================================
@@ -36,13 +36,12 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
-        CorsConfiguration config =
-                new CorsConfiguration();
+        CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowedOrigins(List.of(
                 "http://localhost:5173",
                 "http://localhost:3000",
-                "https://techstore-catalog.vercel.app"
+                "https://techstore-catalog-vite.vercel.app"
         ));
 
         config.setAllowedMethods(List.of(

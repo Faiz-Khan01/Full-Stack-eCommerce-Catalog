@@ -16,7 +16,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = {
-        "https://techstore-catalog.vercel.app",
+        "https://techstore-catalog-vite.vercel.app",
         "http://localhost:5173",
         "http://localhost:3000"
 })
