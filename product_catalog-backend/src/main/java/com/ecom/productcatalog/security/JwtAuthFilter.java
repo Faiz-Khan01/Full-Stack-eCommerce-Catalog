@@ -4,16 +4,15 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Component
@@ -29,70 +28,128 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
-        String rawPath = request.getRequestURI();
-        // Decode URL components (e.g., handles spaces like %20)
-        String path = URLDecoder.decode(rawPath, StandardCharsets.UTF_8);
+        String path = request.getRequestURI();
 
-        // 🚀 ONLY bypass endpoints that are TRULY public.
-        if (path.startsWith("/api/products") ||
-                path.startsWith("/api/auth") ||
-                path.startsWith("/api/payment") ||
-                path.startsWith("/api/test-email") ||
-                path.startsWith("/api/categories") ||
-                path.startsWith("/api/cart") ||
-                path.startsWith("/api/coupons") ||
-                path.startsWith("/api/reviews") ||
-                path.startsWith("/images") ||
-                path.startsWith("/uploads") ||
-                path.endsWith(".png") ||
-                path.endsWith(".jpg") ||
-                path.endsWith(".jpeg")) {
+        // =====================================================
+        // CORS PREFLIGHT
+        // =====================================================
+
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // =====================================================
+        // PUBLIC HEALTH ENDPOINTS
+        // =====================================================
+
+        if ("/".equals(path)
+                || "/health".equals(path)
+                || "/error".equals(path)) {
 
             filterChain.doFilter(request, response);
             return;
         }
+
+        // =====================================================
+        // GET JWT
+        // =====================================================
 
         String authHeader = request.getHeader("Authorization");
-        System.out.println("➡️ Incoming URI: " + path + " | Auth Header present: " + (authHeader != null));
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            System.out.println("❌ Missing or invalid Authorization header for secure route: " + path);
+        System.out.println(
+                "➡️ Incoming URI: " + path +
+                        " | Auth Header present: " +
+                        (authHeader != null)
+        );
+
+        // No Authorization header.
+        //
+        // DO NOT return 401 here.
+        //
+        // SecurityConfig will decide whether this
+        // endpoint requires authentication.
+        if (authHeader == null ||
+                !authHeader.startsWith("Bearer ")) {
+
             filterChain.doFilter(request, response);
             return;
         }
 
-        String token = authHeader.substring(7);
+        String token = authHeader.substring(7).trim();
+
+        if (token.isEmpty()) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // =====================================================
+        // VALIDATE JWT
+        // =====================================================
 
         try {
+
             if (!jwtUtils.validateToken(token)) {
-                System.out.println("❌ JWT Token validation failed (expired, tampered, or invalid key).");
+
+                System.out.println(
+                        "❌ JWT validation failed."
+                );
+
                 filterChain.doFilter(request, response);
                 return;
             }
 
-            String email = jwtUtils.getEmailFromToken(token);
-            String role = jwtUtils.getRoleFromToken(token); // Dynamically extract role from token
+            String email =
+                    jwtUtils.getEmailFromToken(token);
 
-            // Format role properly (e.g., ensure "ROLE_" prefix is present)
-            String formattedRole = (role != null && !role.isBlank()) ? role.toUpperCase() : "USER";
+            String role =
+                    jwtUtils.getRoleFromToken(token);
+
+            // =================================================
+            // FORMAT ROLE
+            // =================================================
+
+            String formattedRole =
+                    (role != null && !role.isBlank())
+                            ? role.toUpperCase()
+                            : "USER";
+
             if (!formattedRole.startsWith("ROLE_")) {
-                formattedRole = "ROLE_" + formattedRole;
+                formattedRole =
+                        "ROLE_" + formattedRole;
             }
+
+            // =================================================
+            // AUTHENTICATION
+            // =================================================
 
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
                             email,
                             null,
-                            List.of(new SimpleGrantedAuthority(formattedRole))
+                            List.of(
+                                    new SimpleGrantedAuthority(
+                                            formattedRole
+                                    )
+                            )
                     );
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            System.out.println("✅ Successfully authenticated user: " + email + " with role: " + formattedRole);
+            SecurityContextHolder
+                    .getContext()
+                    .setAuthentication(authentication);
+
+            System.out.println(
+                    "✅ Authenticated user: " + email +
+                            " | Role: " + formattedRole
+            );
 
         } catch (Exception e) {
-            System.out.println("🔥 JWT Exception error: " + e.getMessage());
-            filterChain.doFilter(request, response);
-            return;
+
+            SecurityContextHolder.clearContext();
+
+            System.out.println(
+                    "🔥 JWT error: " + e.getMessage()
+            );
         }
 
         filterChain.doFilter(request, response);
