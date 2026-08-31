@@ -281,34 +281,36 @@ const Cart = () => {
   // =====================================================
 
   const getImageUrl = (imageUrl) => {
-    if (!imageUrl || String(imageUrl).trim() === "") {
-      return "https://placehold.co/400x400?text=No+Image";
-    }
+  if (!imageUrl || String(imageUrl).trim() === "") {
+    return "https://placehold.co/400x400?text=No+Image";
+  }
 
-    const image = String(imageUrl).trim();
+  const image = String(imageUrl).trim();
 
-    if (
-      image.startsWith("http://") ||
-      image.startsWith("https://")
-    ) {
-      return image;
-    }
+  // Already a complete URL
+  if (/^https?:\/\//i.test(image)) {
+    return image;
+  }
 
-    const backendUrl =
-      import.meta.env.VITE_API_BASE_URL?.replace(
-        /\/api\/?$/,
-        ""
-      ) ||
-      (window.location.hostname === "localhost"
-        ? "http://localhost:8082"
-        : "https://full-stack-ecommerce-catalog.onrender.com");
+  let backendUrl =
+    import.meta.env.VITE_API_BASE_URL ||
+    import.meta.env.VITE_API_URL;
 
-    const cleanPath = image.startsWith("/")
-      ? image
-      : `/${image}`;
+  // Remove trailing /api and /
+  backendUrl = backendUrl?.replace(/\/api\/?$/, "").replace(/\/$/, "");
 
-    return `${backendUrl}${cleanPath}`;
-  };
+  // Production fallback
+  if (!backendUrl) {
+    backendUrl =
+      "https://full-stack-ecommerce-catalog.onrender.com";
+  }
+
+  const cleanPath = image.startsWith("/")
+    ? image
+    : `/${image}`;
+
+  return `${backendUrl}${cleanPath}`;
+};
 
   // =====================================================
   // Loading UI

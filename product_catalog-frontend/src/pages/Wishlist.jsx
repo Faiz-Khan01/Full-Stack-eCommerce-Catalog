@@ -208,9 +208,9 @@ const Wishlist = () => {
       : `/${imageUrl}`;
 
     const backendUrl =
-      window.location.hostname === "localhost"
-        ? "http://localhost:8082"
-        : "https://full-stack-ecommerce-catalog.onrender.com";
+    import.meta.env.VITE_API_BASE_URL?.replace(/\/api\/?$/, "") ||
+    "https://full-stack-ecommerce-catalog.onrender.com";
+
 
     return `${backendUrl}${cleanPath}`;
   };

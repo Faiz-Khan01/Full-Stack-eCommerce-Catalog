@@ -286,35 +286,31 @@ const ProductList = ({
   // =====================================================
 
   const getImageUrl = (imageUrl) => {
-    if (
-      !imageUrl ||
-      imageUrl.trim() === ""
-    ) {
-      return "https://placehold.co/600x400?text=No+Image+Available";
-    }
+  if (!imageUrl || imageUrl.trim() === "") {
+    return "https://placehold.co/600x400?text=No+Image+Available";
+  }
 
-    if (
-      imageUrl.startsWith("http://") ||
-      imageUrl.startsWith("https://")
-    ) {
-      return imageUrl;
-    }
+  if (
+    imageUrl.startsWith("http://") ||
+    imageUrl.startsWith("https://")
+  ) {
+    return imageUrl;
+  }
 
-    const cleanPath = imageUrl.startsWith("/")
-      ? imageUrl
-      : `/${imageUrl}`;
+  const cleanPath = imageUrl.startsWith("/")
+    ? imageUrl
+    : `/${imageUrl}`;
 
-    const backendUrl =
-      import.meta.env.VITE_API_BASE_URL?.replace(
-        /\/api\/?$/,
-        ""
-      ) ||
-      (window.location.hostname === "localhost"
-        ? "http://localhost:8082"
-        : "https://full-stack-ecommerce-catalog.onrender.com");
+  const backendUrl =
+    import.meta.env.VITE_API_BASE_URL?.replace(
+      /\/api\/?$/,
+      ""
+    ) || "https://full-stack-ecommerce-catalog.onrender.com";
 
-    return `${backendUrl}${cleanPath}`;
-  };
+  return `${backendUrl}${cleanPath}`;
+};
+
+
 
   // =====================================================
   // RATING STARS

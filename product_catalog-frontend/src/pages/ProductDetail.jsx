@@ -11,7 +11,8 @@ import PaymentComponent from "../components/PaymentComponent";
 // =====================================================
 const BASE_URL =
   import.meta.env.VITE_API_BASE_URL?.replace(/\/api\/?$/, "") ||
-  "http://localhost:8082";
+  import.meta.env.VITE_API_URL ||
+  "https://full-stack-ecommerce-catalog.onrender.com";
 
 // =====================================================
 // Wishlist Helpers

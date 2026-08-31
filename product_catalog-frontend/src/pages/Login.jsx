@@ -114,9 +114,12 @@ const Login = () => {
   // Google OAuth2 Login
   // =====================================================
   const handleGoogleLogin = () => {
-    const baseAuthUrl = import.meta.env.VITE_API_BASE_URL
-      ? "http://localhost:8082"
-      : "https://full-stack-ecommerce-catalog.onrender.com";
+    const baseAuthUrl =
+    import.meta.env.VITE_API_BASE_URL
+    ? import.meta.env.VITE_API_BASE_URL.replace(/\/api\/?$/, "")
+    : import.meta.env.VITE_API_URL ||
+      "https://full-stack-ecommerce-catalog.onrender.com";
+
 
     window.location.href = `${baseAuthUrl}/oauth2/authorization/google`;
   };

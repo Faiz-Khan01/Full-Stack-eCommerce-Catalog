@@ -8,10 +8,14 @@ const API_BASE_URL =
 
 const Profile = () => {
   const storedUser = JSON.parse(localStorage.getItem("user")) || {};
-  const token = localStorage.getItem("token");
+ // const token = localStorage.getItem("token");
+ const token =
+  localStorage.getItem("token") ||
+  localStorage.getItem("jwtToken");
+
 
   const [isEditing, setIsEditing] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);  
 
   const [formData, setFormData] = useState({
     name: storedUser.name || "",
