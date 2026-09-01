@@ -1,367 +1,3 @@
-// import jsPDF from "jspdf";
-// import "jspdf-autotable";
-
-// export const generateInvoice = (order) => {
-//   if (!order) return;
-
-//   const doc = new jsPDF();
-//   const orderId = order.orderNumber || `ORD-${order.id}`;
-//   const orderDate = order.orderDate ? new Date(order.orderDate).toLocaleDateString("en-IN") : new Date().toLocaleDateString("en-IN");
-//   const totalAmount = Number(order.totalAmount || 0).toFixed(2);
-//   const shippingFee = Number(order.shippingFee || 0).toFixed(2);
-//   const subtotal = (Number(order.totalAmount || 0) - Number(order.shippingFee || 0)).toFixed(2);
-
-//   // Colors
-//   const primaryColor = [15, 23, 42]; // Slate 900
-//   const emeraldColor = [16, 185, 129]; // Emerald 500
-//   const mutedColor = [100, 116, 139]; // Slate 500
-
-//   // 1. Header Banner
-//   doc.setFillColor(...primaryColor);
-//   doc.rect(0, 0, 210, 40, "F");
-
-//   // Logo & Title
-//   doc.setTextColor(255, 255, 255);
-//   doc.setFontSize(22);
-//   doc.setFont("helvetica", "bold");
-//   doc.text("TechStore", 14, 22);
-
-//   doc.setFontSize(10);
-//   doc.setFont("helvetica", "normal");
-//   doc.setTextColor(203, 213, 225);
-//   doc.text("Premium Electronics & Gadgets Hub", 14, 29);
-
-//   // Invoice Title Right
-//   doc.setFontSize(18);
-//   doc.setFont("helvetica", "bold");
-//   doc.setTextColor(255, 255, 255);
-//   doc.text("TAX INVOICE", 196, 22, { align: "right" });
-
-//   doc.setFontSize(9);
-//   doc.setFont("helvetica", "normal");
-//   doc.setTextColor(203, 213, 225);
-//   doc.text(`Invoice #: INV-${order.id || "001"}`, 196, 29, { align: "right" });
-
-//   // 2. Info Cards (Billed To & Order Details)
-//   let y = 50;
-
-//   // Left Column - Customer
-//   doc.setFontSize(11);
-//   doc.setFont("helvetica", "bold");
-//   doc.setTextColor(...primaryColor);
-//   doc.text("Billed To:", 14, y);
-
-//   doc.setFontSize(10);
-//   doc.setFont("helvetica", "normal");
-//   doc.setTextColor(51, 65, 85);
-//   doc.text(order.fullName || "Customer", 14, y + 6);
-//   doc.text(`Email: ${order.userEmail || "N/A"}`, 14, y + 12);
-//   doc.text(`Phone: ${order.mobile || "N/A"}`, 14, y + 18);
-//   if (order.address) {
-//     const addressLines = doc.splitTextToSize(`Address: ${order.address}`, 85);
-//     doc.text(addressLines, 14, y + 24);
-//   }
-
-//   // Right Column - Order Info
-//   doc.setFontSize(11);
-//   doc.setFont("helvetica", "bold");
-//   doc.setTextColor(...primaryColor);
-//   doc.text("Order Information:", 120, y);
-
-//   doc.setFontSize(10);
-//   doc.setFont("helvetica", "normal");
-//   doc.setTextColor(51, 65, 85);
-//   doc.text(`Order Number: ${orderId}`, 120, y + 6);
-//   doc.text(`Order Date: ${orderDate}`, 120, y + 12);
-//   doc.text(`Payment Method: ${order.paymentMethod || "COD"}`, 120, y + 18);
-//   doc.text(`Payment Status: ${order.paymentStatus || "PENDING"}`, 120, y + 24);
-//   doc.text(`Order Status: ${order.orderStatus || "PLACED"}`, 120, y + 30);
-
-//   if (order.courierName || order.trackingNumber) {
-//     doc.text(`Courier: ${order.courierName || "Standard Courier"}`, 120, y + 36);
-//     doc.text(`Tracking #: ${order.trackingNumber || "N/A"}`, 120, y + 42);
-//   }
-
-//   // 3. Items Table
-//   const tableData = (order.items && order.items.length > 0)
-//     ? order.items.map((item, idx) => [
-//         idx + 1,
-//         item.productName || item.name || `Product #${item.productId}`,
-//         `₹${Number(item.price || 0).toFixed(2)}`,
-//         item.quantity || 1,
-//         `₹${(Number(item.price || 0) * Number(item.quantity || 1)).toFixed(2)}`,
-//       ])
-//     : [[1, "Order Item", `₹${subtotal}`, 1, `₹${subtotal}`]];
-
-//   doc.autoTable({
-//     startY: y + 52,
-//     head: [["#", "Item Description", "Unit Price", "Qty", "Total Amount"]],
-//     body: tableData,
-//     theme: "striped",
-//     headStyles: {
-//       fillColor: primaryColor,
-//       textColor: [255, 255, 255],
-//       fontStyle: "bold",
-//       fontSize: 9,
-//     },
-//     bodyStyles: {
-//       fontSize: 9,
-//       textColor: [51, 65, 85],
-//     },
-//     columnStyles: {
-//       0: { cellWidth: 12, halign: "center" },
-//       1: { cellWidth: 90 },
-//       2: { cellWidth: 28, halign: "right" },
-//       3: { cellWidth: 18, halign: "center" },
-//       4: { cellWidth: 35, halign: "right" },
-//     },
-//     margin: { left: 14, right: 14 },
-//   });
-
-//   const finalY = doc.lastAutoTable.finalY + 10;
-
-//   // 4. Totals Breakdown Card
-//   const totalsX = 120;
-//   doc.setFontSize(10);
-//   doc.setTextColor(...mutedColor);
-
-//   doc.text("Subtotal:", totalsX, finalY);
-//   doc.text(`₹${subtotal}`, 196, finalY, { align: "right" });
-
-//   doc.text("Shipping & Handling:", totalsX, finalY + 6);
-//   doc.text(`₹${shippingFee}`, 196, finalY + 6, { align: "right" });
-
-//   // Divider
-//   doc.setDrawColor(226, 232, 240);
-//   doc.line(totalsX, finalY + 10, 196, finalY + 10);
-
-//   // Grand Total
-//   doc.setFontSize(12);
-//   doc.setFont("helvetica", "bold");
-//   doc.setTextColor(...emeraldColor);
-//   doc.text("Grand Total:", totalsX, finalY + 18);
-//   doc.text(`₹${totalAmount}`, 196, finalY + 18, { align: "right" });
-
-//   // 5. Footer
-//   const footerY = 275;
-//   doc.setDrawColor(226, 232, 240);
-//   doc.line(14, footerY - 5, 196, footerY - 5);
-
-//   doc.setFontSize(8);
-//   doc.setFont("helvetica", "normal");
-//   doc.setTextColor(...mutedColor);
-//   doc.text("Thank you for shopping with TechStore! For support, reach us at support@techstore.com", 105, footerY, { align: "center" });
-//   doc.text("This is a computer-generated invoice. No physical signature is required.", 105, footerY + 5, { align: "center" });
-
-//   // Save PDF
-//   doc.save(`Invoice_${orderId}.pdf`);
-// };
-
-
-
-
-
-
-// import { jsPDF } from "jspdf";
-// import { autoTable } from "jspdf-autotable";
-
-// export const generateInvoice = (order) => {
-//   try {
-//     if (!order) {
-//       console.error("No order provided");
-//       return;
-//     }
-
-//     const doc = new jsPDF();
-
-//     doc.setFillColor(15, 23, 42);
-//     doc.rect(0, 0, 210, 40, "F");
-
-//     doc.setTextColor(255, 255, 255);
-//     doc.setFont("helvetica", "bold");
-//     doc.setFontSize(22);
-//     doc.text("TechStore", 14, 20);
-
-//     doc.setFontSize(16);
-//     doc.text("TAX INVOICE", 196, 20, {
-//       align: "right",
-//     });
-
-//     doc.setTextColor(15, 23, 42);
-//     doc.setFontSize(11);
-
-//     doc.text(
-//       `Order: ${order.orderNumber || `ORD-${order.id}`}`,
-//       14,
-//       55
-//     );
-
-//     doc.text(
-//       `Customer: ${order.fullName || "Customer"}`,
-//       14,
-//       63
-//     );
-
-//     doc.text(
-//       `Date: ${
-//         order.orderDate
-//           ? new Date(order.orderDate).toLocaleDateString("en-IN")
-//           : new Date().toLocaleDateString("en-IN")
-//       }`,
-//       14,
-//       71
-//     );
-
-//     const items =
-//       Array.isArray(order.items) && order.items.length
-//         ? order.items
-//         : [
-//             {
-//               productName: "Order Item",
-//               quantity: 1,
-//               price: Number(order.totalAmount || 0),
-//             },
-//           ];
-
-//     const rows = items.map((item, index) => {
-//       const qty = Number(item.quantity || 1);
-//       const price = Number(item.price || 0);
-
-//       return [
-//         index + 1,
-//         item.productName ||
-//           item.name ||
-//           `Product #${item.productId || index + 1}`,
-//         qty,
-//         `₹${price.toFixed(2)}`,
-//         `₹${(qty * price).toFixed(2)}`,
-//       ];
-//     });
-
-//     autoTable(doc, {
-//       startY: 82,
-
-//       head: [
-//         ["#", "Product", "Qty", "Unit Price", "Total"],
-//       ],
-
-//       body: rows,
-
-//       theme: "striped",
-
-//       headStyles: {
-//         fillColor: [15, 23, 42],
-//         textColor: [255, 255, 255],
-//         fontStyle: "bold",
-//       },
-
-//       styles: {
-//         fontSize: 9,
-//         cellPadding: 4,
-//       },
-
-//       columnStyles: {
-//         0: {
-//           cellWidth: 12,
-//           halign: "center",
-//         },
-//         1: {
-//           cellWidth: 85,
-//         },
-//         2: {
-//           cellWidth: 20,
-//           halign: "center",
-//         },
-//         3: {
-//           cellWidth: 32,
-//           halign: "right",
-//         },
-//         4: {
-//           cellWidth: 35,
-//           halign: "right",
-//         },
-//       },
-
-//       margin: {
-//         left: 14,
-//         right: 14,
-//       },
-//     });
-
-//     const finalY =
-//       doc.lastAutoTable?.finalY || 120;
-
-//     const total = Number(
-//       order.totalAmount || 0
-//     );
-
-//     doc.setFont("helvetica", "bold");
-//     doc.setFontSize(12);
-//     doc.setTextColor(16, 185, 129);
-
-//     doc.text(
-//       "Grand Total:",
-//       130,
-//       finalY + 15
-//     );
-
-//     doc.text(
-//       `₹${total.toFixed(2)}`,
-//       196,
-//       finalY + 15,
-//       {
-//         align: "right",
-//       }
-//     );
-
-//     doc.setDrawColor(226, 232, 240);
-
-//     doc.line(
-//       14,
-//       275,
-//       196,
-//       275
-//     );
-
-//     doc.setFont("helvetica", "normal");
-//     doc.setFontSize(8);
-//     doc.setTextColor(100, 116, 139);
-
-//     doc.text(
-//       "Thank you for shopping with TechStore!",
-//       105,
-//       283,
-//       {
-//         align: "center",
-//       }
-//     );
-
-//     const orderId =
-//       order.orderNumber ||
-//       `ORD-${order.id || "001"}`;
-
-//     doc.save(
-//       `TechStore_Invoice_${orderId}.pdf`
-//     );
-
-//   } catch (error) {
-//     console.error(
-//       "Invoice generation error:",
-//       error
-//     );
-
-//     alert(
-//       "Unable to generate invoice. Please check the browser console."
-//     );
-//   }
-// };
-
-
-
-
-
-
-
 import { jsPDF } from "jspdf";
 import { autoTable } from "jspdf-autotable";
 
@@ -441,22 +77,50 @@ export const generateInvoice = (order) => {
       order.trackingNumber ||
       "Assigned on Dispatch";
 
+    // =====================================================
+    // AMOUNTS
+    // =====================================================
+
     const totalAmount =
       Number(order.totalAmount || 0);
 
     const shippingFee =
       Number(order.shippingFee || 0);
 
-    const subtotal =
-      Math.max(totalAmount - shippingFee, 0);
+    // IMPORTANT:
+    // Use discountAmount coming from backend.
+    const discountAmount =
+      Number(order.discountAmount || 0);
+
+    // Coupon code coming from backend
+    const couponCode =
+      order.couponCode ||
+      null;
+
+    // Product subtotal BEFORE coupon discount.
+    //
+    // Prefer calculating it from order items because this is
+    // the actual product value shown in the invoice.
+    const itemsSubtotal =
+      Array.isArray(order.items) && order.items.length > 0
+        ? order.items.reduce((sum, item) => {
+            const qty = Number(item.quantity || 1);
+            const price = Number(item.price || 0);
+
+            return sum + qty * price;
+          }, 0)
+        : Math.max(
+            totalAmount +
+              discountAmount -
+              shippingFee,
+            0
+          );
 
     // =====================================================
     // COLORS
     // =====================================================
 
     const NAVY = [15, 23, 42];
-    const NAVY_2 = [30, 41, 59];
-
     const EMERALD = [16, 185, 129];
     const EMERALD_DARK = [5, 150, 105];
 
@@ -468,12 +132,14 @@ export const generateInvoice = (order) => {
     const LIGHT_BG = [248, 250, 252];
     const BORDER = [226, 232, 240];
 
+    const RED = [220, 38, 38];
+
     // =====================================================
     // HELPER
     // =====================================================
 
-    // jsPDF default Helvetica doesn't reliably contain ₹.
-    // Using "Rs." prevents broken/missing currency characters.
+    // jsPDF Helvetica doesn't reliably support ₹.
+    // Rs. is safer for generated PDFs.
     const money = (value) =>
       `Rs. ${Number(value || 0).toFixed(2)}`;
 
@@ -484,7 +150,6 @@ export const generateInvoice = (order) => {
     doc.setFillColor(...NAVY);
     doc.rect(0, 0, 210, 42, "F");
 
-    // Emerald accent
     doc.setFillColor(...EMERALD);
     doc.rect(0, 0, 5, 42, "F");
 
@@ -497,6 +162,7 @@ export const generateInvoice = (order) => {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(9);
     doc.setTextColor(203, 213, 225);
+
     doc.text(
       "Premium Electronics & Lifestyle Store",
       16,
@@ -507,6 +173,7 @@ export const generateInvoice = (order) => {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(17);
     doc.setTextColor(...WHITE);
+
     doc.text(
       "TAX INVOICE",
       194,
@@ -540,6 +207,7 @@ export const generateInvoice = (order) => {
 
     // Left card
     doc.setFillColor(...LIGHT_BG);
+
     doc.roundedRect(
       14,
       y,
@@ -551,7 +219,6 @@ export const generateInvoice = (order) => {
     );
 
     // Right card
-    doc.setFillColor(...LIGHT_BG);
     doc.roundedRect(
       108,
       y,
@@ -562,14 +229,23 @@ export const generateInvoice = (order) => {
       "F"
     );
 
-    // Left heading
+    // -----------------------------------------------------
+    // BILLED TO
+    // -----------------------------------------------------
+
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
     doc.setTextColor(...NAVY);
-    doc.text("BILLED TO", 19, y + 9);
+
+    doc.text(
+      "BILLED TO",
+      19,
+      y + 9
+    );
 
     doc.setDrawColor(...EMERALD);
     doc.setLineWidth(1);
+
     doc.line(
       19,
       y + 12,
@@ -580,7 +256,12 @@ export const generateInvoice = (order) => {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
     doc.setTextColor(...TEXT);
-    doc.text(customerName, 19, y + 20);
+
+    doc.text(
+      customerName,
+      19,
+      y + 20
+    );
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(8.5);
@@ -610,10 +291,14 @@ export const generateInvoice = (order) => {
       y + 41
     );
 
-    // Right heading
+    // -----------------------------------------------------
+    // ORDER INFORMATION
+    // -----------------------------------------------------
+
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
     doc.setTextColor(...NAVY);
+
     doc.text(
       "ORDER INFORMATION",
       113,
@@ -621,6 +306,7 @@ export const generateInvoice = (order) => {
     );
 
     doc.setDrawColor(...EMERALD);
+
     doc.line(
       113,
       y + 12,
@@ -668,7 +354,7 @@ export const generateInvoice = (order) => {
             {
               productName: "Order Item",
               quantity: 1,
-              price: subtotal,
+              price: itemsSubtotal,
             },
           ];
 
@@ -684,11 +370,15 @@ export const generateInvoice = (order) => {
 
       return [
         index + 1,
+
         item.productName ||
           item.name ||
           `Product #${item.productId || index + 1}`,
+
         qty,
+
         money(price),
+
         money(lineTotal),
       ];
     });
@@ -778,7 +468,11 @@ export const generateInvoice = (order) => {
       order.courierName ||
       order.trackingNumber
     ) {
-      doc.setFillColor(240, 253, 250);
+      doc.setFillColor(
+        240,
+        253,
+        250
+      );
 
       doc.roundedRect(
         14,
@@ -844,9 +538,17 @@ export const generateInvoice = (order) => {
     const totalsX = 126;
     const totalsRight = 196;
 
-    doc.setFont("helvetica", "normal");
+    doc.setFont(
+      "helvetica",
+      "normal"
+    );
+
     doc.setFontSize(9);
     doc.setTextColor(...MUTED);
+
+    // -----------------------------------------------------
+    // ORIGINAL / SUBTOTAL
+    // -----------------------------------------------------
 
     doc.text(
       "Subtotal",
@@ -855,41 +557,106 @@ export const generateInvoice = (order) => {
     );
 
     doc.text(
-      money(subtotal),
+      money(itemsSubtotal),
       totalsRight,
       finalY,
-      { align: "right" }
+      {
+        align: "right",
+      }
     );
+
+    // -----------------------------------------------------
+    // COUPON / DISCOUNT
+    // -----------------------------------------------------
+
+    if (discountAmount > 0) {
+      doc.setTextColor(
+        ...EMERALD_DARK
+      );
+
+      doc.setFont(
+        "helvetica",
+        "bold"
+      );
+
+      doc.text(
+        couponCode
+          ? `Coupon Discount (${couponCode})`
+          : "Coupon Discount",
+        totalsX,
+        finalY + 7
+      );
+
+      doc.text(
+        `- ${money(discountAmount)}`,
+        totalsRight,
+        finalY + 7,
+        {
+          align: "right",
+        }
+      );
+    }
+
+    // -----------------------------------------------------
+    // SHIPPING
+    // -----------------------------------------------------
+
+    const shippingY =
+      discountAmount > 0
+        ? finalY + 14
+        : finalY + 7;
+
+    doc.setFont(
+      "helvetica",
+      "normal"
+    );
+
+    doc.setTextColor(...MUTED);
 
     doc.text(
       "Shipping & Handling",
       totalsX,
-      finalY + 7
+      shippingY
     );
 
     doc.text(
       money(shippingFee),
       totalsRight,
-      finalY + 7,
-      { align: "right" }
+      shippingY,
+      {
+        align: "right",
+      }
     );
+
+    // =====================================================
+    // DIVIDER
+    // =====================================================
+
+    const dividerY =
+      shippingY + 6;
 
     doc.setDrawColor(...BORDER);
     doc.setLineWidth(0.5);
 
     doc.line(
       totalsX,
-      finalY + 12,
+      dividerY,
       totalsRight,
-      finalY + 12
+      dividerY
     );
 
-    // Grand total background
+    // =====================================================
+    // GRAND TOTAL
+    // =====================================================
+
+    const grandTotalY =
+      dividerY + 16;
+
     doc.setFillColor(...NAVY);
 
     doc.roundedRect(
       totalsX - 5,
-      finalY + 16,
+      dividerY + 4,
       75,
       18,
       3,
@@ -897,14 +664,18 @@ export const generateInvoice = (order) => {
       "F"
     );
 
-    doc.setFont("helvetica", "bold");
+    doc.setFont(
+      "helvetica",
+      "bold"
+    );
+
     doc.setFontSize(10);
     doc.setTextColor(...WHITE);
 
     doc.text(
       "GRAND TOTAL",
       totalsX,
-      finalY + 27
+      grandTotalY - 1
     );
 
     doc.setFontSize(11);
@@ -917,8 +688,10 @@ export const generateInvoice = (order) => {
     doc.text(
       money(totalAmount),
       totalsRight,
-      finalY + 27,
-      { align: "right" }
+      grandTotalY - 1,
+      {
+        align: "right",
+      }
     );
 
     // =====================================================
@@ -928,8 +701,12 @@ export const generateInvoice = (order) => {
     const badgeText =
       paymentStatus.toUpperCase();
 
+    const isSuccess =
+      badgeText === "SUCCESS" ||
+      badgeText === "PAID";
+
     const badgeColor =
-      badgeText === "PAID"
+      isSuccess
         ? EMERALD
         : [245, 158, 11];
 
@@ -939,7 +716,7 @@ export const generateInvoice = (order) => {
 
     doc.roundedRect(
       14,
-      finalY + 16,
+      dividerY + 5,
       50,
       9,
       4,
@@ -947,16 +724,79 @@ export const generateInvoice = (order) => {
       "F"
     );
 
-    doc.setFont("helvetica", "bold");
+    doc.setFont(
+      "helvetica",
+      "bold"
+    );
+
     doc.setFontSize(7.5);
     doc.setTextColor(...WHITE);
 
     doc.text(
       `PAYMENT: ${badgeText}`,
       39,
-      finalY + 22,
-      { align: "center" }
+      dividerY + 11,
+      {
+        align: "center",
+      }
     );
+
+    // =====================================================
+    // COUPON BADGE
+    // =====================================================
+
+    if (couponCode && discountAmount > 0) {
+      doc.setFillColor(
+        236,
+        253,
+        245
+      );
+
+      doc.setDrawColor(
+        167,
+        243,
+        208
+      );
+
+      doc.roundedRect(
+        14,
+        dividerY + 18,
+        75,
+        13,
+        3,
+        3,
+        "FD"
+      );
+
+      doc.setFont(
+        "helvetica",
+        "bold"
+      );
+
+      doc.setFontSize(7.5);
+      doc.setTextColor(
+        ...EMERALD_DARK
+      );
+
+      doc.text(
+        `COUPON: ${couponCode}`,
+        18,
+        dividerY + 24
+      );
+
+      doc.setFont(
+        "helvetica",
+        "normal"
+      );
+
+      doc.setFontSize(7);
+
+      doc.text(
+        `You saved ${money(discountAmount)}`,
+        18,
+        dividerY + 28
+      );
+    }
 
     // =====================================================
     // FOOTER
@@ -978,7 +818,11 @@ export const generateInvoice = (order) => {
       footerY - 7
     );
 
-    doc.setFont("helvetica", "bold");
+    doc.setFont(
+      "helvetica",
+      "bold"
+    );
+
     doc.setFontSize(9);
     doc.setTextColor(...NAVY);
 
@@ -986,10 +830,16 @@ export const generateInvoice = (order) => {
       "Thank you for shopping with TechStore!",
       105,
       footerY,
-      { align: "center" }
+      {
+        align: "center",
+      }
     );
 
-    doc.setFont("helvetica", "normal");
+    doc.setFont(
+      "helvetica",
+      "normal"
+    );
+
     doc.setFontSize(7.5);
     doc.setTextColor(...MUTED);
 
@@ -997,23 +847,30 @@ export const generateInvoice = (order) => {
       "This is a computer-generated tax invoice. No physical signature is required.",
       105,
       footerY + 6,
-      { align: "center" }
+      {
+        align: "center",
+      }
     );
 
     doc.text(
       "For support: support@techstore.com",
       105,
       footerY + 12,
-      { align: "center" }
+      {
+        align: "center",
+      }
     );
 
     // =====================================================
-    // SAVE
+    // SAVE PDF
     // =====================================================
 
     const safeOrderId =
       String(orderId)
-        .replace(/[^a-zA-Z0-9-_]/g, "_");
+        .replace(
+          /[^a-zA-Z0-9-_]/g,
+          "_"
+        );
 
     doc.save(
       `TechStore_Invoice_${safeOrderId}.pdf`

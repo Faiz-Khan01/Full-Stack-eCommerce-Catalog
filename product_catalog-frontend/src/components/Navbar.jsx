@@ -33,12 +33,12 @@ const calculateCartCount = (items) => {
 
 const Navbar = ({
   searchTerm = "",
-  onSearch = () => {},
+  onSearch = () => { },
   categories = [],
   selectedCategory = "",
-  onCategoryChange = () => {},
+  onCategoryChange = () => { },
   sortOrder = "asc",
-  onSortChange = () => {},
+  onSortChange = () => { },
 }) => {
   const { user, logout, isAuthenticated, isAdmin } = useAuth();
 
@@ -90,8 +90,8 @@ const Navbar = ({
     Number(contextCartCount) > 0
       ? Number(contextCartCount)
       : calculatedContextCartCount > 0
-      ? calculatedContextCartCount
-      : localCartCount;
+        ? calculatedContextCartCount
+        : localCartCount;
 
   /*
    * LOAD LOCATION + WISHLIST + CART
@@ -376,11 +376,10 @@ const Navbar = ({
               className="action-pill-btn wishlist-action"
               title={
                 wishlistCount > 0
-                  ? `${wishlistCount} wishlist ${
-                      wishlistCount === 1
-                        ? "item"
-                        : "items"
-                    }`
+                  ? `${wishlistCount} wishlist ${wishlistCount === 1
+                    ? "item"
+                    : "items"
+                  }`
                   : "Wishlist"
               }
             >
@@ -405,11 +404,10 @@ const Navbar = ({
               className="action-pill-btn cart-action"
               title={
                 cartCount > 0
-                  ? `${cartCount} cart ${
-                      cartCount === 1
-                        ? "item"
-                        : "items"
-                    }`
+                  ? `${cartCount} cart ${cartCount === 1
+                    ? "item"
+                    : "items"
+                  }`
                   : "Cart"
               }
             >
@@ -507,7 +505,27 @@ const Navbar = ({
                         to="/orders"
                       >
                         <span>📦</span>
-                        My Orders & Tracking
+                        My Orders
+                      </Link>
+                    </li>
+
+                    <li>
+                      <Link
+                        className="dropdown-item portfolio-dropdown-item"
+                        to="/track-order"
+                      >
+                        <span>🚚</span>
+                        Track Order
+                      </Link>
+                    </li>
+
+                    <li>
+                      <Link
+                        className="dropdown-item portfolio-dropdown-item"
+                        to="/help"
+                      >
+                        <span>🎧</span>
+                        Contact Support
                       </Link>
                     </li>
 
@@ -665,18 +683,33 @@ const Navbar = ({
                 </Link>
 
                 {isAuthenticated && (
-                  <Link
-                    to="/orders"
-                    className="mobile-quick-action"
-                    onClick={closeMobileMenu}
-                  >
-                    <span className="mobile-action-icon">
-                      📦
-                    </span>
+                  <>
+                    <Link
+                      to="/orders"
+                      className="mobile-quick-action"
+                      onClick={closeMobileMenu}
+                    >
+                      <span className="mobile-action-icon">
+                        📦
+                      </span>
 
-                    <span>My Orders</span>
-                  </Link>
+                      <span>My Orders</span>
+                    </Link>
+
+                    <Link
+                      to="/track-order"
+                      className="mobile-quick-action"
+                      onClick={closeMobileMenu}
+                    >
+                      <span className="mobile-action-icon">
+                        🚚
+                      </span>
+
+                      <span>Track Order</span>
+                    </Link>
+                  </>
                 )}
+
               </div>
             </div>
           </div>

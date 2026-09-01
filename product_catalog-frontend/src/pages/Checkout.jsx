@@ -157,36 +157,57 @@ const Checkout = () => {
   // Helper to compile full address string
   // =====================================================
   const getCompiledAddress = () => {
-    return `${fullName}, ${houseNo}, ${street}, ${city}, ${state} - ${pinCode}, Country: ${country}${
-      instructions
+    return `${fullName}, ${houseNo}, ${street}, ${city}, ${state} - ${pinCode}, Country: ${country}${instructions
         ? ` | Instructions: ${instructions}`
         : ""
-    }`;
+      }`;
   };
 
+
+
   // =====================================================
-  // Build standard OrderDTO payload (Sends final discounted total)
+  // Build Order Payload
   // =====================================================
   const buildOrderPayload = (method) => ({
     userEmail: email.trim(),
+
     fullName: fullName.trim(),
+
     mobile: mobile.trim(),
+
     address: getCompiledAddress(),
+
     paymentMethod:
       method === "cod" ? "COD" : "ONLINE",
-    totalAmount: Number(finalPayableAmount.toFixed(2)),
+
+    // Final amount after coupon discount
+    totalAmount: Number(
+      finalPayableAmount.toFixed(2)
+    ),
+
+    // Coupon details
+    couponCode: appliedCoupon || null,
+
+    discountAmount: Number(
+      discountAmount.toFixed(2)
+    ),
+
     items: cartItems.map((item) => ({
       productId: Number(
         item.product?.id ?? item.productId
       ),
+
       quantity: Number(item.quantity),
+
       price: Number(
         item.product?.price ??
-          item.price ??
-          0
+        item.price ??
+        0
       ),
     })),
   });
+
+
 
   // =====================================================
   // Clear Storage Helper
@@ -308,15 +329,15 @@ const Checkout = () => {
 
     const rawId =
       typeof orderData === "number" ||
-      typeof orderData === "string"
+        typeof orderData === "string"
         ? orderData
         : orderData?.id ||
-          orderData?.orderId ||
-          orderData?.order_id ||
-          orderData?.savedOrderId ||
-          orderData?.data?.orderId ||
-          orderData?.data?.id ||
-          orderData?.order?.id;
+        orderData?.orderId ||
+        orderData?.order_id ||
+        orderData?.savedOrderId ||
+        orderData?.data?.orderId ||
+        orderData?.data?.id ||
+        orderData?.order?.id;
 
     const internalOrderId = Number(rawId);
 
@@ -430,15 +451,15 @@ const Checkout = () => {
 
     const rawOrderId =
       typeof orderData === "number" ||
-      typeof orderData === "string"
+        typeof orderData === "string"
         ? orderData
         : orderData?.id ||
-          orderData?.orderId ||
-          orderData?.order_id ||
-          orderData?.savedOrderId ||
-          orderData?.data?.orderId ||
-          orderData?.data?.id ||
-          orderData?.order?.id;
+        orderData?.orderId ||
+        orderData?.order_id ||
+        orderData?.savedOrderId ||
+        orderData?.data?.orderId ||
+        orderData?.data?.id ||
+        orderData?.order?.id;
 
     const internalOrderId =
       Number(rawOrderId);
@@ -481,15 +502,15 @@ const Checkout = () => {
 
     const razorpayOrderId =
       typeof gatewayData === "string" &&
-      gatewayData.startsWith("order_")
+        gatewayData.startsWith("order_")
         ? gatewayData
         : gatewayData?.razorpayOrderId ||
-          gatewayData?.orderId ||
-          gatewayData?.id ||
-          gatewayData?.data
-            ?.razorpayOrderId ||
-          gatewayData?.data?.orderId ||
-          gatewayData?.data?.id;
+        gatewayData?.orderId ||
+        gatewayData?.id ||
+        gatewayData?.data
+          ?.razorpayOrderId ||
+        gatewayData?.data?.orderId ||
+        gatewayData?.data?.id;
 
     if (!razorpayOrderId) {
       throw new Error(
@@ -1143,19 +1164,18 @@ const Checkout = () => {
                     {/* COD */}
                     <label
                       htmlFor="codOpt"
-                      className={`d-flex align-items-center gap-3 p-3 rounded-3 mb-2 ${
-                        paymentMethod ===
-                        "cod"
+                      className={`d-flex align-items-center gap-3 p-3 rounded-3 mb-2 ${paymentMethod ===
+                          "cod"
                           ? "bg-white shadow-sm"
                           : ""
-                      }`}
+                        }`}
                       style={{
                         cursor: isSubmitting
                           ? "not-allowed"
                           : "pointer",
                         border:
                           paymentMethod ===
-                          "cod"
+                            "cod"
                             ? "1px solid #dbeafe"
                             : "1px solid transparent",
                         transition:
@@ -1195,19 +1215,18 @@ const Checkout = () => {
                     {/* Online */}
                     <label
                       htmlFor="upiOpt"
-                      className={`d-flex align-items-center gap-3 p-3 rounded-3 ${
-                        paymentMethod ===
-                        "online"
+                      className={`d-flex align-items-center gap-3 p-3 rounded-3 ${paymentMethod ===
+                          "online"
                           ? "bg-white shadow-sm"
                           : ""
-                      }`}
+                        }`}
                       style={{
                         cursor: isSubmitting
                           ? "not-allowed"
                           : "pointer",
                         border:
                           paymentMethod ===
-                          "online"
+                            "online"
                             ? "1px solid #dbeafe"
                             : "1px solid transparent",
                         transition:
@@ -1350,8 +1369,8 @@ const Checkout = () => {
                       Number(
                         item.product
                           ?.price ??
-                          item.price ??
-                          0
+                        item.price ??
+                        0
                       );
 
                     const productDesc =
@@ -1723,4 +1742,4 @@ const Checkout = () => {
   );
 };
 
-export default Checkout;
+export default Checkout;  
