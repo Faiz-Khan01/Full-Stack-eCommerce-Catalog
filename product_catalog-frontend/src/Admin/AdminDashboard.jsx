@@ -68,6 +68,10 @@ const AdminDashboard = () => {
   const [error, setError]         = useState("");
   const [search, setSearch]       = useState("");
 
+  // Pagination States
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5; // Number of orders per page
+
   // ── Fetch data ──────────────────────────────────────────
   const fetchData = async (initial = false) => {
     try {
@@ -106,6 +110,11 @@ const AdminDashboard = () => {
     document.addEventListener("visibilitychange", handler);
     return () => document.removeEventListener("visibilitychange", handler);
   }, []);
+
+  // Reset pagination when search query changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search]);
 
   // ── KPI metrics ──────────────────────────────────────────
   const kpi = useMemo(() => {
@@ -161,23 +170,29 @@ const AdminDashboard = () => {
       .slice(0, 6)
   , [products]);
 
-  // ── Recent 8 orders ───────────────────────────────────────
-  const recentOrders = useMemo(() =>
-    [...orders]
-      .sort((a, b) => new Date(b.orderDate || b.createdAt || 0) - new Date(a.orderDate || a.createdAt || 0))
-      .slice(0, 8)
+  // ── Sorted all orders ─────────────────────────────────────
+  const sortedOrders = useMemo(() =>
+    [...orders].sort((a, b) => new Date(b.orderDate || b.createdAt || 0) - new Date(a.orderDate || a.createdAt || 0))
   , [orders]);
 
   // ── Search filtered orders ────────────────────────────────
   const filteredOrders = useMemo(() => {
     const q = search.toLowerCase();
-    return !search ? recentOrders : orders.filter(o =>
+    if (!q) return sortedOrders;
+    return sortedOrders.filter(o =>
       String(o.id).includes(q) ||
       o.orderNumber?.toLowerCase().includes(q) ||
       o.fullName?.toLowerCase().includes(q) ||
       o.userEmail?.toLowerCase().includes(q)
-    ).slice(0, 10);
-  }, [search, orders, recentOrders]);
+    );
+  }, [search, sortedOrders]);
+
+  // ── Paginated orders ──────────────────────────────────────
+  const totalPages = Math.ceil(filteredOrders.length / pageSize) || 1;
+  const paginatedOrders = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredOrders.slice(start, start + pageSize);
+  }, [filteredOrders, currentPage, pageSize]);
 
   // ─────────────────────────────────────────────────────────
   // LOADING
@@ -221,11 +236,11 @@ const AdminDashboard = () => {
       <div className="row g-3 mb-4">
         {[
           { label: "Total Revenue",   value: fmtRs(kpi.totalRevenue),     sub: `Avg ${fmtRs(Math.round(kpi.avgOrderVal))}/order`, icon: "💰", color: "#10b981", bg: "#f0fdf4" },
-          { label: "Total Orders",    value: kpi.totalOrders,              sub: `${kpi.delivered} delivered`,                      icon: "📦", color: "#6366f1", bg: "#f5f3ff" },
-          { label: "Pending / Active",value: kpi.pending,                  sub: `${kpi.shipped} in-transit`,                       icon: "⏳", color: "#f59e0b", bg: "#fffbeb" },
-          { label: "Delivered",       value: kpi.delivered,                sub: `${kpi.cancelled} cancelled`,                      icon: "✅", color: "#059669", bg: "#ecfdf5" },
-          { label: "Total Products",  value: kpi.totalProducts,            sub: `${kpi.totalCategories} categories`,               icon: "🏷️", color: "#0891b2", bg: "#ecfeff" },
-          { label: "Low Stock",       value: kpi.lowStock,                 sub: `${kpi.outOfStock} out of stock`,                  icon: "⚠️", color: "#e11d48", bg: "#fff1f2" },
+          { label: "Total Orders",    value: kpi.totalOrders,             sub: `${kpi.delivered} delivered`,                                         icon: "📦", color: "#6366f1", bg: "#f5f3ff" },
+          { label: "Pending / Active",value: kpi.pending,                 sub: `${kpi.shipped} in-transit`,                                          icon: "⏳", color: "#f59e0b", bg: "#fffbeb" },
+          { label: "Delivered",       value: kpi.delivered,               sub: `${kpi.cancelled} cancelled`,                                         icon: "✅", color: "#059669", bg: "#ecfdf5" },
+          { label: "Total Products",  value: kpi.totalProducts,           sub: `${kpi.totalCategories} categories`,                                  icon: "🏷️", color: "#0891b2", bg: "#ecfeff" },
+          { label: "Low Stock",       value: kpi.lowStock,                sub: `${kpi.outOfStock} out of stock`,                                     icon: "⚠️", color: "#e11d48", bg: "#fff1f2" },
         ].map(card => (
           <div className="col-12 col-sm-6 col-lg-4 col-xl-2" key={card.label}>
             <div className="adash-kpi-card" style={{ borderTop: `3px solid ${card.color}` }}>
@@ -311,63 +326,92 @@ const AdminDashboard = () => {
       {/* ── Orders + Low Stock ─────────────────────────────── */}
       <div className="row g-3 mb-4">
 
-        {/* Recent Orders */}
+        {/* Recent Orders with Pagination */}
         <div className="col-lg-8">
-          <div className="adash-card">
-            <div className="adash-card-header">
-              <h6 className="fw-bold m-0">📋 Recent Orders</h6>
-              <div className="d-flex align-items-center gap-2">
-                <input
-                  className="form-control form-control-sm"
-                  style={{ width: 200, fontSize: 12 }}
-                  placeholder="Search orders..."
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                />
-                <Link to="/admin/orders" className="btn btn-sm btn-outline-dark rounded-pill" style={{ fontSize: 11, whiteSpace: "nowrap" }}>
-                  View All →
-                </Link>
+          <div className="adash-card d-flex flex-column justify-content-between">
+            <div>
+              <div className="adash-card-header">
+                <h6 className="fw-bold m-0">📋 Recent Orders</h6>
+                <div className="d-flex align-items-center gap-2">
+                  <input
+                    className="form-control form-control-sm"
+                    style={{ width: 200, fontSize: 12 }}
+                    placeholder="Search orders..."
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                  />
+                  <Link to="/admin/orders" className="btn btn-sm btn-outline-dark rounded-pill" style={{ fontSize: 11, whiteSpace: "nowrap" }}>
+                    View All →
+                  </Link>
+                </div>
+              </div>
+              <div className="table-responsive">
+                <table className="table adash-table align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th>ORDER #</th>
+                      <th>CUSTOMER</th>
+                      <th>DATE</th>
+                      <th>AMOUNT</th>
+                      <th>STATUS</th>
+                      <th>COURIER</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paginatedOrders.length === 0 ? (
+                      <tr><td colSpan={6} className="text-center py-4" style={{ color: "#94a3b8" }}>No orders found.</td></tr>
+                    ) : paginatedOrders.map(o => (
+                      <tr key={o.id}>
+                        <td>
+                          <span className="font-monospace fw-bold" style={{ fontSize: 11, color: "#0f172a" }}>
+                            {o.orderNumber || `#${o.id}`}
+                          </span>
+                        </td>
+                        <td>
+                          <div style={{ fontSize: 12, fontWeight: 600, color: "#0f172a" }}>{o.fullName || "Customer"}</div>
+                          <div style={{ fontSize: 10, color: "#94a3b8" }}>{o.userEmail}</div>
+                        </td>
+                        <td style={{ fontSize: 11, color: "#64748b" }}>{fmtDate(o.orderDate || o.createdAt)}</td>
+                        <td style={{ fontSize: 12, fontWeight: 700, color: "#0f172a" }}>₹{fmt(o.totalAmount)}</td>
+                        <td><StatusPill status={o.orderStatus} /></td>
+                        <td style={{ fontSize: 11, color: "#475569" }}>
+                          {o.courierName
+                            ? <span className="badge bg-light border text-dark" style={{ fontSize: 9 }}>{o.courierName}</span>
+                            : <span style={{ color: "#94a3b8" }}>—</span>}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
-            <div className="table-responsive">
-              <table className="table adash-table align-middle mb-0">
-                <thead>
-                  <tr>
-                    <th>ORDER #</th>
-                    <th>CUSTOMER</th>
-                    <th>DATE</th>
-                    <th>AMOUNT</th>
-                    <th>STATUS</th>
-                    <th>COURIER</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredOrders.length === 0 ? (
-                    <tr><td colSpan={6} className="text-center py-4" style={{ color: "#94a3b8" }}>No orders found.</td></tr>
-                  ) : filteredOrders.map(o => (
-                    <tr key={o.id}>
-                      <td>
-                        <span className="font-monospace fw-bold" style={{ fontSize: 11, color: "#0f172a" }}>
-                          {o.orderNumber || `#${o.id}`}
-                        </span>
-                      </td>
-                      <td>
-                        <div style={{ fontSize: 12, fontWeight: 600, color: "#0f172a" }}>{o.fullName || "Customer"}</div>
-                        <div style={{ fontSize: 10, color: "#94a3b8" }}>{o.userEmail}</div>
-                      </td>
-                      <td style={{ fontSize: 11, color: "#64748b" }}>{fmtDate(o.orderDate || o.createdAt)}</td>
-                      <td style={{ fontSize: 12, fontWeight: 700, color: "#0f172a" }}>₹{fmt(o.totalAmount)}</td>
-                      <td><StatusPill status={o.orderStatus} /></td>
-                      <td style={{ fontSize: 11, color: "#475569" }}>
-                        {o.courierName
-                          ? <span className="badge bg-light border text-dark" style={{ fontSize: 9 }}>{o.courierName}</span>
-                          : <span style={{ color: "#94a3b8" }}>—</span>}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+
+            {/* Pagination controls */}
+            {totalPages > 1 && (
+              <div className="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                <span style={{ fontSize: 11, color: "#64748b" }}>
+                  Page {currentPage} of {totalPages} ({filteredOrders.length} total orders)
+                </span>
+                <div className="btn-group btn-group-sm">
+                  <button
+                    className="btn btn-outline-secondary"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
+                    style={{ fontSize: 11 }}
+                  >
+                    ← Prev
+                  </button>
+                  <button
+                    className="btn btn-outline-secondary"
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
+                    style={{ fontSize: 11 }}
+                  >
+                    Next →
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -459,12 +503,12 @@ const AdminDashboard = () => {
             </div>
             <div className="row g-2">
               {[
-                { to: "/admin/orders",     icon: "📦", label: "Manage Orders",    sub: `${kpi.pending} pending`,              color: "#6366f1", bg: "#f5f3ff" },
-                { to: "/admin/products",   icon: "🏷️", label: "Manage Products",  sub: `${kpi.totalProducts} products`,       color: "#0891b2", bg: "#ecfeff" },
-                { to: "/admin/inventory",  icon: "📊", label: "View Inventory",   sub: `${kpi.lowStock} low stock`,           color: "#d97706", bg: "#fffbeb" },
-                { to: "/admin/customers",  icon: "👤", label: "View Customers",   sub: "All registered users",                color: "#059669", bg: "#ecfdf5" },
-                { to: "/admin/categories", icon: "🗂️", label: "Categories",       sub: `${kpi.totalCategories} active`,       color: "#7c3aed", bg: "#faf5ff" },
-                { to: "/admin/settings",   icon: "⚙️", label: "Settings",         sub: "Store configuration",                 color: "#475569", bg: "#f8fafc" },
+                { to: "/admin/orders",    icon: "📦", label: "Manage Orders",    sub: `${kpi.pending} pending`,             color: "#6366f1", bg: "#f5f3ff" },
+                { to: "/admin/products",   icon: "🏷️", label: "Manage Products",  sub: `${kpi.totalProducts} products`,      color: "#0891b2", bg: "#ecfeff" },
+                { to: "/admin/inventory",  icon: "📊", label: "View Inventory",   sub: `${kpi.lowStock} low stock`,          color: "#d97706", bg: "#fffbeb" },
+                { to: "/admin/customers",  icon: "👤", label: "View Customers",   sub: "All registered users",               color: "#059669", bg: "#ecfdf5" },
+                { to: "/admin/categories", icon: "🗂️", label: "Categories",       sub: `${kpi.totalCategories} active`,      color: "#7c3aed", bg: "#faf5ff" },
+                { to: "/admin/settings",   icon: "⚙️", label: "Settings",         sub: "Store configuration",                color: "#475569", bg: "#f8fafc" },
               ].map(action => (
                 <div className="col-6" key={action.to}>
                   <Link to={action.to} className="adash-quick-action" style={{ borderLeft: `3px solid ${action.color}` }}>

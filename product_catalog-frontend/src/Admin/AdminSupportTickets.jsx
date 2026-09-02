@@ -815,8 +815,8 @@ const apiRequest = async (
     ...(options.body instanceof FormData
       ? {}
       : {
-          "Content-Type": "application/json",
-        }),
+        "Content-Type": "application/json",
+      }),
     ...(options.headers || {}),
   };
 
@@ -846,8 +846,8 @@ const apiRequest = async (
   if (!response.ok) {
     const error = new Error(
       result?.message ||
-        result?.error ||
-        `Request failed with status ${response.status}`
+      result?.error ||
+      `Request failed with status ${response.status}`
     );
     error.status = response.status;
     throw error;
@@ -918,8 +918,8 @@ const AdminSupportTickets = () => {
         const data = Array.isArray(result?.data)
           ? result.data
           : Array.isArray(result)
-          ? result
-          : [];
+            ? result
+            : [];
 
         setTickets(data);
       } catch (err) {
@@ -939,7 +939,7 @@ const AdminSupportTickets = () => {
         } else {
           setError(
             err.message ||
-              "Unable to load support tickets"
+            "Unable to load support tickets"
           );
         }
       } finally {
@@ -1062,20 +1062,14 @@ const AdminSupportTickets = () => {
     try {
       setLoadingDetails(true);
 
-      const result = await apiRequest(
-        `/support/admin/tickets/${ticket.id}`,
-        {},
-        authToken
-      );
+      // Change this line:
+      const result = await apiRequest(`/support/tickets/${ticket.id}`, {}, authToken);
 
       if (result?.data) {
         setSelectedTicket(result.data);
       }
     } catch (err) {
-      console.warn(
-        "Unable to load full ticket details:",
-        err
-      );
+      console.warn("Unable to load full ticket details:", err);
     } finally {
       setLoadingDetails(false);
     }
@@ -1134,7 +1128,7 @@ const AdminSupportTickets = () => {
     } catch (err) {
       alert(
         err.message ||
-          "Failed to update ticket status"
+        "Failed to update ticket status"
       );
     } finally {
       setUpdating(false);
@@ -1196,7 +1190,7 @@ const AdminSupportTickets = () => {
     } catch (err) {
       alert(
         err.message ||
-          "Failed to update ticket priority"
+        "Failed to update ticket priority"
       );
     } finally {
       setUpdating(false);
@@ -1215,9 +1209,9 @@ const AdminSupportTickets = () => {
       prev.map((ticket) =>
         ticket.id === id
           ? {
-              ...ticket,
-              ...changes,
-            }
+            ...ticket,
+            ...changes,
+          }
           : ticket
       )
     );
@@ -1225,9 +1219,9 @@ const AdminSupportTickets = () => {
     setSelectedTicket((prev) =>
       prev && prev.id === id
         ? {
-            ...prev,
-            ...changes,
-          }
+          ...prev,
+          ...changes,
+        }
         : prev
     );
   };
@@ -1277,11 +1271,11 @@ const AdminSupportTickets = () => {
         setTickets((prev) =>
           prev.map((ticket) =>
             ticket.id ===
-            returnedTicket.id
+              returnedTicket.id
               ? {
-                  ...ticket,
-                  ...returnedTicket,
-                }
+                ...ticket,
+                ...returnedTicket,
+              }
               : ticket
           )
         );
@@ -1292,7 +1286,7 @@ const AdminSupportTickets = () => {
     } catch (err) {
       alert(
         err.message ||
-          "Failed to send admin reply"
+        "Failed to send admin reply"
       );
     } finally {
       setSendingReply(false);
@@ -1334,7 +1328,7 @@ const AdminSupportTickets = () => {
     } catch (err) {
       alert(
         err.message ||
-          "Failed to delete ticket"
+        "Failed to delete ticket"
       );
     } finally {
       setDeleting(false);
@@ -1693,4 +1687,4 @@ const AdminSupportTickets = () => {
   );
 };
 
-export default AdminSupportTickets;
+export default AdminSupportTickets; 
