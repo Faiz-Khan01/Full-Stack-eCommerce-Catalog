@@ -17,7 +17,9 @@ public class EmailTestController {
     private EmailService emailService;
 
 
+    // =========================================================
     // 1. TEST CUSTOMER ORDER CONFIRMATION EMAIL
+    // =========================================================
 
     @GetMapping("/customer")
     public ResponseEntity<?> testCustomerEmail(
@@ -29,20 +31,47 @@ public class EmailTestController {
                 "Mechanical Keyboard (x1) - ₹3,299.00"
         );
 
+        // -------------------------------------------------
+        // TEST ORDER VALUES
+        // -------------------------------------------------
+
+        BigDecimal subtotalAmount =
+                BigDecimal.valueOf(4798.00);
+
+        BigDecimal discountAmount =
+                BigDecimal.valueOf(500.00);
+
+        String couponCode =
+                "SAVE500";
+
+        BigDecimal finalTotalAmount =
+                BigDecimal.valueOf(4298.00);
+
+
+        // -------------------------------------------------
+        // SEND CUSTOMER EMAIL
+        // -------------------------------------------------
+
         emailService.sendOrderConfirmationEmail(
                 email,
                 "Faiz Khan",
                 "ORD-99823",
-                BigDecimal.valueOf(4798.00),
+                subtotalAmount,
+                discountAmount,
+                couponCode,
+                finalTotalAmount,
                 mockItems,
                 "RAZORPAY",
                 "SUCCESS"
         );
 
+
+
         return ResponseEntity.ok(
                 Map.of(
                         "message",
-                        "Customer test email sent asynchronously to " + email
+                        "Customer test email sent asynchronously to "
+                                + email
                 )
         );
     }
@@ -57,7 +86,7 @@ public class EmailTestController {
 
         emailService.sendAdminNewOrderAlert(
                 "ORD-99823",
-                BigDecimal.valueOf(4798.00),
+                BigDecimal.valueOf(4298.00),
                 "Faiz Khan"
         );
 

@@ -21,6 +21,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,6 +32,10 @@ import java.util.stream.Collectors;
 @Service
 public class OrderService {
 
+    // =========================================================
+    // REPOSITORIES
+    // =========================================================
+
     @Autowired
     private OrderRepository orderRepository;
 
@@ -39,6 +44,10 @@ public class OrderService {
 
     @Autowired
     private PaymentRepository paymentRepository;
+
+    // =========================================================
+    // SERVICES
+    // =========================================================
 
     @Autowired
     private InventoryService inventoryService;
@@ -52,8 +61,59 @@ public class OrderService {
     @Autowired
     private CourierService courierService;
 
+    @Autowired
+    private CouponService couponService;
+
+    // =========================================================
+    // RAZORPAY
+    // =========================================================
+
     @Value("${razorpay.key-secret:}")
     private String razorpaySecret;
+
+    // =========================================================
+    // CONSTANTS
+    // =========================================================
+
+    private static final String GUEST_EMAIL =
+            "guest@productcatalog.com";
+
+    private static final String STATUS_PLACED =
+            "PLACED";
+
+    private static final String STATUS_SHIPPED =
+            "SHIPPED";
+
+    private static final String STATUS_DELIVERED =
+            "DELIVERED";
+
+    private static final String STATUS_CANCELLED =
+            "CANCELLED";
+
+    private static final String PAYMENT_PENDING =
+            "PENDING";
+
+    private static final String PAYMENT_SUCCESS =
+            "SUCCESS";
+
+    private static final String PAYMENT_REFUND_INITIATED =
+            "REFUND_INITIATED";
+
+    private static final String PAYMENT_COD =
+            "COD";
+
+    private static final String PAYMENT_RAZORPAY =
+            "RAZORPAY";
+
+    private static final BigDecimal FREE_SHIPPING_THRESHOLD =
+            new BigDecimal("500.00");
+
+    private static final BigDecimal DEFAULT_SHIPPING_FEE =
+            new BigDecimal("50.00");
+
+    // =========================================================
+    // PARSE NUMERIC ORDER ID
+    // =========================================================
 
     private Long parseNumericOrderId(Object rawOrderId) {
 
@@ -61,7 +121,8 @@ public class OrderService {
             return null;
         }
 
-        String orderIdStr = rawOrderId.toString().trim();
+        String orderIdStr =
+                rawOrderId.toString().trim();
 
         if (orderIdStr.isBlank()) {
             return null;
@@ -72,14 +133,31 @@ public class OrderService {
             String numericPart =
                     orderIdStr.replaceAll("[^0-9]", "");
 
-            return numericPart.isEmpty()
-                    ? null
-                    : Long.valueOf(numericPart);
+            if (numericPart.isEmpty()) {
+                return null;
+            }
+
+            return Long.valueOf(numericPart);
 
         } catch (Exception e) {
 
             return null;
         }
+    }
+
+    // =========================================================
+    // CLEAN EMAIL
+    // =========================================================
+
+    private String cleanEmail(String email) {
+
+        if (email == null ||
+                email.trim().isEmpty()) {
+
+            return GUEST_EMAIL;
+        }
+
+        return email.trim().toLowerCase();
     }
 
     // =========================================================
@@ -100,17 +178,20 @@ public class OrderService {
     // =========================================================
 
     @Transactional(readOnly = true)
-    public List<OrderDTO> getOrdersByUserEmail(String email) {
+    public List<OrderDTO> getOrdersByUserEmail(
+            String email) {
 
-        if (email == null || email.trim().isEmpty()) {
+        if (email == null ||
+                email.trim().isEmpty()) {
+
             return new ArrayList<>();
         }
 
-        String cleanEmail =
+        String cleanUserEmail =
                 email.trim().toLowerCase();
 
         return orderRepository
-                .findByUserEmailIgnoreCase(cleanEmail)
+                .findByUserEmailIgnoreCase(cleanUserEmail)
                 .stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
@@ -184,6 +265,10 @@ public class OrderService {
     @Transactional
     public OrderDTO placeOrder(OrderDTO orderDTO) {
 
+        // -----------------------------------------------------
+        // VALIDATE DTO
+        // -----------------------------------------------------
+
         if (orderDTO == null) {
 
             throw new IllegalArgumentException(
@@ -191,17 +276,22 @@ public class OrderService {
             );
         }
 
-        String cleanUserEmail =
-                orderDTO.getUserEmail() == null ||
-                        orderDTO.getUserEmail()
-                                .trim()
-                                .isEmpty()
-                        ? "guest@productcatalog.com"
-                        : orderDTO.getUserEmail()
-                        .trim()
-                        .toLowerCase();
+        // -----------------------------------------------------
+        // CLEAN EMAIL
+        // -----------------------------------------------------
 
-        orderDTO.setUserEmail(cleanUserEmail);
+        String cleanUserEmail =
+                cleanEmail(
+                        orderDTO.getUserEmail()
+                );
+
+        orderDTO.setUserEmail(
+                cleanUserEmail
+        );
+
+        // -----------------------------------------------------
+        // VALIDATE ITEMS
+        // -----------------------------------------------------
 
         if (orderDTO.getItems() == null ||
                 orderDTO.getItems().isEmpty()) {
@@ -211,8 +301,15 @@ public class OrderService {
             );
         }
 
+        // =====================================================
+        // CALCULATE PRODUCT TOTAL FROM DATABASE
+        // =====================================================
+
         BigDecimal calculatedTotal =
                 BigDecimal.ZERO;
+
+        List<Product> validatedProducts =
+                new ArrayList<>();
 
         for (OrderItemDTO itemDto :
                 orderDTO.getItems()) {
@@ -251,6 +348,10 @@ public class OrderService {
                                     )
                             );
 
+            // -------------------------------------------------
+            // VALIDATE PRICE
+            // -------------------------------------------------
+
             if (product.getPrice() == null ||
                     product.getPrice()
                             .compareTo(BigDecimal.ZERO) < 0) {
@@ -260,6 +361,10 @@ public class OrderService {
                                 + product.getId()
                 );
             }
+
+            // -------------------------------------------------
+            // CHECK STOCK
+            // -------------------------------------------------
 
             boolean available =
                     inventoryService.isStockAvailable(
@@ -275,6 +380,10 @@ public class OrderService {
                 );
             }
 
+            // -------------------------------------------------
+            // CALCULATE LINE TOTAL
+            // -------------------------------------------------
+
             BigDecimal lineTotal =
                     product.getPrice()
                             .multiply(
@@ -284,52 +393,259 @@ public class OrderService {
                             );
 
             calculatedTotal =
-                    calculatedTotal.add(lineTotal);
+                    calculatedTotal.add(
+                            lineTotal
+                    );
+
+            validatedProducts.add(product);
         }
 
+        // =====================================================
+        // VALIDATE PRODUCT TOTAL
+        // =====================================================
+
         if (calculatedTotal.compareTo(
-                BigDecimal.ZERO) <= 0) {
+                BigDecimal.ZERO
+        ) <= 0) {
 
             throw new IllegalArgumentException(
                     "Invalid calculated order total"
             );
         }
 
-        BigDecimal shippingFee = BigDecimal.ZERO;
-        if (orderDTO.getShippingFee() != null) {
-            shippingFee = orderDTO.getShippingFee();
-        } else if (calculatedTotal.compareTo(new BigDecimal("500")) < 0) {
-            shippingFee = new BigDecimal("50.00");
+        // =====================================================
+        // COUPON
+        // =====================================================
+
+        BigDecimal discountAmount =
+                BigDecimal.ZERO;
+
+        String couponCode =
+                null;
+
+        if (orderDTO.getCouponCode() != null &&
+                !orderDTO.getCouponCode()
+                        .trim()
+                        .isEmpty()) {
+
+            couponCode =
+                    orderDTO.getCouponCode()
+                            .trim()
+                            .toUpperCase();
+
+            try {
+
+                discountAmount =
+                        couponService.calculateDiscount(
+                                couponCode,
+                                calculatedTotal
+                        );
+
+                if (discountAmount == null) {
+                    discountAmount =
+                            BigDecimal.ZERO;
+                }
+
+            } catch (Exception e) {
+
+                throw new IllegalArgumentException(
+                        "Invalid coupon: "
+                                + e.getMessage()
+                );
+            }
+
+            // -------------------------------------------------
+            // DISCOUNT CANNOT BE NEGATIVE
+            // -------------------------------------------------
+
+            if (discountAmount.compareTo(
+                    BigDecimal.ZERO
+            ) < 0) {
+
+                discountAmount =
+                        BigDecimal.ZERO;
+            }
+
+            // -------------------------------------------------
+            // DISCOUNT CANNOT EXCEED SUBTOTAL
+            // -------------------------------------------------
+
+            if (discountAmount.compareTo(
+                    calculatedTotal
+            ) > 0) {
+
+                discountAmount =
+                        calculatedTotal;
+            }
         }
 
-        BigDecimal grandTotal = calculatedTotal.add(shippingFee);
+        // =====================================================
+        // DISCOUNTED SUBTOTAL
+        // =====================================================
 
-        Order order = new Order();
+        BigDecimal discountedSubtotal =
+                calculatedTotal.subtract(
+                        discountAmount
+                );
 
-        order.setUserEmail(cleanUserEmail);
-        order.setFullName(orderDTO.getFullName());
-        order.setMobile(orderDTO.getMobile());
-        order.setAddress(orderDTO.getAddress());
-        order.setShippingFee(shippingFee);
-        order.setTotalAmount(grandTotal);
-        order.setOrderDate(new Date());
+        if (discountedSubtotal.compareTo(
+                BigDecimal.ZERO
+        ) < 0) {
+
+            discountedSubtotal =
+                    BigDecimal.ZERO;
+        }
+
+        // =====================================================
+        // SHIPPING
+        // =====================================================
+
+        BigDecimal shippingFee;
+
+        /*
+         * IMPORTANT:
+         *
+         * Frontend shipping fee should ideally NOT be trusted.
+         * For security, calculate shipping on backend.
+         *
+         * Current rule:
+         * - >= ₹500 => FREE
+         * - < ₹500 => ₹50
+         */
+
+        if (discountedSubtotal.compareTo(
+                FREE_SHIPPING_THRESHOLD
+        ) >= 0) {
+
+            shippingFee =
+                    BigDecimal.ZERO;
+
+        } else {
+
+            shippingFee =
+                    DEFAULT_SHIPPING_FEE;
+        }
+
+        // =====================================================
+        // GRAND TOTAL
+        // =====================================================
+
+        BigDecimal grandTotal =
+                discountedSubtotal
+                        .add(shippingFee);
+
+        if (grandTotal.compareTo(
+                BigDecimal.ZERO
+        ) < 0) {
+
+            grandTotal =
+                    BigDecimal.ZERO;
+        }
+
+        // =====================================================
+        // PAYMENT METHOD
+        // =====================================================
 
         String method =
                 orderDTO.getPaymentMethod() != null &&
-                        !orderDTO.getPaymentMethod()
-                                .trim()
-                                .isEmpty()
+                        !orderDTO.getPaymentMethod().trim().isEmpty()
                         ? orderDTO.getPaymentMethod()
                         .trim()
                         .toUpperCase()
-                        : "COD";
+                        : PAYMENT_COD;
 
-        order.setPaymentMethod(method);
+        if ("ONLINE".equals(method)) {
+            method = PAYMENT_RAZORPAY;
+        }
 
-        order.setOrderStatus("PLACED");
-        order.setPaymentStatus("PENDING");
+          //   -----------------------------------------------------
+          // VALIDATE PAYMENT METHOD
+          // -----------------------------------------------------
 
-        order.addHistory(new OrderHistory(order, "PLACED", "Origin Hub", "Order placed successfully via " + method));
+        if (!PAYMENT_COD.equals(method) &&
+                !PAYMENT_RAZORPAY.equals(method)) {
+
+            throw new IllegalArgumentException(
+                    "Unsupported payment method: " + method
+            );
+        }
+
+        // =====================================================
+        // CREATE ORDER ENTITY
+        // =====================================================
+
+        Order order =
+                new Order();
+
+        order.setUserEmail(
+                cleanUserEmail
+        );
+
+        order.setFullName(
+                orderDTO.getFullName()
+        );
+
+        order.setMobile(
+                orderDTO.getMobile()
+        );
+
+        order.setAddress(
+                orderDTO.getAddress()
+        );
+
+        // -----------------------------------------------------
+        // SERVER CALCULATED VALUES
+        // -----------------------------------------------------
+
+        order.setShippingFee(
+                shippingFee
+        );
+
+        order.setDiscountAmount(
+                discountAmount
+        );
+
+        order.setCouponCode(
+                couponCode
+        );
+
+        order.setTotalAmount(
+                grandTotal
+        );
+
+        // -----------------------------------------------------
+        // ORDER DATE
+        // -----------------------------------------------------
+
+        order.setOrderDate(
+                new Date()
+        );
+
+        // -----------------------------------------------------
+        // PAYMENT
+        // -----------------------------------------------------
+
+        order.setPaymentMethod(
+                method
+        );
+
+        order.setPaymentStatus(
+                PAYMENT_COD.equalsIgnoreCase(method)
+                        ? PAYMENT_PENDING
+                        : PAYMENT_PENDING
+        );
+
+        // -----------------------------------------------------
+        // ORDER STATUS
+        // -----------------------------------------------------
+
+        order.setOrderStatus(
+                STATUS_PLACED
+        );
+
+        // =====================================================
+        // RAZORPAY ORDER ID
+        // =====================================================
 
         if (orderDTO.getRazorpayOrderId() != null &&
                 !orderDTO.getRazorpayOrderId()
@@ -342,23 +658,49 @@ public class OrderService {
             );
         }
 
+        // =====================================================
+        // ORDER HISTORY
+        // =====================================================
+
+        String historyMessage =
+                "Order placed successfully via "
+                        + method;
+
+        if (couponCode != null) {
+
+            historyMessage +=
+                    " | Coupon: "
+                            + couponCode
+                            + " | Discount: ₹"
+                            + discountAmount
+                            .toPlainString();
+        }
+
+        order.addHistory(
+                new OrderHistory(
+                        order,
+                        STATUS_PLACED,
+                        "Origin Hub",
+                        historyMessage
+                )
+        );
+
+        // =====================================================
+        // ORDER ITEMS
+        // =====================================================
+
         List<String> itemsSummary =
                 new ArrayList<>();
 
-        for (OrderItemDTO itemDto :
-                orderDTO.getItems()) {
+        for (int i = 0;
+             i < orderDTO.getItems().size();
+             i++) {
+
+            OrderItemDTO itemDto =
+                    orderDTO.getItems().get(i);
 
             Product product =
-                    productRepository
-                            .findById(
-                                    itemDto.getProductId()
-                            )
-                            .orElseThrow(() ->
-                                    new RuntimeException(
-                                            "Product not found with ID: "
-                                                    + itemDto.getProductId()
-                                    )
-                            );
+                    validatedProducts.get(i);
 
             OrderItem item =
                     new OrderItem(
@@ -367,53 +709,75 @@ public class OrderService {
                             product.getPrice()
                     );
 
-            order.addItem(item);
+            order.addItem(
+                    item
+            );
 
             itemsSummary.add(
                     String.format(
                             "%s (x%d) - ₹%s",
                             product.getName(),
                             item.getQuantity(),
-                            item.getPrice().toPlainString()
+                            product.getPrice()
+                                    .toPlainString()
                     )
             );
         }
 
-        Order savedOrder =
-                orderRepository.save(order);
+        // =====================================================
+        // SAVE ORDER
+        // =====================================================
 
-        String generatedOrderNumber =
-                orderDTO.getOrderNumber() != null &&
-                        !orderDTO.getOrderNumber()
-                                .isBlank()
-                        ? orderDTO.getOrderNumber()
-                        .replace("#", "")
-                        .trim()
-                        : "ORD-"
-                        + LocalDate.now().getYear()
-                        + "-"
-                        + String.format(
-                        "%04d",
-                        savedOrder.getId()
+        Order savedOrder =
+                orderRepository.save(
+                        order
                 );
+
+        // =====================================================
+        // GENERATE ORDER NUMBER
+        // =====================================================
+
+        String generatedOrderNumber;
+
+        if (orderDTO.getOrderNumber() != null &&
+                !orderDTO.getOrderNumber()
+                        .isBlank()) {
+
+            generatedOrderNumber =
+                    orderDTO.getOrderNumber()
+                            .replace("#", "")
+                            .trim();
+
+        } else {
+
+            generatedOrderNumber =
+                    "ORD-"
+                            + LocalDate.now().getYear()
+                            + "-"
+                            + String.format(
+                            "%04d",
+                            savedOrder.getId()
+                    );
+        }
 
         savedOrder.setOrderNumber(
                 generatedOrderNumber
         );
 
         savedOrder =
-                orderRepository.save(savedOrder);
-
-        if ("COD".equalsIgnoreCase(method)) {
-
-            for (OrderItem item :
-                    savedOrder.getItems()) {
-
-                inventoryService.deductStock(
-                        item.getProduct().getId(),
-                        item.getQuantity()
+                orderRepository.save(
+                        savedOrder
                 );
-            }
+
+        // =====================================================
+        // COD
+        // =====================================================
+
+        if (PAYMENT_COD.equalsIgnoreCase(method)) {
+
+            deductInventoryForOrder(
+                    savedOrder
+            );
 
             triggerOrderEmails(
                     savedOrder,
@@ -421,7 +785,22 @@ public class OrderService {
             );
         }
 
-        return convertToDTO(savedOrder);
+        // =====================================================
+        // ONLINE PAYMENT
+        // =====================================================
+
+        /*
+         * IMPORTANT:
+         *
+         * Online payment order ke time inventory deduct nahi karna.
+         *
+         * Payment SUCCESS hone ke baad
+         * completeOnlineOrder() mein deduct hoga.
+         */
+
+        return convertToDTO(
+                savedOrder
+        );
     }
 
     // =========================================================
@@ -441,26 +820,32 @@ public class OrderService {
             );
         }
 
-        String cleanEmail =
+        String cleanUserEmail =
                 email.trim().toLowerCase();
 
         List<CartItem> cartItems =
-                cartService.getCartItems(cleanEmail);
+                cartService.getCartItems(
+                        cleanUserEmail
+                );
 
         if (cartItems == null ||
                 cartItems.isEmpty()) {
 
             throw new RuntimeException(
                     "Cart is empty for user: "
-                            + cleanEmail
+                            + cleanUserEmail
             );
         }
 
         if (orderDTO == null) {
-            orderDTO = new OrderDTO();
+
+            orderDTO =
+                    new OrderDTO();
         }
 
-        orderDTO.setUserEmail(cleanEmail);
+        orderDTO.setUserEmail(
+                cleanUserEmail
+        );
 
         List<OrderItemDTO> itemDTOs =
                 new ArrayList<>();
@@ -485,6 +870,20 @@ public class OrderService {
             Product product =
                     cartItem.getProduct();
 
+            if (product.getId() == null) {
+
+                throw new IllegalArgumentException(
+                        "Cart product ID cannot be null"
+                );
+            }
+
+            if (product.getPrice() == null) {
+
+                throw new IllegalArgumentException(
+                        "Cart product price cannot be null"
+                );
+            }
+
             OrderItemDTO itemDTO =
                     new OrderItemDTO();
 
@@ -504,11 +903,17 @@ public class OrderService {
                     cartItem.getQuantity()
             );
 
+            /*
+             * This is only informational.
+             * placeOrder() uses DB product price.
+             */
             itemDTO.setPrice(
                     product.getPrice()
             );
 
-            itemDTOs.add(itemDTO);
+            itemDTOs.add(
+                    itemDTO
+            );
         }
 
         if (itemDTOs.isEmpty()) {
@@ -518,14 +923,28 @@ public class OrderService {
             );
         }
 
-        orderDTO.setItems(itemDTOs);
+        orderDTO.setItems(
+                itemDTOs
+        );
+
+        /*
+         * Do NOT calculate or trust totalAmount
+         * from frontend/cart here.
+         *
+         * placeOrder() calculates everything
+         * from database.
+         */
 
         OrderDTO placedOrder =
-                placeOrder(orderDTO);
+                placeOrder(
+                        orderDTO
+                );
 
         try {
 
-            clearCartSafely(cleanEmail);
+            clearCartSafely(
+                    cleanUserEmail
+            );
 
         } catch (Exception ignored) {
         }
@@ -578,7 +997,9 @@ public class OrderService {
         }
 
         if (orderDTO == null) {
-            orderDTO = new OrderDTO();
+
+            orderDTO =
+                    new OrderDTO();
         }
 
         orderDTO.setUserEmail(
@@ -603,21 +1024,29 @@ public class OrderService {
                 product.getImageUrl()
         );
 
-        itemDTO.setQuantity(1);
+        itemDTO.setQuantity(
+                1
+        );
 
         itemDTO.setPrice(
                 product.getPrice()
         );
 
-        items.add(itemDTO);
-
-        orderDTO.setItems(items);
-
-        orderDTO.setTotalAmount(
-                product.getPrice()
+        items.add(
+                itemDTO
         );
 
-        return placeOrder(orderDTO);
+        orderDTO.setItems(
+                items
+        );
+
+        /*
+         * Total is recalculated inside placeOrder().
+         */
+
+        return placeOrder(
+                orderDTO
+        );
     }
 
     // =========================================================
@@ -631,15 +1060,26 @@ public class OrderService {
             String razorpayPaymentId,
             String razorpaySignature) {
 
-        Order order = null;
+        Order order =
+                null;
+
+        // -----------------------------------------------------
+        // 1. FIND BY DATABASE ORDER ID
+        // -----------------------------------------------------
 
         if (dbOrderId != null) {
 
             order =
                     orderRepository
-                            .findById(dbOrderId)
+                            .findById(
+                                    dbOrderId
+                            )
                             .orElse(null);
         }
+
+        // -----------------------------------------------------
+        // 2. FIND BY RAZORPAY ORDER ID
+        // -----------------------------------------------------
 
         if (order == null &&
                 razorpayOrderId != null &&
@@ -648,10 +1088,14 @@ public class OrderService {
             order =
                     orderRepository
                             .findByRazorpayOrderId(
-                                    razorpayOrderId
+                                    razorpayOrderId.trim()
                             )
                             .orElse(null);
         }
+
+        // -----------------------------------------------------
+        // 3. FIND THROUGH PAYMENT RECORD
+        // -----------------------------------------------------
 
         if (order == null &&
                 razorpayOrderId != null &&
@@ -660,7 +1104,7 @@ public class OrderService {
             Payment paymentRecord =
                     paymentRepository
                             .findByRazorpayOrderId(
-                                    razorpayOrderId
+                                    razorpayOrderId.trim()
                             )
                             .orElse(null);
 
@@ -684,6 +1128,10 @@ public class OrderService {
             }
         }
 
+        // -----------------------------------------------------
+        // ORDER NOT FOUND
+        // -----------------------------------------------------
+
         if (order == null) {
 
             throw new RuntimeException(
@@ -694,32 +1142,57 @@ public class OrderService {
             );
         }
 
-        if ("SUCCESS".equalsIgnoreCase(
-                order.getPaymentStatus()
-        )) {
-
-            return convertToDTO(order);
-        }
+        // -----------------------------------------------------
+        // VALIDATE RAZORPAY DATA
+        // -----------------------------------------------------
 
         if (razorpayOrderId == null ||
-                razorpayOrderId.isBlank()) {
+                razorpayOrderId.trim().isEmpty()) {
 
             throw new IllegalArgumentException(
                     "Razorpay order ID cannot be empty"
             );
         }
 
+        if (razorpayPaymentId == null ||
+                razorpayPaymentId.trim().isEmpty()) {
+
+            throw new IllegalArgumentException(
+                    "Razorpay payment ID cannot be empty"
+            );
+        }
+
+        if (razorpaySignature == null ||
+                razorpaySignature.trim().isEmpty()) {
+
+            throw new IllegalArgumentException(
+                    "Razorpay signature cannot be empty"
+            );
+        }
+
+        String cleanRazorpayOrderId =
+                razorpayOrderId.trim();
+
+        String cleanRazorpayPaymentId =
+                razorpayPaymentId.trim();
+
+        String cleanRazorpaySignature =
+                razorpaySignature.trim();
+
+        // -----------------------------------------------------
+        // CHECK RAZORPAY ORDER ID
+        // -----------------------------------------------------
+
         if (order.getRazorpayOrderId() == null ||
                 order.getRazorpayOrderId().isBlank()) {
 
             order.setRazorpayOrderId(
-                    razorpayOrderId.trim()
+                    cleanRazorpayOrderId
             );
-        }
 
-        if (!order.getRazorpayOrderId()
+        } else if (!order.getRazorpayOrderId()
                 .equals(
-                        razorpayOrderId.trim()
+                        cleanRazorpayOrderId
                 )) {
 
             throw new IllegalArgumentException(
@@ -727,61 +1200,110 @@ public class OrderService {
             );
         }
 
-        boolean isValid =
+        // -----------------------------------------------------
+        // ALREADY PAID
+        // -----------------------------------------------------
+
+        if (PAYMENT_SUCCESS.equalsIgnoreCase(
+                order.getPaymentStatus()
+        )) {
+
+            return convertToDTO(
+                    order
+            );
+        }
+
+        // -----------------------------------------------------
+        // VERIFY SIGNATURE
+        // -----------------------------------------------------
+
+        boolean validSignature =
                 verifyRazorpaySignature(
                         order.getRazorpayOrderId(),
-                        razorpayPaymentId,
-                        razorpaySignature
+                        cleanRazorpayPaymentId,
+                        cleanRazorpaySignature
                 );
 
-        if (!isValid) {
+        if (!validSignature) {
 
             throw new IllegalArgumentException(
                     "Invalid Razorpay payment signature"
             );
         }
 
-        order.setPaymentStatus("SUCCESS");
-        order.setPaymentMethod("RAZORPAY");
+        // =====================================================
+        // PAYMENT SUCCESS
+        // =====================================================
 
-        List<String> itemsSummary =
-                new ArrayList<>();
+        order.setPaymentStatus(
+                PAYMENT_SUCCESS
+        );
 
-        if (order.getItems() != null) {
+        order.setPaymentMethod(
+                PAYMENT_RAZORPAY
+        );
 
-            for (OrderItem item :
-                    order.getItems()) {
+        // =====================================================
+        // ORDER HISTORY
+        // =====================================================
 
-                if (item.getProduct() == null) {
-                    continue;
-                }
+        order.addHistory(
+                new OrderHistory(
+                        order,
+                        STATUS_PLACED,
+                        "Payment Gateway",
+                        "Online payment successful. Razorpay Payment ID: "
+                                + cleanRazorpayPaymentId
+                )
+        );
 
-                inventoryService.deductStock(
-                        item.getProduct().getId(),
-                        item.getQuantity()
-                );
+        // =====================================================
+        // INVENTORY
+        // =====================================================
 
-                itemsSummary.add(
-                        String.format(
-                                "%s (x%d) - ₹%s",
-                                item.getProduct().getName(),
-                                item.getQuantity(),
-                                item.getPrice() != null
-                                        ? item.getPrice()
-                                        .toPlainString()
-                                        : "0.00"
-                        )
-                );
-            }
-        }
+        /*
+         * Stock is deducted ONLY after successful payment.
+         *
+         * IMPORTANT:
+         * If your inventoryService.deductStock() itself
+         * throws when stock is insufficient, the transaction
+         * will rolback the payment-status DB change.
+         */
+
+        deductInventoryForOrder(
+                order
+        );
+
+        // =====================================================
+        // SAVE
+        // =====================================================
 
         Order updatedOrder =
-                orderRepository.save(order);
+                orderRepository.save(
+                        order
+                );
+
+        // =====================================================
+        // ITEMS SUMMARY
+        // =====================================================
+
+        List<String> itemsSummary =
+                buildItemsSummary(
+                        updatedOrder
+                );
+
+        // =====================================================
+        // EMAIL
+        // =====================================================
 
         triggerOrderEmails(
                 updatedOrder,
                 itemsSummary
         );
+
+        // =====================================================
+        // CLEAR CART
+        // =====================================================
 
         try {
 
@@ -795,7 +1317,9 @@ public class OrderService {
         } catch (Exception ignored) {
         }
 
-        return convertToDTO(updatedOrder);
+        return convertToDTO(
+                updatedOrder
+        );
     }
 
     // =========================================================
@@ -817,11 +1341,100 @@ public class OrderService {
     }
 
     // =========================================================
+    // DEDUCT INVENTORY
+    // =========================================================
+
+    private void deductInventoryForOrder(
+            Order order) {
+
+        if (order == null ||
+                order.getItems() == null ||
+                order.getItems().isEmpty()) {
+
+            return;
+        }
+
+        for (OrderItem item :
+                order.getItems()) {
+
+            if (item == null) {
+                continue;
+            }
+
+            if (item.getProduct() == null) {
+                continue;
+            }
+
+            if (item.getQuantity() == null ||
+                    item.getQuantity() <= 0) {
+
+                throw new IllegalArgumentException(
+                        "Invalid quantity for order item"
+                );
+            }
+
+            inventoryService.deductStock(
+                    item.getProduct().getId(),
+                    item.getQuantity()
+            );
+        }
+    }
+
+    // =========================================================
+    // BUILD ITEMS SUMMARY
+    // =========================================================
+
+    private List<String> buildItemsSummary(
+            Order order) {
+
+        List<String> itemsSummary =
+                new ArrayList<>();
+
+        if (order == null ||
+                order.getItems() == null) {
+
+            return itemsSummary;
+        }
+
+        for (OrderItem item :
+                order.getItems()) {
+
+            if (item == null ||
+                    item.getProduct() == null) {
+
+                continue;
+            }
+
+            BigDecimal price =
+                    item.getPrice() != null
+                            ? item.getPrice()
+                            : BigDecimal.ZERO;
+
+            int quantity =
+                    item.getQuantity() != null
+                            ? item.getQuantity()
+                            : 0;
+
+            itemsSummary.add(
+                    String.format(
+                            "%s (x%d) - ₹%s",
+                            item.getProduct().getName(),
+                            quantity,
+                            price.toPlainString()
+                    )
+            );
+        }
+
+        return itemsSummary;
+    }
+
+    // =========================================================
     // CLEAR CART SAFELY
     // =========================================================
 
     @Transactional
-    public void clearCartSafely(String email) {
+    public void clearCartSafely(
+            String email) {
 
         if (email == null ||
                 email.trim().isEmpty()) {
@@ -856,6 +1469,10 @@ public class OrderService {
         if (razorpaySecret == null ||
                 razorpaySecret.isBlank()) {
 
+            System.err.println(
+                    "Razorpay secret is not configured"
+            );
+
             return false;
         }
 
@@ -872,20 +1489,27 @@ public class OrderService {
         try {
 
             String payload =
-                    orderId + "|" + paymentId;
+                    orderId.trim()
+                            + "|"
+                            + paymentId.trim();
 
             Mac sha256HMAC =
-                    Mac.getInstance("HmacSHA256");
-
-            SecretKeySpec secretKey =
-                    new SecretKeySpec(
-                            razorpaySecret.getBytes(
-                                    StandardCharsets.UTF_8
-                            ),
+                    Mac.getInstance(
                             "HmacSHA256"
                     );
 
-            sha256HMAC.init(secretKey);
+            SecretKeySpec secretKey =
+                    new SecretKeySpec(
+                            razorpaySecret
+                                    .getBytes(
+                                            StandardCharsets.UTF_8
+                                    ),
+                            "HmacSHA256"
+                    );
+
+            sha256HMAC.init(
+                    secretKey
+            );
 
             byte[] hash =
                     sha256HMAC.doFinal(
@@ -908,14 +1532,28 @@ public class OrderService {
                     hexString.append('0');
                 }
 
-                hexString.append(hex);
+                hexString.append(
+                        hex
+                );
             }
 
-            return hexString
-                    .toString()
-                    .equalsIgnoreCase(
-                            signature.trim()
-                    );
+            /*
+             * Constant-time comparison is preferable
+             * for signatures.
+             */
+
+            return MessageDigest.isEqual(
+                    hexString
+                            .toString()
+                            .getBytes(
+                                    StandardCharsets.UTF_8
+                            ),
+                    signature
+                            .trim()
+                            .getBytes(
+                                    StandardCharsets.UTF_8
+                            )
+            );
 
         } catch (Exception e) {
 
@@ -942,6 +1580,17 @@ public class OrderService {
 
         try {
 
+            // -------------------------------------------------
+            // CUSTOMER EMAIL
+            // -------------------------------------------------
+
+            String customerEmail =
+                    order.getUserEmail();
+
+            // -------------------------------------------------
+            // ORDER NUMBER
+            // -------------------------------------------------
+
             String displayOrderId =
                     order.getOrderNumber() != null &&
                             !order.getOrderNumber().isBlank()
@@ -950,44 +1599,168 @@ public class OrderService {
                             order.getId()
                     );
 
-            String customerName =
-                    order.getFullName() != null &&
-                            !order.getFullName().isBlank()
-                            ? order.getFullName().trim()
-                            : order.getUserEmail() != null &&
-                            order.getUserEmail().contains("@")
-                            ? order.getUserEmail()
-                            .split("@")[0]
-                            : "Customer";
+            // -------------------------------------------------
+            // CUSTOMER NAME
+            // -------------------------------------------------
+
+            String customerName;
+
+            if (order.getFullName() != null &&
+                    !order.getFullName().isBlank()) {
+
+                customerName =
+                        order.getFullName().trim();
+
+            } else if (order.getUserEmail() != null &&
+                    order.getUserEmail().contains("@")) {
+
+                customerName =
+                        order.getUserEmail()
+                                .split("@")[0];
+
+            } else {
+
+                customerName =
+                        "Customer";
+            }
+
+            // -------------------------------------------------
+            // PAYMENT METHOD
+            // -------------------------------------------------
 
             String paymentMethod =
                     order.getPaymentMethod() != null &&
                             !order.getPaymentMethod().isBlank()
                             ? order.getPaymentMethod()
-                            : "COD";
+                            : PAYMENT_COD;
+
+            // -------------------------------------------------
+            // PAYMENT STATUS
+            // -------------------------------------------------
 
             String paymentStatus =
                     order.getPaymentStatus() != null &&
                             !order.getPaymentStatus().isBlank()
                             ? order.getPaymentStatus()
-                            : "PENDING";
+                            : PAYMENT_PENDING;
 
-            emailService.sendOrderConfirmationEmail(
-                    order.getUserEmail(),
-                    customerName,
+            // -------------------------------------------------
+            // SUBTOTAL
+            // -------------------------------------------------
+
+            BigDecimal subtotalAmount =
+                    BigDecimal.ZERO;
+
+            if (order.getItems() != null) {
+
+                for (OrderItem item :
+                        order.getItems()) {
+
+                    if (item == null ||
+                            item.getPrice() == null ||
+                            item.getQuantity() == null) {
+
+                        continue;
+                    }
+
+                    BigDecimal itemTotal =
+                            item.getPrice()
+                                    .multiply(
+                                            BigDecimal.valueOf(
+                                                    item.getQuantity()
+                                            )
+                                    );
+
+                    subtotalAmount =
+                            subtotalAmount.add(
+                                    itemTotal
+                            );
+                }
+            }
+
+            // -------------------------------------------------
+            // DISCOUNT
+            // -------------------------------------------------
+
+            BigDecimal discountAmount =
+                    order.getDiscountAmount() != null
+                            ? order.getDiscountAmount()
+                            : BigDecimal.ZERO;
+
+            // -------------------------------------------------
+            // COUPON
+            // -------------------------------------------------
+
+            String couponCode =
+                    order.getCouponCode();
+
+            // -------------------------------------------------
+            // SHIPPING
+            // -------------------------------------------------
+
+            BigDecimal shippingFee =
+                    order.getShippingFee() != null
+                            ? order.getShippingFee()
+                            : BigDecimal.ZERO;
+
+            // -------------------------------------------------
+            // FINAL TOTAL
+            // -------------------------------------------------
+
+            BigDecimal totalAmount =
+                    order.getTotalAmount() != null
+                            ? order.getTotalAmount()
+                            : BigDecimal.ZERO;
+
+            // -------------------------------------------------
+            // CUSTOMER EMAIL
+            // -------------------------------------------------
+
+            if (customerEmail != null &&
+                    !customerEmail.isBlank()) {
+
+                emailService.sendOrderConfirmationEmail(
+                        customerEmail,
+                        customerName,
+                        displayOrderId,
+                        subtotalAmount,
+                        discountAmount,
+                        couponCode,
+                        totalAmount,
+                        itemsSummary,
+                        paymentMethod,
+                        paymentStatus
+                );
+            }
+
+            // -------------------------------------------------
+            // ADMIN EMAIL
+            // -------------------------------------------------
+
+            emailService.sendAdminNewOrderAlert(
                     displayOrderId,
-                    order.getTotalAmount(),
-                    itemsSummary,
+                    totalAmount,
+                    customerName,
                     paymentMethod,
                     paymentStatus
             );
 
-            emailService.sendAdminNewOrderAlert(
-                    displayOrderId,
-                    order.getTotalAmount(),
-                    customerName,
-                    paymentMethod,
-                    paymentStatus
+            System.out.println(
+                    "Order emails triggered successfully"
+                            + " | Order: #"
+                            + displayOrderId
+                            + " | Customer: "
+                            + customerEmail
+                            + " | Subtotal: ₹"
+                            + subtotalAmount
+                            + " | Discount: ₹"
+                            + discountAmount
+                            + " | Coupon: "
+                            + couponCode
+                            + " | Shipping: ₹"
+                            + shippingFee
+                            + " | Total: ₹"
+                            + totalAmount
             );
 
         } catch (Exception e) {
@@ -998,15 +1771,18 @@ public class OrderService {
                             + ": "
                             + e.getMessage()
             );
+
+            e.printStackTrace();
         }
     }
 
     // =========================================================
-    // CONVERT ORDER ENTITY TO DTO
+    // CONVERT ENTITY TO DTO
     // =========================================================
 
     @Transactional(readOnly = true)
-    public OrderDTO convertToDTO(Order order) {
+    public OrderDTO convertToDTO(
+            Order order) {
 
         if (order == null) {
             return null;
@@ -1014,6 +1790,10 @@ public class OrderService {
 
         OrderDTO dto =
                 new OrderDTO();
+
+        // -----------------------------------------------------
+        // BASIC INFORMATION
+        // -----------------------------------------------------
 
         dto.setId(
                 order.getId()
@@ -1039,13 +1819,41 @@ public class OrderService {
                 order.getAddress()
         );
 
+        // -----------------------------------------------------
+        // AMOUNTS
+        // -----------------------------------------------------
+
         dto.setTotalAmount(
                 order.getTotalAmount()
         );
 
+        dto.setShippingFee(
+                order.getShippingFee() != null
+                        ? order.getShippingFee()
+                        : BigDecimal.ZERO
+        );
+
+        dto.setDiscountAmount(
+                order.getDiscountAmount() != null
+                        ? order.getDiscountAmount()
+                        : BigDecimal.ZERO
+        );
+
+        dto.setCouponCode(
+                order.getCouponCode()
+        );
+
+        // -----------------------------------------------------
+        // DATE
+        // -----------------------------------------------------
+
         dto.setOrderDate(
                 order.getOrderDate()
         );
+
+        // -----------------------------------------------------
+        // PAYMENT
+        // -----------------------------------------------------
 
         dto.setPaymentStatus(
                 order.getPaymentStatus()
@@ -1059,23 +1867,17 @@ public class OrderService {
                 order.getRazorpayOrderId()
         );
 
-        dto.setShippingFee(
-                order.getShippingFee() != null
-                        ? order.getShippingFee()
-                        : BigDecimal.ZERO
-        );
-
-        // =====================================================
+        // -----------------------------------------------------
         // ORDER STATUS
-        // =====================================================
+        // -----------------------------------------------------
 
         dto.setOrderStatus(
                 order.getOrderStatus()
         );
 
-        // =====================================================
-        // SHIPPING / COURIER INFORMATION
-        // =====================================================
+        // -----------------------------------------------------
+        // COURIER
+        // -----------------------------------------------------
 
         dto.setCourierName(
                 order.getCourierName()
@@ -1090,23 +1892,37 @@ public class OrderService {
         );
 
         // =====================================================
-        // ORDER HISTORIES / TIMELINE
+        // ORDER HISTORY
         // =====================================================
 
         if (order.getOrderHistories() != null) {
-            List<OrderHistoryDTO> historyDTOs = order.getOrderHistories()
-                    .stream()
-                    .map(h -> new OrderHistoryDTO(
-                            h.getId(),
-                            h.getStatus(),
-                            h.getLocation(),
-                            h.getNotes(),
-                            h.getTimestamp()
-                    ))
-                    .collect(Collectors.toList());
-            dto.setOrderHistories(historyDTOs);
+
+            List<OrderHistoryDTO> historyDTOs =
+                    order.getOrderHistories()
+                            .stream()
+                            .filter(h -> h != null)
+                            .map(h ->
+                                    new OrderHistoryDTO(
+                                            h.getId(),
+                                            h.getStatus(),
+                                            h.getLocation(),
+                                            h.getNotes(),
+                                            h.getTimestamp()
+                                    )
+                            )
+                            .collect(
+                                    Collectors.toList()
+                            );
+
+            dto.setOrderHistories(
+                    historyDTOs
+            );
+
         } else {
-            dto.setOrderHistories(new ArrayList<>());
+
+            dto.setOrderHistories(
+                    new ArrayList<>()
+            );
         }
 
         // =====================================================
@@ -1118,6 +1934,7 @@ public class OrderService {
             List<OrderItemDTO> itemDTOs =
                     order.getItems()
                             .stream()
+                            .filter(item -> item != null)
                             .map(item -> {
 
                                 OrderItemDTO itemDto =
@@ -1154,9 +1971,13 @@ public class OrderService {
                                 return itemDto;
 
                             })
-                            .collect(Collectors.toList());
+                            .collect(
+                                    Collectors.toList()
+                            );
 
-            dto.setItems(itemDTOs);
+            dto.setItems(
+                    itemDTOs
+            );
 
         } else {
 
@@ -1200,34 +2021,102 @@ public class OrderService {
                         .findById(id)
                         .orElseThrow(() ->
                                 new RuntimeException(
-                                         "Order not found with ID: "
+                                        "Order not found with ID: "
                                                 + id
                                 )
                         );
+
+        String oldStatus =
+                order.getOrderStatus();
+
+        // -----------------------------------------------------
+        // VALIDATE STATUS
+        // -----------------------------------------------------
+
+        List<String> allowedStatuses =
+                List.of(
+                        STATUS_PLACED,
+                        "PROCESSING",
+                        STATUS_SHIPPED,
+                        "OUT_FOR_DELIVERY",
+                        STATUS_DELIVERED,
+                        STATUS_CANCELLED
+                );
+
+        if (!allowedStatuses.contains(
+                newStatus
+        )) {
+
+            throw new IllegalArgumentException(
+                    "Invalid order status: "
+                            + newStatus
+            );
+        }
+
+        // -----------------------------------------------------
+        // UPDATE
+        // -----------------------------------------------------
 
         order.setOrderStatus(
                 newStatus
         );
 
-        String note = "Order status updated to " + newStatus;
-        order.addHistory(new OrderHistory(order, newStatus, "Logistics Center", note));
+        String note =
+                "Order status updated from "
+                        + (
+                        oldStatus != null
+                                ? oldStatus
+                                : "UNKNOWN"
+                )
+                        + " to "
+                        + newStatus;
+
+        order.addHistory(
+                new OrderHistory(
+                        order,
+                        newStatus,
+                        "Logistics Center",
+                        note
+                )
+        );
 
         Order updatedOrder =
-                orderRepository.save(order);
+                orderRepository.save(
+                        order
+                );
+
+        // -----------------------------------------------------
+        // EMAIL
+        // -----------------------------------------------------
 
         try {
-            emailService.sendOrderStatusUpdateEmail(
-                    updatedOrder.getUserEmail(),
-                    updatedOrder.getFullName(),
-                    updatedOrder.getOrderNumber(),
-                    newStatus,
-                    updatedOrder.getCourierName(),
-                    updatedOrder.getTrackingNumber(),
-                    updatedOrder.getTrackingUrl()
-            );
-        } catch (Exception ignored) {}
 
-        return convertToDTO(updatedOrder);
+            if (updatedOrder.getUserEmail() != null &&
+                    !updatedOrder.getUserEmail()
+                            .isBlank()) {
+
+                emailService.sendOrderStatusUpdateEmail(
+                        updatedOrder.getUserEmail(),
+                        updatedOrder.getFullName(),
+                        updatedOrder.getOrderNumber(),
+                        newStatus,
+                        updatedOrder.getCourierName(),
+                        updatedOrder.getTrackingNumber(),
+                        updatedOrder.getTrackingUrl()
+                );
+            }
+
+        } catch (Exception e) {
+
+            System.err.println(
+                    "Order status email failed: "
+                            + e.getMessage()
+            );
+        }
+
+        return convertToDTO(
+                updatedOrder
+        );
     }
 
     // =========================================================
@@ -1258,47 +2147,154 @@ public class OrderService {
                                 )
                         );
 
-        String effectiveCourier = courierName != null && !courierName.trim().isEmpty() ? courierName.trim() : order.getCourierName();
-        String effectiveTrackingNo = trackingNumber != null && !trackingNumber.trim().isEmpty() ? trackingNumber.trim() : order.getTrackingNumber();
-        String effectiveTrackingUrl = trackingUrl != null && !trackingUrl.trim().isEmpty() ? trackingUrl.trim() : order.getTrackingUrl();
+        String effectiveCourier =
+                courierName != null &&
+                        !courierName.trim().isEmpty()
+                        ? courierName.trim()
+                        : order.getCourierName();
 
-        if ((effectiveTrackingNo == null || effectiveTrackingNo.isEmpty()) && effectiveCourier != null && !effectiveCourier.isEmpty()) {
-            Map<String, String> generated = courierService.generateTracking(order, effectiveCourier);
-            effectiveTrackingNo = generated.get("trackingNumber");
-            effectiveTrackingUrl = generated.get("trackingUrl");
+        String effectiveTrackingNo =
+                trackingNumber != null &&
+                        !trackingNumber.trim().isEmpty()
+                        ? trackingNumber.trim()
+                        : order.getTrackingNumber();
+
+        String effectiveTrackingUrl =
+                trackingUrl != null &&
+                        !trackingUrl.trim().isEmpty()
+                        ? trackingUrl.trim()
+                        : order.getTrackingUrl();
+
+        // -----------------------------------------------------
+        // GENERATE TRACKING
+        // -----------------------------------------------------
+
+        if ((effectiveTrackingNo == null ||
+                effectiveTrackingNo.isEmpty()) &&
+                effectiveCourier != null &&
+                !effectiveCourier.isEmpty()) {
+
+            Map<String, String> generated =
+                    courierService.generateTracking(
+                            order,
+                            effectiveCourier
+                    );
+
+            if (generated != null) {
+
+                effectiveTrackingNo =
+                        generated.get(
+                                "trackingNumber"
+                        );
+
+                effectiveTrackingUrl =
+                        generated.get(
+                                "trackingUrl"
+                        );
+            }
         }
 
-        order.setCourierName(effectiveCourier);
-        order.setTrackingNumber(effectiveTrackingNo);
-        order.setTrackingUrl(effectiveTrackingUrl);
+        // -----------------------------------------------------
+        // SET SHIPPING INFO
+        // -----------------------------------------------------
 
-        if (!"DELIVERED".equalsIgnoreCase(order.getOrderStatus()) && !"CANCELLED".equalsIgnoreCase(order.getOrderStatus())) {
-            order.setOrderStatus("SHIPPED");
+        order.setCourierName(
+                effectiveCourier
+        );
+
+        order.setTrackingNumber(
+                effectiveTrackingNo
+        );
+
+        order.setTrackingUrl(
+                effectiveTrackingUrl
+        );
+
+        // -----------------------------------------------------
+        // UPDATE STATUS
+        // -----------------------------------------------------
+
+        String currentStatus =
+                order.getOrderStatus();
+
+        if (!STATUS_DELIVERED.equalsIgnoreCase(
+                currentStatus
+        ) &&
+                !STATUS_CANCELLED.equalsIgnoreCase(
+                        currentStatus
+                )) {
+
+            order.setOrderStatus(
+                    STATUS_SHIPPED
+            );
         }
 
-        order.addHistory(new OrderHistory(
-                order,
-                "SHIPPED",
-                "Distribution Center",
-                "Shipment handed over to " + (effectiveCourier != null ? effectiveCourier : "Courier") + " (Tracking #" + (effectiveTrackingNo != null ? effectiveTrackingNo : "N/A") + ")"
-        ));
+        // -----------------------------------------------------
+        // HISTORY
+        // -----------------------------------------------------
+
+        order.addHistory(
+                new OrderHistory(
+                        order,
+                        STATUS_SHIPPED,
+                        "Distribution Center",
+                        "Shipment handed over to "
+                                + (
+                                effectiveCourier != null
+                                        ? effectiveCourier
+                                        : "Courier"
+                        )
+                                + " (Tracking #"
+                                + (
+                                effectiveTrackingNo != null
+                                        ? effectiveTrackingNo
+                                        : "N/A"
+                        )
+                                + ")"
+                )
+        );
+
+        // -----------------------------------------------------
+        // SAVE
+        // -----------------------------------------------------
 
         Order updatedOrder =
-                orderRepository.save(order);
+                orderRepository.save(
+                        order
+                );
+
+        // -----------------------------------------------------
+        // EMAIL
+        // -----------------------------------------------------
 
         try {
-            emailService.sendOrderStatusUpdateEmail(
-                    updatedOrder.getUserEmail(),
-                    updatedOrder.getFullName(),
-                    updatedOrder.getOrderNumber(),
-                    updatedOrder.getOrderStatus(),
-                    updatedOrder.getCourierName(),
-                    updatedOrder.getTrackingNumber(),
-                    updatedOrder.getTrackingUrl()
-            );
-        } catch (Exception ignored) {}
 
-        return convertToDTO(updatedOrder);
+            if (updatedOrder.getUserEmail() != null &&
+                    !updatedOrder.getUserEmail()
+                            .isBlank()) {
+
+                emailService.sendOrderStatusUpdateEmail(
+                        updatedOrder.getUserEmail(),
+                        updatedOrder.getFullName(),
+                        updatedOrder.getOrderNumber(),
+                        updatedOrder.getOrderStatus(),
+                        updatedOrder.getCourierName(),
+                        updatedOrder.getTrackingNumber(),
+                        updatedOrder.getTrackingUrl()
+                );
+            }
+
+        } catch (Exception e) {
+
+            System.err.println(
+                    "Shipping email failed: "
+                            + e.getMessage()
+            );
+        }
+
+        return convertToDTO(
+                updatedOrder
+        );
     }
 
     // =========================================================
@@ -1306,90 +2302,338 @@ public class OrderService {
     // =========================================================
 
     @Transactional
-    public OrderDTO cancelOrder(Long id, String userEmail, String reason) {
+    public OrderDTO cancelOrder(
+            Long id,
+            String userEmail,
+            String reason) {
+
         if (id == null) {
-            throw new IllegalArgumentException("Order ID cannot be null");
+
+            throw new IllegalArgumentException(
+                    "Order ID cannot be null"
+            );
         }
 
-        Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Order not found with ID: " + id));
+        Order order =
+                orderRepository
+                        .findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Order not found with ID: "
+                                                + id
+                                )
+                        );
 
-        if (userEmail != null && !userEmail.equalsIgnoreCase("admin") && !userEmail.equalsIgnoreCase(order.getUserEmail())) {
-            throw new RuntimeException("Unauthorized: You can only cancel your own orders.");
+        // =====================================================
+        // AUTHORIZATION
+        // =====================================================
+
+        if (userEmail != null &&
+                !userEmail.trim().isEmpty() &&
+                !userEmail.equalsIgnoreCase("admin") &&
+                !userEmail.equalsIgnoreCase(
+                        order.getUserEmail()
+                )) {
+
+            throw new RuntimeException(
+                    "Unauthorized: You can only cancel your own orders."
+            );
         }
 
-        String currentStatus = order.getOrderStatus() != null ? order.getOrderStatus().toUpperCase() : "PLACED";
-        if ("DELIVERED".equals(currentStatus) || "CANCELLED".equals(currentStatus)) {
-            throw new RuntimeException("Order cannot be cancelled in status: " + currentStatus);
+        // =====================================================
+        // CURRENT STATUS
+        // =====================================================
+
+        String currentStatus =
+                order.getOrderStatus() != null
+                        ? order.getOrderStatus()
+                        .toUpperCase()
+                        : STATUS_PLACED;
+
+        if (STATUS_DELIVERED.equals(
+                currentStatus
+        ) ||
+                STATUS_CANCELLED.equals(
+                        currentStatus
+                )) {
+
+            throw new RuntimeException(
+                    "Order cannot be cancelled in status: "
+                            + currentStatus
+            );
         }
 
-        // 1. Restore Inventory
-        if (order.getItems() != null) {
-            for (OrderItem item : order.getItems()) {
-                if (item.getProduct() != null && item.getQuantity() != null) {
-                    inventoryService.restoreStock(item.getProduct().getId(), item.getQuantity());
+        // =====================================================
+        // INVENTORY RESTORE
+        // =====================================================
+
+        /*
+         * IMPORTANT FIX:
+         *
+         * Original code always restored inventory.
+         *
+         * But online orders do NOT deduct inventory until
+         * payment succeeds.
+         *
+         * Therefore:
+         *
+         * COD:
+         *     stock was deducted at placement
+         *     => restore stock on cancellation
+         *
+         * ONLINE + SUCCESS:
+         *     stock was deducted after payment
+         *     => restore stock on cancellation
+         *
+         * ONLINE + PENDING:
+         *     stock was NOT deducted
+         *     => DO NOT restore
+         */
+
+        boolean inventoryWasDeducted =
+                PAYMENT_COD.equalsIgnoreCase(
+                        order.getPaymentMethod()
+                )
+                        ||
+                        PAYMENT_SUCCESS.equalsIgnoreCase(
+                                order.getPaymentStatus()
+                        );
+
+        if (inventoryWasDeducted &&
+                order.getItems() != null) {
+
+            for (OrderItem item :
+                    order.getItems()) {
+
+                if (item == null ||
+                        item.getProduct() == null ||
+                        item.getQuantity() == null ||
+                        item.getQuantity() <= 0) {
+
+                    continue;
                 }
+
+                inventoryService.restoreStock(
+                        item.getProduct().getId(),
+                        item.getQuantity()
+                );
             }
         }
 
-        // 2. Refund Handling
-        String refundStatus = "N/A (COD)";
-        if ("SUCCESS".equalsIgnoreCase(order.getPaymentStatus())) {
-            order.setPaymentStatus("REFUND_INITIATED");
-            refundStatus = "Refund initiated (Amount: ₹" + order.getTotalAmount() + ")";
+        // =====================================================
+        // REFUND
+        // =====================================================
+
+        String refundStatus;
+
+        if (PAYMENT_SUCCESS.equalsIgnoreCase(
+                order.getPaymentStatus()
+        )) {
+
+            /*
+             * NOTE:
+             * This only changes DB status.
+             * Actual Razorpay refund API call should be handled
+             * separately if required.
+             */
+
+            order.setPaymentStatus(
+                    PAYMENT_REFUND_INITIATED
+            );
+
+            refundStatus =
+                    "Refund initiated (Amount: ₹"
+                            + (
+                            order.getTotalAmount() != null
+                                    ? order.getTotalAmount()
+                                    : BigDecimal.ZERO
+                    )
+                            + ")";
+
+        } else {
+
+            refundStatus =
+                    "N/A (Payment not completed)";
         }
 
-        // 3. Status Update
-        order.setOrderStatus("CANCELLED");
-        String cancelReason = (reason != null && !reason.trim().isEmpty()) ? reason.trim() : "Cancelled by user";
-        order.addHistory(new OrderHistory(order, "CANCELLED", "Customer Service", "Order cancelled. Reason: " + cancelReason + " | " + refundStatus));
+        // =====================================================
+        // CANCEL REASON
+        // =====================================================
 
-        Order updatedOrder = orderRepository.save(order);
+        String cancelReason =
+                reason != null &&
+                        !reason.trim().isEmpty()
+                        ? reason.trim()
+                        : "Cancelled by user";
 
-        // 4. Email Alert
+        // =====================================================
+        // UPDATE STATUS
+        // =====================================================
+
+        order.setOrderStatus(
+                STATUS_CANCELLED
+        );
+
+        // =====================================================
+        // HISTORY
+        // =====================================================
+
+        order.addHistory(
+                new OrderHistory(
+                        order,
+                        STATUS_CANCELLED,
+                        "Customer Service",
+                        "Order cancelled. Reason: "
+                                + cancelReason
+                                + " | "
+                                + refundStatus
+                )
+        );
+
+        // =====================================================
+        // SAVE
+        // =====================================================
+
+        Order updatedOrder =
+                orderRepository.save(
+                        order
+                );
+
+        // =====================================================
+        // EMAIL
+        // =====================================================
+
         try {
-            emailService.sendOrderCancelledEmail(
-                    updatedOrder.getUserEmail(),
-                    updatedOrder.getFullName(),
-                    updatedOrder.getOrderNumber(),
-                    refundStatus
-            );
-        } catch (Exception ignored) {}
 
-        return convertToDTO(updatedOrder);
+            if (updatedOrder.getUserEmail() != null &&
+                    !updatedOrder.getUserEmail()
+                            .isBlank()) {
+
+                emailService.sendOrderCancelledEmail(
+                        updatedOrder.getUserEmail(),
+                        updatedOrder.getFullName(),
+                        updatedOrder.getOrderNumber(),
+                        refundStatus
+                );
+            }
+
+        } catch (Exception e) {
+
+            System.err.println(
+                    "Cancellation email failed: "
+                            + e.getMessage()
+            );
+        }
+
+        return convertToDTO(
+                updatedOrder
+        );
     }
 
     // =========================================================
-    // TRACK ORDER BY ID OR TRACKING NUMBER
+    // TRACK ORDER
     // =========================================================
 
     @Transactional(readOnly = true)
-    public OrderDTO trackOrderByQuery(String query) {
-        if (query == null || query.trim().isEmpty()) {
-            throw new IllegalArgumentException("Tracking query cannot be empty");
-        }
-        String clean = query.trim().replace("#", "");
+    public OrderDTO trackOrderByQuery(
+            String query) {
 
-        // 1. Try orderNumber
-        Order order = orderRepository.findByOrderNumber(clean).orElse(null);
+        if (query == null ||
+                query.trim().isEmpty()) {
 
-        // 2. Try ID
-        if (order == null && clean.matches("\\d+")) {
-            order = orderRepository.findById(Long.parseLong(clean)).orElse(null);
+            throw new IllegalArgumentException(
+                    "Tracking query cannot be empty"
+            );
         }
 
-        // 3. Try tracking number
+        String clean =
+                query.trim()
+                        .replace("#", "")
+                        .trim();
+
+        Order order =
+                null;
+
+        // =====================================================
+        // 1. ORDER NUMBER
+        // =====================================================
+
+        order =
+                orderRepository
+                        .findByOrderNumber(
+                                clean
+                        )
+                        .orElse(null);
+
+        // =====================================================
+        // 2. DATABASE ID
+        // =====================================================
+
+        if (order == null &&
+                clean.matches("\\d+")) {
+
+            try {
+
+                Long dbId =
+                        Long.parseLong(clean);
+
+                order =
+                        orderRepository
+                                .findById(
+                                        dbId
+                                )
+                                .orElse(null);
+
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        // =====================================================
+        // 3. TRACKING NUMBER
+        // =====================================================
+
         if (order == null) {
-            order = orderRepository.findAll().stream()
-                    .filter(o -> clean.equalsIgnoreCase(o.getTrackingNumber()))
-                    .findFirst()
-                    .orElse(null);
+
+            /*
+             * Current implementation keeps compatibility
+             * with your existing repository.
+             *
+             * Better approach:
+             *
+             * orderRepository.findByTrackingNumber(clean)
+             *
+             * Add that repository method if possible.
+             */
+
+            order =
+                    orderRepository
+                            .findAll()
+                            .stream()
+                            .filter(o ->
+                                    o != null &&
+                                            o.getTrackingNumber() != null &&
+                                            clean.equalsIgnoreCase(
+                                                    o.getTrackingNumber()
+                                            )
+                            )
+                            .findFirst()
+                            .orElse(null);
         }
+
+        // =====================================================
+        // NOT FOUND
+        // =====================================================
 
         if (order == null) {
-            throw new RuntimeException("No order found matching: " + query);
+
+            throw new RuntimeException(
+                    "No order found matching: "
+                            + query
+            );
         }
 
-        return convertToDTO(order);
+        return convertToDTO(
+                order
+        );
     }
 }

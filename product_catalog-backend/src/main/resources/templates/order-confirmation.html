@@ -21,7 +21,9 @@
     box-sizing:border-box;
 ">
 
+    <!-- ================================================= -->
     <!-- MAIN CONTAINER -->
+    <!-- ================================================= -->
 
     <div style="
         max-width:640px;
@@ -93,7 +95,9 @@
             padding:34px 32px 30px;
         ">
 
+            <!-- ================================================= -->
             <!-- GREETING -->
+            <!-- ================================================= -->
 
             <h2 style="
                 margin:0 0 9px;
@@ -145,6 +149,7 @@
                         width="100%"
                         cellpadding="0"
                         cellspacing="0"
+                        border="0"
                 >
 
                     <!-- ORDER ID -->
@@ -230,6 +235,7 @@
                         width="100%"
                         cellpadding="0"
                         cellspacing="0"
+                        border="0"
                 >
 
                     <tr>
@@ -316,6 +322,7 @@
                         width="100%"
                         cellpadding="0"
                         cellspacing="0"
+                        border="0"
                 >
 
                     <tr>
@@ -399,6 +406,7 @@
                             width="100%"
                             cellpadding="0"
                             cellspacing="0"
+                            border="0"
                     >
 
                         <tr>
@@ -452,7 +460,9 @@
                 </div>
 
 
+                <!-- ================================================= -->
                 <!-- PRODUCTS -->
+                <!-- ================================================= -->
 
                 <div style="
                     padding:5px 20px;
@@ -474,6 +484,7 @@
                                 width="100%"
                                 cellpadding="0"
                                 cellspacing="0"
+                                border="0"
                         >
 
                             <tr>
@@ -558,37 +569,254 @@
 
 
                 <!-- ================================================= -->
-                <!-- TOTAL -->
+                <!-- PRICE BREAKDOWN -->
                 <!-- ================================================= -->
 
                 <div style="
                     padding:20px;
                     background:#fafafa;
+                    border-top:1px solid #e5e7eb;
                 ">
 
                     <table
                             width="100%"
                             cellpadding="0"
                             cellspacing="0"
+                            border="0"
                     >
+
+                        <!-- ================================================= -->
+                        <!-- SUBTOTAL -->
+                        <!-- ================================================= -->
 
                         <tr>
 
                             <td style="
+                                padding:6px 0;
                                 color:#64748b;
                                 font-size:13px;
                             ">
+                                Subtotal
+                            </td>
 
-                                <!-- COD -->
+                            <td
+                                    th:text="${'₹' + #numbers.formatDecimal(
+                                        subtotalAmount,
+                                        1,
+                                        2
+                                    )}"
+                                    style="
+                                padding:6px 0;
+                                text-align:right;
+                                color:#334155;
+                                font-size:13px;
+                                font-weight:600;
+                            "
+                            >
+                                ₹0.00
+                            </td>
+
+                        </tr>
+
+
+                        <!-- ================================================= -->
+                        <!-- COUPON -->
+                        <!-- ================================================= -->
+
+                        <tr
+                                th:if="${couponCode != null and !couponCode.isEmpty()}"
+                        >
+
+                            <td style="
+                                padding:7px 0;
+                                color:#16a34a;
+                                font-size:13px;
+                            ">
+
+                                <span>
+                                    Coupon Discount
+                                </span>
+
+                                <span
+                                        th:text="${' (' + couponCode + ')'}"
+                                        style="
+                                    color:#15803d;
+                                    font-size:11px;
+                                    font-weight:700;
+                                "
+                                >
+                                    (SAVE500)
+                                </span>
+
+                            </td>
+
+                            <td
+                                    th:text="${'- ₹' + #numbers.formatDecimal(
+                                        discountAmount,
+                                        1,
+                                        2
+                                    )}"
+                                    style="
+                                padding:7px 0;
+                                text-align:right;
+                                color:#16a34a;
+                                font-size:13px;
+                                font-weight:700;
+                            "
+                            >
+                                - ₹0.00
+                            </td>
+
+                        </tr>
+
+
+                        <!-- ================================================= -->
+                        <!-- DISCOUNT WITHOUT COUPON CODE -->
+                        <!-- ================================================= -->
+
+                        <tr
+                                th:if="${
+                                    (couponCode == null or couponCode.isEmpty())
+                                    and discountAmount != null
+                                    and discountAmount.compareTo(T(java.math.BigDecimal).ZERO) > 0
+                                }"
+                        >
+
+                            <td style="
+                                padding:7px 0;
+                                color:#16a34a;
+                                font-size:13px;
+                            ">
+                                Discount
+                            </td>
+
+                            <td
+                                    th:text="${'- ₹' + #numbers.formatDecimal(
+                                        discountAmount,
+                                        1,
+                                        2
+                                    )}"
+                                    style="
+                                padding:7px 0;
+                                text-align:right;
+                                color:#16a34a;
+                                font-size:13px;
+                                font-weight:700;
+                            "
+                            >
+                                - ₹0.00
+                            </td>
+
+                        </tr>
+
+
+                        <!-- ================================================= -->
+                        <!-- SHIPPING FEE -->
+                        <!-- ================================================= -->
+
+                        <tr
+                                th:if="${
+                                    shippingFee != null
+                                    and shippingFee.compareTo(T(java.math.BigDecimal).ZERO) > 0
+                                }"
+                        >
+
+                            <td style="
+                                padding:7px 0;
+                                color:#64748b;
+                                font-size:13px;
+                            ">
+                                Shipping Fee
+                            </td>
+
+                            <td
+                                    th:text="${'₹' + #numbers.formatDecimal(
+                                        shippingFee,
+                                        1,
+                                        2
+                                    )}"
+                                    style="
+                                padding:7px 0;
+                                text-align:right;
+                                color:#334155;
+                                font-size:13px;
+                                font-weight:600;
+                            "
+                            >
+                                ₹0.00
+                            </td>
+
+                        </tr>
+
+
+                        <!-- ================================================= -->
+                        <!-- FREE SHIPPING -->
+                        <!-- ================================================= -->
+
+                        <tr
+                                th:if="${
+                                    shippingFee == null
+                                    or shippingFee.compareTo(T(java.math.BigDecimal).ZERO) == 0
+                                }"
+                        >
+
+                            <td style="
+                                padding:7px 0;
+                                color:#64748b;
+                                font-size:13px;
+                            ">
+                                Shipping Fee
+                            </td>
+
+                            <td style="
+                                padding:7px 0;
+                                text-align:right;
+                                color:#16a34a;
+                                font-size:13px;
+                                font-weight:700;
+                            ">
+                                FREE
+                            </td>
+
+                        </tr>
+
+
+                        <!-- ================================================= -->
+                        <!-- SEPARATOR -->
+                        <!-- ================================================= -->
+
+                        <tr>
+
+                            <td
+                                    colspan="2"
+                                    style="
+                                padding-top:12px;
+                                border-bottom:1px solid #e5e7eb;
+                            "
+                            >
+                            </td>
+
+                        </tr>
+
+
+                        <!-- ================================================= -->
+                        <!-- FINAL TOTAL -->
+                        <!-- ================================================= -->
+
+                        <tr>
+
+                            <td style="
+                                padding-top:16px;
+                                color:#111827;
+                                font-size:15px;
+                                font-weight:800;
+                            ">
 
                                 <span
                                         th:if="${isCashOnDelivery}"
                                 >
                                     Total Amount
                                 </span>
-
-
-                                <!-- ONLINE -->
 
                                 <span
                                         th:unless="${isCashOnDelivery}"
@@ -601,14 +829,15 @@
 
                             <td
                                     th:text="${'₹' + #numbers.formatDecimal(
-                                totalAmount,
-                                1,
-                                2
-                            )}"
+                                        totalAmount,
+                                        1,
+                                        2
+                                    )}"
                                     style="
+                                padding-top:16px;
                                 text-align:right;
                                 color:#111827;
-                                font-size:22px;
+                                font-size:23px;
                                 font-weight:800;
                             "
                             >
@@ -618,6 +847,74 @@
                         </tr>
 
                     </table>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- DISCOUNT SUCCESS MESSAGE -->
+            <!-- ================================================= -->
+
+            <div
+                    th:if="${
+                        discountAmount != null
+                        and discountAmount.compareTo(T(java.math.BigDecimal).ZERO) > 0
+                    }"
+                    style="
+                margin-top:15px;
+                padding:15px 18px;
+                background:linear-gradient(
+                    135deg,
+                    #f0fdf4,
+                    #ecfdf5
+                );
+                border:1px solid #bbf7d0;
+                border-radius:14px;
+            "
+            >
+
+                <div style="
+                    color:#166534;
+                    font-size:12px;
+                    font-weight:700;
+                ">
+
+                    🎉 You saved
+
+                    <span
+                            th:text="${'₹' + #numbers.formatDecimal(
+                                discountAmount,
+                                1,
+                                2
+                            )}"
+                    >
+                        ₹0.00
+                    </span>
+
+                    on this order!
+
+                </div>
+
+
+                <div
+                        th:if="${couponCode != null and !couponCode.isEmpty()}"
+                        style="
+                    margin-top:5px;
+                    color:#4d7c5b;
+                    font-size:11px;
+                    line-height:1.5;
+                "
+                >
+
+                    Coupon applied:
+
+                    <strong
+                            th:text="${couponCode}"
+                    >
+                        SAVE500
+                    </strong>
 
                 </div>
 
@@ -659,10 +956,10 @@
 
                     <strong
                             th:text="${'₹' + #numbers.formatDecimal(
-                        totalAmount,
-                        1,
-                        2
-                    )}"
+                                totalAmount,
+                                1,
+                                2
+                            )}"
                     >
                         ₹0.00
                     </strong>
@@ -694,6 +991,7 @@
                         width="100%"
                         cellpadding="0"
                         cellspacing="0"
+                        border="0"
                 >
 
                     <tr>

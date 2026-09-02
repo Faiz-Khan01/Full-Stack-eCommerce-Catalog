@@ -41,6 +41,9 @@ public class EmailService {
             String customerEmail,
             String customerName,
             String orderId,
+            BigDecimal subtotalAmount,
+            BigDecimal discountAmount,
+            String couponCode,
             BigDecimal totalAmount,
             List<String> itemsSummary,
             String paymentMethod,
@@ -86,6 +89,46 @@ public class EmailService {
                             !orderId.isBlank()
                             ? orderId.trim()
                             : "N/A";
+
+            // -------------------------------------------------
+            // SAFE SUBTOTAL
+            // -------------------------------------------------
+
+            BigDecimal safeSubtotalAmount =
+                    subtotalAmount != null
+                            ? subtotalAmount.setScale(
+                            2,
+                            RoundingMode.HALF_UP
+                    )
+                            : BigDecimal.ZERO.setScale(
+                            2,
+                            RoundingMode.HALF_UP
+                    );
+
+            // -------------------------------------------------
+            // SAFE DISCOUNT
+            // -------------------------------------------------
+
+            BigDecimal safeDiscountAmount =
+                    discountAmount != null
+                            ? discountAmount.setScale(
+                            2,
+                            RoundingMode.HALF_UP
+                    )
+                            : BigDecimal.ZERO.setScale(
+                            2,
+                            RoundingMode.HALF_UP
+                    );
+
+            // -------------------------------------------------
+            // SAFE COUPON
+            // -------------------------------------------------
+
+            String safeCouponCode =
+                    couponCode != null &&
+                            !couponCode.isBlank()
+                            ? couponCode.trim()
+                            : "";
 
             // -------------------------------------------------
             // SAFE TOTAL
@@ -180,6 +223,21 @@ public class EmailService {
             );
 
             context.setVariable(
+                    "subtotalAmount",
+                    safeSubtotalAmount
+            );
+
+            context.setVariable(
+                    "discountAmount",
+                    safeDiscountAmount
+            );
+
+            context.setVariable(
+                    "couponCode",
+                    safeCouponCode
+            );
+
+            context.setVariable(
                     "totalAmount",
                     safeTotalAmount
             );
@@ -220,7 +278,7 @@ public class EmailService {
             );
 
             // -------------------------------------------------
-            // PROCESS THYMELEAF TEMPLATE
+            // PROCESS TEMPLATE
             // -------------------------------------------------
 
             String htmlContent =
@@ -230,7 +288,7 @@ public class EmailService {
                     );
 
             // -------------------------------------------------
-            // CREATE MIME MESSAGE
+            // MIME MESSAGE
             // -------------------------------------------------
 
             MimeMessage message =
@@ -243,26 +301,14 @@ public class EmailService {
                             "UTF-8"
                     );
 
-            // -------------------------------------------------
-            // FROM
-            // -------------------------------------------------
-
             helper.setFrom(
                     senderEmail,
                     "TechStore"
             );
 
-            // -------------------------------------------------
-            // TO
-            // -------------------------------------------------
-
             helper.setTo(
                     customerEmail.trim()
             );
-
-            // -------------------------------------------------
-            // REPLY TO ADMIN
-            // -------------------------------------------------
 
             if (adminEmail != null &&
                     !adminEmail.isBlank()) {
@@ -300,7 +346,7 @@ public class EmailService {
             helper.setSubject(subject);
 
             // -------------------------------------------------
-            // HTML BODY
+            // HTML
             // -------------------------------------------------
 
             helper.setText(
@@ -318,6 +364,10 @@ public class EmailService {
                     "✅ Customer order email sent successfully"
                             + " | Email: " + customerEmail
                             + " | Order: #" + safeOrderId
+                            + " | Subtotal: ₹" + safeSubtotalAmount
+                            + " | Discount: ₹" + safeDiscountAmount
+                            + " | Coupon: " + safeCouponCode
+                            + " | Total: ₹" + safeTotalAmount
                             + " | Method: "
                             + normalizedPaymentMethod
                             + " | Status: "
@@ -814,7 +864,7 @@ public class EmailService {
 
     // =========================================================
     // 7. ADMIN SUPPORT TICKET NOTIFICATION
-    // =========================================================
+   // =========================================================
 
     @Async
     public void sendAdminSupportTicketAlert(
@@ -829,8 +879,12 @@ public class EmailService {
         try {
 
             System.out.println(
-                    "📩 Sending support ticket notification..."
+                    "📩 Sending HTML support ticket notification..."
             );
+
+            // -----------------------------------------------------
+            // SAFE CUSTOMER EMAIL
+            // -----------------------------------------------------
 
             String safeCustomerEmail =
                     customerEmail != null &&
@@ -838,11 +892,19 @@ public class EmailService {
                             ? customerEmail.trim()
                             : "Not provided";
 
+            // -----------------------------------------------------
+            // SAFE CATEGORY
+            // -----------------------------------------------------
+
             String safeCategory =
                     category != null &&
                             !category.isBlank()
                             ? category.trim()
                             : "General";
+
+            // -----------------------------------------------------
+            // SAFE SUBJECT
+            // -----------------------------------------------------
 
             String safeSubject =
                     subject != null &&
@@ -850,103 +912,209 @@ public class EmailService {
                             ? subject.trim()
                             : "Support Request";
 
+            // -----------------------------------------------------
+            // SAFE MESSAGE
+            // -----------------------------------------------------
+
             String safeTicketMessage =
                     ticketMessage != null &&
                             !ticketMessage.isBlank()
                             ? ticketMessage.trim()
                             : "No message provided";
 
+            // -----------------------------------------------------
+            // SAFE PRIORITY
+            // -----------------------------------------------------
+
             String safePriority =
                     priority != null &&
                             !priority.isBlank()
-                            ? priority.trim()
-                            : "Normal";
+                            ? priority.trim().toUpperCase()
+                            : "NORMAL";
 
-            SimpleMailMessage mail =
-                    new SimpleMailMessage();
+            // -----------------------------------------------------
+            // PRIORITY FLAGS
+            // -----------------------------------------------------
 
-            mail.setFrom(
-                    senderEmail
+            boolean isUrgent =
+                    "URGENT".equalsIgnoreCase(
+                            safePriority
+                    );
+
+            boolean isHigh =
+                    "HIGH".equalsIgnoreCase(
+                            safePriority
+                    );
+
+            // -----------------------------------------------------
+            // THYMELEAF CONTEXT
+            // -----------------------------------------------------
+
+            Context context =
+                    new Context();
+
+            context.setVariable(
+                    "ticketId",
+                    ticketId
             );
 
-            mail.setTo(
+            context.setVariable(
+                    "customerEmail",
+                    safeCustomerEmail
+            );
+
+            context.setVariable(
+                    "category",
+                    safeCategory
+            );
+
+            context.setVariable(
+                    "subject",
+                    safeSubject
+            );
+
+            context.setVariable(
+                    "ticketMessage",
+                    safeTicketMessage
+            );
+
+            context.setVariable(
+                    "priority",
+                    safePriority
+            );
+
+            context.setVariable(
+                    "isUrgent",
+                    isUrgent
+            );
+
+            context.setVariable(
+                    "isHigh",
+                    isHigh
+            );
+
+            // -----------------------------------------------------
+            // PROCESS THYMELEAF HTML
+            // -----------------------------------------------------
+
+            String htmlContent =
+                    templateEngine.process(
+                            "support-ticket",
+                            context
+                    );
+
+            // -----------------------------------------------------
+            // CREATE MIME MESSAGE
+            // -----------------------------------------------------
+
+            MimeMessage message =
+                    mailSender.createMimeMessage();
+
+            MimeMessageHelper helper =
+                    new MimeMessageHelper(
+                            message,
+                            true,
+                            "UTF-8"
+                    );
+
+            // -----------------------------------------------------
+            // FROM
+            // -----------------------------------------------------
+
+            helper.setFrom(
+                    senderEmail,
+                    "TechStore"
+            );
+
+            // -----------------------------------------------------
+            // TO ADMIN
+            // -----------------------------------------------------
+
+            helper.setTo(
                     adminEmail
             );
+
+            // -----------------------------------------------------
+            // REPLY TO CUSTOMER
+            // -----------------------------------------------------
 
             if (!safeCustomerEmail.equals(
                     "Not provided"
             )) {
 
-                mail.setReplyTo(
+                helper.setReplyTo(
                         safeCustomerEmail
                 );
             }
 
-            mail.setSubject(
-                    "🎫 New Support Ticket #"
-                            + ticketId
+            // -----------------------------------------------------
+            // SUBJECT
+            // -----------------------------------------------------
+
+            String emailSubject;
+
+            if (isUrgent) {
+
+                emailSubject =
+                        "🚨 URGENT Support Ticket #"
+                                + ticketId;
+
+            } else if (isHigh) {
+
+                emailSubject =
+                        "⚠️ HIGH Priority Support Ticket #"
+                                + ticketId;
+
+            } else {
+
+                emailSubject =
+                        "🎫 New Support Ticket #"
+                                + ticketId;
+            }
+
+            helper.setSubject(
+                    emailSubject
             );
 
-            mail.setText(
-                    "Hello Admin,\n\n"
+            // -----------------------------------------------------
+            // HTML BODY
+            // -----------------------------------------------------
 
-                            + "A new support ticket has been submitted by a customer.\n\n"
-
-                            + "========================================\n"
-                            + "SUPPORT TICKET DETAILS\n"
-                            + "========================================\n\n"
-
-                            + "Ticket ID: #"
-                            + ticketId
-                            + "\n"
-
-                            + "Customer Email: "
-                            + safeCustomerEmail
-                            + "\n"
-
-                            + "Category: "
-                            + safeCategory
-                            + "\n"
-
-                            + "Priority: "
-                            + safePriority
-                            + "\n"
-
-                            + "Subject: "
-                            + safeSubject
-                            + "\n\n"
-
-                            + "----------------------------------------\n"
-                            + "CUSTOMER MESSAGE\n"
-                            + "----------------------------------------\n\n"
-
-                            + safeTicketMessage
-                            + "\n\n"
-
-                            + "========================================\n\n"
-
-                            + "Please open the Admin Dashboard to review and manage this support ticket.\n\n"
-
-                            + "Regards,\n"
-                            + "TechStore Support"
+            helper.setText(
+                    htmlContent,
+                    true
             );
 
-            mailSender.send(mail);
+            // -----------------------------------------------------
+            // SEND
+            // -----------------------------------------------------
+
+            mailSender.send(message);
 
             System.out.println(
-                    "✅ Support Ticket Email Sent Successfully"
+                    "✅ HTML Support Ticket Email Sent Successfully"
+                            + " | Ticket: #" + ticketId
+                            + " | Customer: "
+                            + safeCustomerEmail
+                            + " | Category: "
+                            + safeCategory
+                            + " | Priority: "
+                            + safePriority
             );
 
         } catch (Exception e) {
 
             System.err.println(
-                    "❌ Support Ticket Email Failed: "
+                    "❌ HTML Support Ticket Email Failed"
+                            + " | Ticket: #" + ticketId
+                            + " | Error: "
                             + e.getMessage()
             );
 
             e.printStackTrace();
         }
     }
+
 
 
     // =========================================================
