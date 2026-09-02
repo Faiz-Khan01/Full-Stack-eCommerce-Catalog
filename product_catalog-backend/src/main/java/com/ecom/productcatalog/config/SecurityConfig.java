@@ -28,8 +28,9 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthFilter jwtAuthFilter;
 
-    @Value("${app.frontend.url:https://techstore-catalog-vite.vercel.app}")
+    @Value("${app.frontend.url:https://techstore-catalog.vercel.app}")
     private String frontendUrl;
+
 
     // =========================================================
     // CORS
