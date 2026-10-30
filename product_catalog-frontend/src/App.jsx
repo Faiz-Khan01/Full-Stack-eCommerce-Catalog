@@ -1,4 +1,4 @@
-﻿import React, {
+import React, {
   lazy,
   Suspense,
   useEffect,
@@ -85,6 +85,9 @@ const AdminInventory = lazy(() => import("./Admin/AdminInventory"));
 const AdminOrders = lazy(() => import("./Admin/AdminOrders"));
 const AdminCustomers = lazy(() => import("./Admin/AdminCustomers"));
 const AdminSettings = lazy(() => import("./Admin/AdminSettings"));
+const AdminAIAssistant = lazy(() => import("./Admin/AdminAIAssistant"));
+const StorefrontAIAssistant = lazy(() => import("./components/StorefrontAIAssistant"));
+const FittingRoomWidget = lazy(() => import("./components/FittingRoomWidget"));
 
 // =========================================================
 // API BASE URL
@@ -213,17 +216,21 @@ export const themes = {
     hoverBg: "#F1EBDD",
     mutedBg: "#F3EEE4",
     shadow: "rgba(71, 61, 45, 0.10)",
+    accent: "#e07a42",
+    accentGlow: "rgba(224, 122, 66, 0.35)",
   },
   dark: {
-    background: "#090D16",
-    cardSolid: "#111827",
-    textPrimary: "#F8FAFC",
-    textSecondary: "#94A3B8",
-    border: "#1F2937",
-    inputBg: "#1F2937",
-    hoverBg: "#1F2937",
-    mutedBg: "#111827",
-    shadow: "rgba(0, 0, 0, 0.35)",
+    background: "#0c0d12",
+    cardSolid: "#14151b",
+    textPrimary: "#f8fafc",
+    textSecondary: "#9ca3af",
+    border: "rgba(255, 255, 255, 0.09)",
+    inputBg: "#1a1b22",
+    hoverBg: "#22232c",
+    mutedBg: "#16171e",
+    shadow: "rgba(0, 0, 0, 0.65)",
+    accent: "#e07a42",
+    accentGlow: "rgba(224, 122, 66, 0.35)",
   },
 };
 
@@ -419,6 +426,7 @@ function AppContent() {
                   <Routes>
                     <Route path="" element={<AdminDashboard />} />
                     <Route path="dashboard" element={<AdminDashboard />} />
+                    <Route path="ai-assistant" element={<AdminAIAssistant />} />
                     <Route path="products" element={<AdminProducts />} />
                     <Route path="categories" element={<AdminCategories />} />
                     <Route path="inventory" element={<AdminInventory />} />
@@ -437,6 +445,8 @@ function AppContent() {
         </Routes>
       </Suspense>
 
+      {!isAdminPage && <StorefrontAIAssistant />}
+      {!isAdminPage && <FittingRoomWidget />}
       {!isAdminPage && <Footer />}
     </div>
   );

@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 
 const ProductList = ({
@@ -467,34 +467,30 @@ const ProductList = ({
                 }}
               >
                 {/* =================================================
-                    WISHLIST
+                    WISHLIST BUTTON (Top Left - Frame 00:25)
                 ================================================= */}
 
                 <button
                   type="button"
                   className="wishlist-button position-absolute d-flex align-items-center justify-content-center"
                   style={{
-                    top: "12px",
-                    right: "12px",
-                    width: "38px",
-                    height: "38px",
+                    top: "14px",
+                    left: "14px",
+                    width: "36px",
+                    height: "36px",
                     borderRadius: "50%",
                     zIndex: 5,
                     background: wishlisted
                       ? "linear-gradient(135deg, #ef4444, #dc2626)"
-                      : "var(--card)",
+                      : "rgba(18, 19, 23, 0.75)",
                     color: wishlisted
                       ? "#fff"
-                      : "var(--text-secondary)",
-                    border:
-                      "1px solid var(--border)",
-                    boxShadow:
-                      "0 6px 16px var(--shadow)",
-                    backdropFilter:
-                      "blur(10px)",
+                      : "rgba(255, 255, 255, 0.8)",
+                    border: "1px solid rgba(255, 255, 255, 0.12)",
+                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.4)",
+                    backdropFilter: "blur(8px)",
                     cursor: "pointer",
-                    transition:
-                      "all 0.25s ease",
+                    transition: "all 0.25s ease",
                   }}
                   aria-label={
                     wishlisted
@@ -504,34 +500,90 @@ const ProductList = ({
                   onClick={() =>
                     toggleWishlist(product)
                   }
-                  onMouseEnter={(e) => {
-                    if (!wishlisted) {
-                      e.currentTarget.style.color =
-                        "#ef4444";
-
-                      e.currentTarget.style.transform =
-                        "scale(1.08)";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.color =
-                      wishlisted
-                        ? "#fff"
-                        : "var(--text-secondary)";
-
-                    e.currentTarget.style.transform =
-                      "scale(1)";
-                  }}
                 >
-                  <span
-                    style={{
-                      fontSize: "19px",
-                      lineHeight: 1,
-                    }}
-                  >
+                  <span style={{ fontSize: "16px", lineHeight: 1 }}>
                     {wishlisted ? "♥" : "♡"}
                   </span>
                 </button>
+
+                {/* =================================================
+                    FITTING ROOM HANGER BUTTON (Top Left - Below Heart)
+                ================================================= */}
+                <button
+                  type="button"
+                  className="position-absolute d-flex align-items-center justify-content-center"
+                  style={{
+                    top: "56px",
+                    left: "14px",
+                    width: "36px",
+                    height: "36px",
+                    borderRadius: "50%",
+                    zIndex: 5,
+                    background: "rgba(18, 19, 23, 0.75)",
+                    color: "#e07a42",
+                    border: "1px solid rgba(224, 122, 66, 0.3)",
+                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.4)",
+                    backdropFilter: "blur(8px)",
+                    cursor: "pointer",
+                    transition: "all 0.25s ease",
+                  }}
+                  title="Wear this item in Virtual Fitting Room"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const cleanImg = getImageUrl(product.imageUrl);
+                    window.dispatchEvent(
+                      new CustomEvent("wearInFittingRoom", {
+                        detail: {
+                          id: product.id,
+                          name: product.name,
+                          price: product.price,
+                          imageUrl: cleanImg,
+                          category: product.category?.name || product.category || "Apparel",
+                        },
+                      })
+                    );
+                    Swal.fire({
+                      icon: "success",
+                      title: "Draped in Fitting Room",
+                      text: `"${product.name || "Item"}" sent to active 3D model!`,
+                      toast: true,
+                      position: "bottom-left",
+                      timer: 1600,
+                      showConfirmButton: false,
+                      background: "#18181b",
+                      color: "#ffffff",
+                    });
+                  }}
+                >
+                  <span style={{ fontSize: "14px" }}>🧥</span>
+                </button>
+
+                {/* =================================================
+                    RATING BADGE (Top Right - Frame 00:25)
+                ================================================= */}
+                <div
+                  className="position-absolute d-flex align-items-center gap-1"
+                  style={{
+                    top: "14px",
+                    right: "14px",
+                    zIndex: 5,
+                    background: "rgba(18, 19, 23, 0.75)",
+                    backdropFilter: "blur(8px)",
+                    border: "1px solid rgba(255, 255, 255, 0.12)",
+                    borderRadius: "20px",
+                    padding: "4px 10px",
+                    fontSize: "11px",
+                    fontWeight: 700,
+                    color: "#f59e0b",
+                  }}
+                >
+                  <span>★</span>
+                  <span style={{ color: "#fff" }}>
+                    {Number(product.averageRating) > 0
+                      ? Number(product.averageRating).toFixed(1)
+                      : "4.2"}
+                  </span>
+                </div>
 
                 {/* =================================================
                     PRODUCT IMAGE
@@ -722,35 +774,42 @@ const ProductList = ({
 
                   {/* Price */}
 
-                  <div className="mb-2 mt-auto">
-                    <small
-                      className="d-block mb-0"
-                      style={{
-                        fontSize: "10px",
-                        fontWeight: 600,
-                        textTransform:
-                          "uppercase",
-                        letterSpacing: "0.7px",
-                        color:
-                          "var(--text-secondary)",
-                      }}
-                    >
-                      Price
-                    </small>
+                  <div className="mb-3 mt-auto d-flex align-items-baseline justify-content-between">
+                    <div>
+                      <span
+                        className="fw-bold"
+                        style={{
+                          color: "var(--text-primary)",
+                          fontSize: "22px",
+                          letterSpacing: "-0.5px",
+                        }}
+                      >
+                        ₹{Number(product.price || 0).toLocaleString("en-IN")}
+                      </span>
+                    </div>
 
-                    <span
-                      className="fw-bold"
+                    <button
+                      type="button"
+                      disabled={isLoading}
+                      onClick={() => handleAddToCart(product)}
                       style={{
-                        color: "#2563eb",
-                        fontSize: "21px",
-                        letterSpacing: "-0.4px",
+                        background: "linear-gradient(135deg, #e07a42 0%, #c45e2a 100%)",
+                        border: "none",
+                        borderRadius: "14px",
+                        width: "38px",
+                        height: "38px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "#fff",
+                        cursor: "pointer",
+                        boxShadow: "0 4px 14px rgba(224, 122, 66, 0.35)",
+                        transition: "all 0.2s ease",
                       }}
+                      title="Quick Add to Cart"
                     >
-                      ₹
-                      {Number(
-                        product.price || 0
-                      ).toFixed(2)}
-                    </span>
+                      🛒
+                    </button>
                   </div>
 
                   {/* =================================================
@@ -758,50 +817,6 @@ const ProductList = ({
                   ================================================= */}
 
                   <div className="d-grid gap-2">
-                    {/* View Details */}
-
-                    {onViewDetails && (
-                      <button
-                        type="button"
-                        className="btn details-button fw-semibold"
-                        onClick={() =>
-                          onViewDetails(
-                            product.id
-                          )
-                        }
-                        style={{
-                          minHeight: "38px",
-                          borderRadius: "9px",
-                          padding: "7px 12px",
-                          fontSize: "12px",
-                          color:
-                            "var(--text-primary)",
-                          background:
-                            "var(--muted-bg)",
-                          border:
-                            "1px solid var(--border)",
-                          transition:
-                            "all 0.25s ease",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background =
-                            "var(--hover-bg)";
-
-                          e.currentTarget.style.transform =
-                            "translateY(-1px)";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background =
-                            "var(--muted-bg)";
-
-                          e.currentTarget.style.transform =
-                            "translateY(0)";
-                        }}
-                      >
-                        ⭐ View Reviews & Details
-                      </button>
-                    )}
-
                     {/* Buy Now */}
 
                     <button
@@ -814,13 +829,13 @@ const ProductList = ({
                       style={{
                         minHeight: "38px",
                         border: "none",
-                        borderRadius: "9px",
+                        borderRadius: "10px",
                         padding: "8px 12px",
                         fontSize: "12px",
                         background:
-                          "linear-gradient(135deg, #16a34a, #15803d)",
+                          "linear-gradient(135deg, #e07a42, #b45309)",
                         boxShadow:
-                          "0 6px 14px rgba(22, 163, 74, 0.18)",
+                          "0 4px 14px rgba(224, 122, 66, 0.25)",
                         transition:
                           "all 0.25s ease",
                       }}
@@ -828,17 +843,15 @@ const ProductList = ({
                         if (!isLoading) {
                           e.currentTarget.style.transform =
                             "translateY(-1px)";
-
                           e.currentTarget.style.boxShadow =
-                            "0 9px 18px rgba(22, 163, 74, 0.25)";
+                            "0 6px 18px rgba(224, 122, 66, 0.4)";
                         }
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.transform =
                           "translateY(0)";
-
                         e.currentTarget.style.boxShadow =
-                          "0 6px 14px rgba(22, 163, 74, 0.18)";
+                          "0 4px 14px rgba(224, 122, 66, 0.25)";
                       }}
                     >
                       {isLoading ? (
@@ -848,13 +861,46 @@ const ProductList = ({
                             role="status"
                             aria-hidden="true"
                           />
-
                           Processing...
                         </>
                       ) : (
                         <>Buy Now ⚡</>
                       )}
                     </button>
+
+                    {/* View Details */}
+
+                    {onViewDetails && (
+                      <button
+                        type="button"
+                        className="btn fw-semibold"
+                        onClick={() =>
+                          onViewDetails(
+                            product.id
+                          )
+                        }
+                        style={{
+                          minHeight: "36px",
+                          borderRadius: "10px",
+                          padding: "6px 12px",
+                          fontSize: "12px",
+                          color: "var(--text-secondary)",
+                          background: "transparent",
+                          border: "1px solid var(--border)",
+                          transition: "all 0.2s ease",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = "var(--hover-bg)";
+                          e.currentTarget.style.color = "var(--text-primary)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = "transparent";
+                          e.currentTarget.style.color = "var(--text-secondary)";
+                        }}
+                      >
+                        View Details ➔
+                      </button>
+                    )}
 
                     {/* Add To Cart */}
 

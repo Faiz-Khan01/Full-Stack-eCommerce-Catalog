@@ -1,225 +1,227 @@
-// import React from "react";
-// import { Link, useLocation } from "react-router-dom";
-// import { useTheme, themes } from "../App";
-
-// const AdminSidebar = () => {
-//   const { darkMode } = useTheme();
-//   const theme = darkMode ? themes.dark : themes.light;
-//   const location = useLocation();
-
-//   const menuItems = [
-//     { name: "Dashboard", path: "/admin/dashboard", icon: "📊" },
-//     { name: "Products", path: "/admin/products", icon: "📦" },
-//     { name: "Categories", path: "/admin/categories", icon: "📁" },
-//     { name: "Inventory", path: "/admin/inventory", icon: "🏷️" },
-//     { name: "Orders", path: "/admin/orders", icon: "🛒" },
-//     { name: "Customers", path: "/admin/customers", icon: "👥" },
-//     { name: "Support Tickets", path: "/admin/support", icon: "🎫" }, 
-//     { name: "Settings", path: "/admin/settings", icon: "⚙️" },
-//   ];
-
-//   return (
-//     <div
-//       style={{
-//         width: "260px",
-//         minHeight: "100vh",
-//         background: darkMode ? "#0f172a" : "#ffffff",
-//         borderRight: `1px solid ${theme.border}`,
-//         padding: "24px 16px",
-//         transition: "background 0.3s ease, border 0.3s ease",
-//       }}
-//     >
-//       {/* Brand Logo */}
-//       <div className="d-flex align-items-center gap-2 mb-4 px-2">
-//         <div
-//           style={{
-//             background: "linear-gradient(135deg, #f59e0b, #d97706)",
-//             borderRadius: "12px",
-//             padding: "8px",
-//             display: "flex",
-//             alignItems: "center",
-//             justifyContent: "center",
-//           }}
-//         >
-//           🛒
-//         </div>
-//         <span
-//           className="fw-bold fs-4"
-//           style={{
-//             color: darkMode ? "#facc15" : "#1e293b",
-//           }}
-//         >
-//           TechStore
-//         </span>
-//       </div>
-
-//       <div
-//         className="text-uppercase fs-7 fw-bold mb-3 px-2"
-//         style={{ color: theme.textSecondary, fontSize: "11px", letterSpacing: "1px" }}
-//       >
-//         Main Menu
-//       </div>
-
-//       {/* Menu Links */}
-//       <nav className="d-flex flex-column gap-1">
-//         {menuItems.map((item) => {
-//           const isActive = location.pathname === item.path;
-//           return (
-//             <Link
-//               key={item.name}
-//               to={item.path}
-//               className="text-decoration-none d-flex align-items-center gap-3 px-3 py-2.5 rounded-3"
-//               style={{
-//                 background: isActive
-//                   ? darkMode
-//                     ? "rgba(255, 255, 255, 0.08)"
-//                     : "#f1f5f9"
-//                   : "transparent",
-//                 color: isActive ? theme.textPrimary : theme.textSecondary,
-//                 fontWeight: isActive ? "600" : "500",
-//                 transition: "all 0.2s ease",
-//               }}
-//             >
-//               <span>{item.icon}</span>
-//               <span>{item.name}</span>
-//             </Link>
-//           );
-//         })}
-//       </nav>
-//     </div>
-//   );
-// };
-
-// export default AdminSidebar;
-
-
-
-
-
-
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useTheme, themes } from "../App";
+import { useTheme } from "../App";
 
 const AdminSidebar = () => {
   const { darkMode } = useTheme();
-  const theme = darkMode ? themes.dark : themes.light;
   const location = useLocation();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Clear auth token and user storage
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-    
-    // Redirect to login page
     navigate("/login");
   };
 
-  const menuItems = [
-    { name: "Dashboard", path: "/admin/dashboard", icon: "📊" },
-    { name: "Products", path: "/admin/products", icon: "📦" },
-    { name: "Categories", path: "/admin/categories", icon: "📁" },
-    { name: "Inventory", path: "/admin/inventory", icon: "🏷️" },
-    { name: "Orders", path: "/admin/orders", icon: "🛒" },
-    { name: "Customers", path: "/admin/customers", icon: "👥" },
-    { name: "Support Tickets", path: "/admin/support", icon: "🎫" }, 
-    { name: "Settings", path: "/admin/settings", icon: "⚙️" },
+  const sections = [
+    {
+      title: "MAIN",
+      items: [
+        { name: "Overview", path: "/admin/dashboard", icon: "📊" },
+        { name: "AI Assistant", path: "/admin/ai-assistant", icon: "✨", isAI: true },
+      ],
+    },
+    {
+      title: "CATALOGUE",
+      items: [
+        { name: "Products", path: "/admin/products", icon: "📦" },
+        { name: "Categories", path: "/admin/categories", icon: "📁" },
+      ],
+    },
+    {
+      title: "SALES",
+      items: [
+        { name: "Orders", path: "/admin/orders", icon: "🛒" },
+        { name: "Users", path: "/admin/customers", icon: "👥" },
+      ],
+    },
+    {
+      title: "STOREFRONT",
+      items: [
+        { name: "Home Page", path: "/", icon: "🛍️", external: true },
+      ],
+    },
+    {
+      title: "ADMINISTRATION",
+      items: [
+        { name: "Admin Management", path: "/admin/support", icon: "🛡️" },
+        { name: "Settings", path: "/admin/settings", icon: "⚙️" },
+      ],
+    },
   ];
 
   return (
     <div
       style={{
-        width: "260px",
+        width: "250px",
+        minWidth: "250px",
         minHeight: "100vh",
-        background: darkMode ? "#0f172a" : "#ffffff",
-        borderRight: `1px solid ${theme.border}`,
-        padding: "24px 16px",
-        transition: "background 0.3s ease, border 0.3s ease",
+        background: "#0e0f14",
+        borderRight: "1px solid rgba(255, 255, 255, 0.08)",
+        padding: "20px 14px",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "space-between", // Ensures items spread and logout sits at bottom nicely
+        justifyContent: "space-between",
+        userSelect: "none",
+        zIndex: 50,
       }}
     >
       <div>
-        {/* Brand Logo */}
+        {/* Brand Logo - Arequa luxury styling */}
         <div className="d-flex align-items-center gap-2 mb-4 px-2">
           <div
             style={{
-              background: "linear-gradient(135deg, #f59e0b, #d97706)",
-              borderRadius: "12px",
-              padding: "8px",
+              width: "36px",
+              height: "36px",
+              borderRadius: "10px",
+              background: "linear-gradient(135deg, #e07a42 0%, #c45e2a 100%)",
+              boxShadow: "0 4px 14px rgba(224, 122, 66, 0.4)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              color: "#ffffff",
+              fontWeight: 900,
+              fontSize: "18px",
             }}
           >
-            🛒
+            A
           </div>
-          <span
-            className="fw-bold fs-4"
-            style={{
-              color: darkMode ? "#facc15" : "#1e293b",
-            }}
-          >
-            TechStore
-          </span>
+          <div className="d-flex flex-column">
+            <span
+              style={{
+                fontFamily: "Inter, sans-serif",
+                fontWeight: 800,
+                fontSize: "18px",
+                letterSpacing: "-0.5px",
+                color: "#ffffff",
+              }}
+            >
+              Arequa
+            </span>
+            <span
+              style={{
+                fontSize: "9px",
+                letterSpacing: "1px",
+                textTransform: "uppercase",
+                color: "rgba(255, 255, 255, 0.4)",
+                fontWeight: 600,
+              }}
+            >
+              Luxury Atelier
+            </span>
+          </div>
         </div>
 
-        <div
-          className="text-uppercase fs-7 fw-bold mb-3 px-2"
-          style={{ color: theme.textSecondary, fontSize: "11px", letterSpacing: "1px" }}
-        >
-          Main Menu
-        </div>
-
-        {/* Menu Links */}
-        <nav className="d-flex flex-column gap-1">
-          {menuItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            return (
-              <Link
-                key={item.name}
-                to={item.path}
-                className="text-decoration-none d-flex align-items-center gap-3 px-3 py-2.5 rounded-3"
+        {/* Navigation Sections */}
+        <div className="d-flex flex-column gap-3">
+          {sections.map((sec) => (
+            <div key={sec.title}>
+              <div
                 style={{
-                  background: isActive
-                    ? darkMode
-                      ? "rgba(255, 255, 255, 0.08)"
-                      : "#f1f5f9"
-                    : "transparent",
-                  color: isActive ? theme.textPrimary : theme.textSecondary,
-                  fontWeight: isActive ? "600" : "500",
-                  transition: "all 0.2s ease",
+                  fontSize: "10px",
+                  fontWeight: 700,
+                  letterSpacing: "1px",
+                  color: "rgba(255, 255, 255, 0.35)",
+                  padding: "0 10px 4px 10px",
+                  textTransform: "uppercase",
                 }}
               >
-                <span>{item.icon}</span>
-                <span>{item.name}</span>
-              </Link>
-            );
-          })}
-        </nav>
+                {sec.title}
+              </div>
+
+              <div className="d-flex flex-column gap-1">
+                {sec.items.map((item) => {
+                  const isActive =
+                    location.pathname === item.path ||
+                    (item.path === "/admin/dashboard" && location.pathname === "/admin");
+
+                  return (
+                    <Link
+                      key={item.name}
+                      to={item.path}
+                      className="text-decoration-none d-flex align-items-center justify-content-between px-3 py-2 rounded-3"
+                      style={{
+                        background: isActive
+                          ? "rgba(224, 122, 66, 0.14)"
+                          : "transparent",
+                        color: isActive ? "#ffffff" : "rgba(255, 255, 255, 0.65)",
+                        border: isActive
+                          ? "1px solid rgba(224, 122, 66, 0.3)"
+                          : "1px solid transparent",
+                        fontSize: "13px",
+                        fontWeight: isActive ? 600 : 500,
+                        transition: "all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+                      }}
+                      onMouseEnter={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)";
+                          e.currentTarget.style.color = "#ffffff";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isActive) {
+                          e.currentTarget.style.background = "transparent";
+                          e.currentTarget.style.color = "rgba(255, 255, 255, 0.65)";
+                        }
+                      }}
+                    >
+                      <div className="d-flex align-items-center gap-2.5">
+                        <span style={{ fontSize: "14px" }}>{item.icon}</span>
+                        <span>{item.name}</span>
+                      </div>
+
+                      {item.isAI && (
+                        <span
+                          style={{
+                            background: "linear-gradient(135deg, #e07a42, #f59e0b)",
+                            color: "#ffffff",
+                            fontSize: "9px",
+                            fontWeight: 800,
+                            padding: "2px 6px",
+                            borderRadius: "10px",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.5px",
+                          }}
+                        >
+                          AI
+                        </span>
+                      )}
+
+                      {item.external && (
+                        <span style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.4)" }}>
+                          ↗
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Logout Button Section */}
-      <div className="px-2 pt-3" style={{ borderTop: `1px solid ${theme.border}` }}>
+      {/* Footer Section / Logout */}
+      <div className="pt-3" style={{ borderTop: "1px solid rgba(255, 255, 255, 0.08)" }}>
         <button
           onClick={handleLogout}
-          className="w-100 text-decoration-none d-flex align-items-center gap-3 px-3 py-2.5 rounded-3 border-0"
+          className="w-100 text-decoration-none d-flex align-items-center gap-2.5 px-3 py-2 rounded-3 border-0"
           style={{
-            background: darkMode ? "rgba(239, 68, 68, 0.15)" : "#fee2e2",
-            color: "#ef4444",
-            fontWeight: "600",
+            background: "rgba(239, 68, 68, 0.08)",
+            color: "#f87171",
+            fontSize: "13px",
+            fontWeight: 600,
             cursor: "pointer",
             transition: "all 0.2s ease",
+            border: "1px solid rgba(239, 68, 68, 0.15)",
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = "#ef4444";
-            e.currentTarget.style.color = "#ffffff";
+            e.currentTarget.style.background = "rgba(239, 68, 68, 0.2)";
+            e.currentTarget.style.borderColor = "rgba(239, 68, 68, 0.4)";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = darkMode ? "rgba(239, 68, 68, 0.15)" : "#fee2e2";
-            e.currentTarget.style.color = "#ef4444";
+            e.currentTarget.style.background = "rgba(239, 68, 68, 0.08)";
+            e.currentTarget.style.borderColor = "rgba(239, 68, 68, 0.15)";
           }}
         >
           <span>🚪</span>

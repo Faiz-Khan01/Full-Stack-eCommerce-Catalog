@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import CategoryFilter from "./CategoryFilter";
 import ThemeToggle from "./ThemeToggle";
@@ -16,7 +16,7 @@ const getWishlistItems = () => {
 
 const getCartItems = () => {
   try {
-    const saved = JSON.parse(localStorage.getItem("cart") || "[]");
+    const saved = JSON.parse(localStorage.getItem("cart") || localStorage.getItem("guestCart") || "[]");
     return Array.isArray(saved) ? saved : [];
   } catch {
     return [];
@@ -260,14 +260,16 @@ const Navbar = ({
 
             <div className="brand-text-wrapper">
               <span className="brand-name">
-                TechStore
+                STORE
               </span>
 
-              <span className="brand-badge">
-                PRO
-              </span>
             </div>
           </Link>
+
+          {/* EDITORIAL NAV LINKS */}
+          <div className="d-none d-lg-flex align-items-center gap-4 ms-3 me-2">
+            <Link to="/" className="text-decoration-none fw-bold text-uppercase" style={{ fontSize: "12px", letterSpacing: "1.2px", color: "var(--text-primary)" }}>Home</Link>
+          </div>
 
           {/* =====================================================
               DELIVERY LOCATION

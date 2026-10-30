@@ -5,18 +5,14 @@ spring:
   application:
     name: productcatalog
 
-  # ==========================================
-  # 1. Database - Aiven MySQL
-  # ==========================================
+  # Database - Aiven MySQL
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
-  # ==========================================
-  # 2. JPA / Hibernate
-  # ==========================================
+  # JPA / Hibernate
   jpa:
     hibernate:
       ddl-auto: update
@@ -25,15 +21,13 @@ spring:
     properties:
       hibernate:
         format_sql: false
+        dialect: org.hibernate.dialect.MySQLDialect
 
-  # ==========================================
-  # 3. OAuth2
-  # ==========================================
+  # OAuth2
   security:
     oauth2:
       client:
         registration:
-
           google:
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_CLIENT_SECRET}
@@ -48,12 +42,10 @@ spring:
               - user:email
               - read:user
 
-  # ==========================================
-  # 4. Email - Gmail SMTP
-  # ==========================================
+  # Email - Gmail SMTP
   mail:
-    host: ${MAIL_HOST:smtp.gmail.com}
-    port: ${MAIL_PORT:587}
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
     username: ${MAIL_USERNAME}
     password: ${MAIL_PASSWORD}
     properties:
@@ -64,28 +56,24 @@ spring:
             enable: true
             required: true
           ssl:
-            trust: ${MAIL_HOST:smtp.gmail.com}
+            trust: ${MAIL_HOST}
           connectiontimeout: 5000
           timeout: 5000
           writetimeout: 5000
 
-# ==========================================
-# 5. Application
-# ==========================================
+# Application
 app:
   frontend:
-    url: ${FRONTEND_URL:http://localhost:5173}
+    url: ${FRONTEND_URL}
 
   admin:
     email: ${ADMIN_EMAIL}
 
   jwt:
     secret: ${JWT_SECRET}
-    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+    expiration-ms: ${JWT_EXPIRATION_MS}
 
-# ==========================================
-# 6. Razorpay
-# ==========================================
+# Razorpay
 razorpay:
   key-id: ${RAZORPAY_KEY_ID}
   key-secret: ${RAZORPAY_KEY_SECRET}

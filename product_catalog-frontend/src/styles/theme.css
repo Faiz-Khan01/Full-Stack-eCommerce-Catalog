@@ -1,43 +1,114 @@
 /* =========================================================
-   PRODUCT DETAIL - THEME SUPPORT
+   LUXURY MATTE OBSIDIAN THEME & ANIMATIONS (Matching Video)
    ========================================================= */
 
+:root {
+  --luxury-terracotta: #e07a42;
+  --luxury-terracotta-hover: #f0854d;
+  --luxury-dark-bg: #0c0d12;
+  --luxury-card-bg: #14151b;
+  --luxury-card-elevated: #1a1b22;
+  --luxury-border: rgba(255, 255, 255, 0.08);
+  --luxury-accent-glow: 0 8px 25px rgba(224, 122, 66, 0.35);
+}
+
+/* =========================================================
+   CUSTOM LUXURY SCROLLBAR
+   ========================================================= */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0c0d12;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #242630;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #e07a42;
+}
+
+/* =========================================================
+   LUXURY ANIMATIONS & KEYFRAMES
+   ========================================================= */
+@keyframes luxuryFloat {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(1deg);
+  }
+}
+
+@keyframes luxuryGlowPulse {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(224, 122, 66, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(224, 122, 66, 0.45);
+  }
+}
+
+@keyframes shimmerSlide {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* =========================================================
+   PRODUCT CARD - 3D HOVER & LUXURY EFFECTS
+   ========================================================= */
+.product-card {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease !important;
+  will-change: transform, box-shadow;
+}
+
+.product-card:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.7), 0 0 25px rgba(224, 122, 66, 0.16) !important;
+  border-color: rgba(224, 122, 66, 0.3) !important;
+}
+
+.product-card:hover .product-list-image {
+  transform: scale(1.08) !important;
+}
+
+/* =========================================================
+   PRODUCT DETAIL - THEME SUPPORT
+   ========================================================= */
 .premium-product-page {
   background:
     radial-gradient(
       circle at 10% 15%,
-      rgba(99, 102, 241, 0.10),
-      transparent 28%
+      rgba(224, 122, 66, 0.08),
+      transparent 35%
     ),
     radial-gradient(
       circle at 90% 85%,
-      rgba(168, 85, 247, 0.10),
-      transparent 30%
+      rgba(245, 158, 11, 0.05),
+      transparent 35%
     ),
     var(--bg);
   color: var(--text-primary);
-
-  transition:
-    background-color 0.25s ease,
-    color 0.25s ease;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
-
-
-/* Main product card */
 
 .product-main-card {
   background: var(--card) !important;
   color: var(--text-primary);
-
   border-color: var(--border) !important;
-
   box-shadow:
     0 30px 80px var(--shadow),
     0 8px 25px var(--shadow);
 }
-
-
-/* Product image area */
 
 .product-image-section {
   background:
@@ -48,9 +119,6 @@
       var(--hover-bg) 100%
     ) !important;
 }
-
-
-/* Product information */
 
 .product-info-section {
   color: var(--text-primary);
@@ -68,17 +136,11 @@
   color: var(--text-secondary) !important;
 }
 
-
-/* Category */
-
 .category-badge {
-  background: rgba(99, 102, 241, 0.10) !important;
-  border-color: rgba(99, 102, 241, 0.20) !important;
-  color: #818cf8 !important;
+  background: rgba(224, 122, 66, 0.12) !important;
+  border-color: rgba(224, 122, 66, 0.25) !important;
+  color: #e07a42 !important;
 }
-
-
-/* Rating */
 
 .rating-text {
   color: var(--text-secondary) !important;
@@ -87,9 +149,6 @@
 .no-rating {
   color: var(--text-secondary) !important;
 }
-
-
-/* Divider */
 
 .premium-divider {
   background:
@@ -100,15 +159,9 @@
     ) !important;
 }
 
-
-/* Price label */
-
 .price-label {
   color: var(--text-secondary) !important;
 }
-
-
-/* Trust section */
 
 .trust-row {
   border-color: var(--border) !important;
@@ -118,9 +171,6 @@
   color: var(--text-secondary) !important;
 }
 
-
-/* Back button */
-
 .premium-back-button {
   background: var(--card) !important;
   color: var(--text-secondary) !important;
@@ -129,11 +179,8 @@
 
 .premium-back-button:hover {
   background: var(--hover-bg) !important;
-  color: #818cf8 !important;
+  color: #e07a42 !important;
 }
-
-
-/* Wishlist */
 
 .wishlist-button {
   background: var(--card) !important;
@@ -146,86 +193,69 @@
   color: #ef4444 !important;
 }
 
-
-/* Reviews */
-
 .reviews-card {
   background: var(--card) !important;
   border-color: var(--border) !important;
   box-shadow: 0 20px 60px var(--shadow) !important;
 }
 
-
 /* =========================================================
-   DARK MODE - PRODUCT DETAIL
+   DARK MODE - OVERRIDES
    ========================================================= */
-
 [data-theme="dark"] .premium-product-page {
   background:
     radial-gradient(
       circle at 10% 15%,
-      rgba(99, 102, 241, 0.12),
-      transparent 28%
+      rgba(224, 122, 66, 0.08),
+      transparent 35%
     ),
     radial-gradient(
       circle at 90% 85%,
-      rgba(168, 85, 247, 0.10),
+      rgba(255, 255, 255, 0.03),
       transparent 30%
     ),
-    linear-gradient(
-      180deg,
-      #090d16 0%,
-      #0f172a 100%
-    );
+    #0c0d12;
 }
-
 
 [data-theme="dark"] .product-main-card {
-  background: #111827 !important;
-  border-color: #1f2937 !important;
+  background: #14151b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
-
 
 [data-theme="dark"] .product-image-section {
   background:
     radial-gradient(
       circle at center,
-      #111827 0%,
-      #0f172a 60%,
-      #090d16 100%
+      #181920 0%,
+      #14151b 60%,
+      #0c0d12 100%
     ) !important;
 }
 
-
 [data-theme="dark"] .image-glow {
-  background: rgba(99, 102, 241, 0.12);
+  background: rgba(224, 122, 66, 0.15);
 }
-
 
 [data-theme="dark"] .premium-back-button {
-  background: #111827 !important;
+  background: #14151b !important;
   color: #94a3b8 !important;
-  border-color: #1f2937 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
-
 
 [data-theme="dark"] .wishlist-button {
-  background: #111827 !important;
+  background: #14151b !important;
   color: #94a3b8 !important;
-  border-color: #1f2937 !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
-
 
 [data-theme="dark"] .reviews-card {
-  background: #111827 !important;
-  border-color: #1f2937 !important;
+  background: #14151b !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
-
 
 /* =========================================================
    PRODUCT REVIEW DARK MODE
    ========================================================= */
-
 [data-theme="dark"] .product-review-container {
   color: var(--text-primary);
 }
@@ -244,19 +274,9 @@
   color: var(--text-secondary);
 }
 
-
-/* =========================================================
-   GLOBAL IMAGE BACKGROUND
-   ========================================================= */
-
 [data-theme="dark"] img {
   color: var(--text-secondary);
 }
-
-
-/* =========================================================
-   DISABLED BUTTONS
-   ========================================================= */
 
 button:disabled {
   cursor: not-allowed;

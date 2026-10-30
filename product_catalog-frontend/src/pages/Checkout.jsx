@@ -1490,14 +1490,26 @@ const Checkout = () => {
 
                               <div className="d-flex align-items-center justify-content-between">
 
-                                <span className="text-muted small">
-                                  Quantity:{" "}
-                                  <strong className="text-dark">
-                                    {
-                                      item.quantity
-                                    }
-                                  </strong>
-                                </span>
+                                <div className="d-flex align-items-center gap-2">
+                                  <span className="text-muted small">
+                                    Qty: <strong className="text-dark">{item.quantity}</strong>
+                                  </span>
+                                  {item.size && (
+                                    <span
+                                      style={{
+                                        background: "rgba(224, 122, 66, 0.12)",
+                                        color: "#e07a42",
+                                        border: "1px solid rgba(224, 122, 66, 0.3)",
+                                        borderRadius: "6px",
+                                        padding: "1px 7px",
+                                        fontSize: "10px",
+                                        fontWeight: 700,
+                                      }}
+                                    >
+                                      {item.size}
+                                    </span>
+                                  )}
+                                </div>
 
                                 <span className="fw-bold text-dark">
                                   ₹

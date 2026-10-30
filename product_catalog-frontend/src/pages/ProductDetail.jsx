@@ -1,4 +1,5 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
+import { getProductSizes } from "../utils/productSizes";
 import { useParams, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
@@ -48,6 +49,16 @@ const ProductDetail = ({ onAddToCart }) => {
 
   const [wishlisted, setWishlisted] = useState(false);
   const [wishlistLoading, setWishlistLoading] = useState(false);
+  const [selectedSize, setSelectedSize] = useState("");
+
+  const availableSizes = useMemo(() => getProductSizes(product), [product]);
+
+  useEffect(() => {
+    if (availableSizes && availableSizes.length > 0) {
+      const def = availableSizes.find((s) => s.isDefault) || availableSizes[0];
+      setSelectedSize(def.label);
+    }
+  }, [availableSizes]);
 
   const [dbOrderId, setDbOrderId] = useState(null);
   const [creatingOrder, setCreatingOrder] = useState(false);
@@ -246,42 +257,71 @@ const ProductDetail = ({ onAddToCart }) => {
   // =====================================================
   // Add To Cart
   // =====================================================
-  const handleAddProductToCart = () => {
-    if (!product) {
-      return;
-    }
+  const handleAddProductToCart = async () => {
+    if (!product) return;
 
-    if (!user?.email) {
-      Swal.fire({
-        title: "Login Required",
-        text:
-          "Please log in before adding products to your cart.",
-        icon: "info",
-        showCancelButton: true,
-        confirmButtonText: "Login",
-        cancelButtonText: "Cancel",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          navigate("/login");
+    try {
+      const CART_STORAGE_KEY = "guestCart";
+      const existingGuestCart = JSON.parse(
+        localStorage.getItem(CART_STORAGE_KEY) || localStorage.getItem("cart") || "[]"
+      );
+
+      const itemToAdd = {
+        id: product.id,
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        imageUrl: product.imageUrl,
+        quantity: 1,
+        size: selectedSize,
+        product: product,
+      };
+
+      const existingIndex = existingGuestCart.findIndex(
+        (c) => String(c.id || c.productId) === String(product.id) && c.size === selectedSize
+      );
+
+      if (existingIndex > -1) {
+        existingGuestCart[existingIndex].quantity = (existingGuestCart[existingIndex].quantity || 1) + 1;
+      } else {
+        existingGuestCart.push(itemToAdd);
+      }
+
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(existingGuestCart));
+      localStorage.setItem("cart", JSON.stringify(existingGuestCart));
+
+      if (user?.email) {
+        try {
+          await api.post(`/cart/add/${product.id}?email=${encodeURIComponent(user.email)}`);
+        } catch (apiErr) {
+          console.warn("Backend cart sync notice:", apiErr?.message);
         }
-      });
+      }
 
-      return;
-    }
+      if (onAddToCart) {
+        try { onAddToCart(product.id); } catch {}
+      }
 
-    if (onAddToCart) {
-      onAddToCart(product.id);
+      window.dispatchEvent(new Event("cartUpdated"));
 
       Swal.fire({
         icon: "success",
-        title: "Added to Cart",
-        text:
-          `${product.name || "Product"} was added to your cart.`,
-        toast: true,
-        position: "top-end",
-        timer: 1500,
-        showConfirmButton: false,
+        title: "Added to Cart!",
+        html: `<b>${product.name}</b> (Size: <b>${selectedSize}</b>) added to bag.<br/><span style="color:#e07a42; font-weight:700;">₹${Number(product.price || 0).toLocaleString("en-IN")}</span>`,
+        showCancelButton: true,
+        confirmButtonText: "View Cart 🛒",
+        cancelButtonText: "Continue Shopping",
+        confirmButtonColor: "#e07a42",
+        cancelButtonColor: "#27272a",
+        background: "#18181b",
+        color: "#ffffff",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/cart");
+        }
       });
+    } catch (err) {
+      console.error("Cart error:", err);
     }
   };
 
@@ -693,7 +733,117 @@ const ProductDetail = ({ onAddToCart }) => {
                 {/* =================================================
                     Action Buttons
                 ================================================= */}
+                                {/* =================================================
+                    SIZE & VOLUME SELECTION (Apparel, Shoes, Perfume)
+                ================================================= */}
+                <div className="size-selection-block mb-4 pt-2">
+                  <div className="d-flex align-items-center justify-content-between mb-2">
+                    <span style={{ fontSize: "12px", fontWeight: 800, textTransform: "uppercase", letterSpacing: "1px", color: "var(--text-primary)" }}>
+                      {availableSizes[0]?.type === "volume" || availableSizes[0]?.label?.includes("ml") ? "Select Volume" : "Select Size"}
+                    </span>
+                    <span
+                      style={{ fontSize: "11px", color: "#e07a42", fontWeight: 700, cursor: "pointer" }}
+                      onClick={() => {
+                        Swal.fire({
+                          icon: "info",
+                          title: "Size & Volume Guide",
+                          html: `
+                            <div style="font-size:13px; text-align:left; color:#ccc; line-height:1.6;">
+                              <b>Apparel (Shirts, Jackets, Pants):</b><br/>
+                              • S: Chest 38" / Waist 30"<br/>
+                              • M: Chest 40" / Waist 32" (Regular)<br/>
+                              • L: Chest 42" / Waist 34" (Tailored)<br/>
+                              • XL: Chest 44" / Waist 36" (Relaxed)<br/><br/>
+                              <b>Footwear:</b> UK sizing standard (EU 41 - 45).<br/><br/>
+                              <b>Perfumes:</b> 50 ml (Travel Spray), 100 ml (Signature Flacon), 150 ml (Atelier Edition).
+                            </div>
+                          `,
+                          background: "#18181b",
+                          color: "#fff",
+                          confirmButtonColor: "#e07a42",
+                        });
+                      }}
+                    >
+                      Size Guide 📏
+                    </span>
+                  </div>
+
+                  <div className="d-flex flex-wrap gap-2">
+                    {availableSizes.map((s) => {
+                      const isSel = selectedSize === s.label;
+                      return (
+                        <button
+                          key={s.label}
+                          type="button"
+                          onClick={() => setSelectedSize(s.label)}
+                          style={{
+                            background: isSel ? "rgba(224, 122, 66, 0.18)" : "rgba(255, 255, 255, 0.04)",
+                            border: `1.5px solid ${isSel ? "#e07a42" : "rgba(255, 255, 255, 0.12)"}`,
+                            borderRadius: "12px",
+                            padding: "8px 16px",
+                            color: isSel ? "#e07a42" : "var(--text-primary)",
+                            cursor: "pointer",
+                            transition: "all 0.2s ease",
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            minWidth: "65px",
+                            boxShadow: isSel ? "0 0 15px rgba(224, 122, 66, 0.3)" : "none",
+                          }}
+                        >
+                          <span style={{ fontSize: "14px", fontWeight: 800 }}>{s.label}</span>
+                          {s.desc && (
+                            <span style={{ fontSize: "10px", color: isSel ? "#e07a42" : "var(--text-secondary)", opacity: 0.8, marginTop: "2px" }}>
+                              {s.desc}
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
                 <div className="action-area">
+
+                  {/* Virtual Fitting Room Try */}
+                  <button
+                    type="button"
+                    className="fitting-room-detail-btn"
+                    style={{
+                      background: "rgba(224, 122, 66, 0.12)",
+                      border: "1px solid rgba(224, 122, 66, 0.35)",
+                      borderRadius: "14px",
+                      color: "#e07a42",
+                      padding: "12px 18px",
+                      fontWeight: 700,
+                      fontSize: "14px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "8px",
+                      cursor: "pointer",
+                      transition: "all 0.2s ease",
+                      width: "100%",
+                      marginBottom: "12px",
+                    }}
+                    onClick={() => {
+                      const cleanImg = getProductImageUrl(product.imageUrl);
+                      window.dispatchEvent(
+                        new CustomEvent("wearInFittingRoom", {
+                          detail: {
+                            id: product.id,
+                            name: product.name,
+                            price: product.price,
+                            imageUrl: cleanImg,
+                            category: product.category?.name || product.category || "Apparel",
+                          },
+                        })
+                      );
+                    }}
+                  >
+                    <span>🧥</span>
+                    <span>Try on 3D Model in Fitting Room</span>
+                  </button>
 
                   {/* Add To Cart */}
                   <button

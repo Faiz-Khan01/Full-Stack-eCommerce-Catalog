@@ -33,7 +33,12 @@ const Cart = () => {
     const user = getStoredUser();
 
     if (!user?.email) {
-      setCartItems([]);
+      try {
+        const localItems = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || localStorage.getItem('cart') || '[]');
+        setCartItems(Array.isArray(localItems) ? localItems : []);
+      } catch {
+        setCartItems([]);
+      }
       setLoading(false);
       return;
     }
@@ -611,6 +616,23 @@ const Cart = () => {
                               {item.name ||
                                 "Unknown Product"}
                             </strong>
+                            {item.size && (
+                              <span
+                                style={{
+                                  display: "inline-block",
+                                  marginTop: "4px",
+                                  background: "rgba(224, 122, 66, 0.12)",
+                                  color: "#e07a42",
+                                  border: "1px solid rgba(224, 122, 66, 0.3)",
+                                  borderRadius: "6px",
+                                  padding: "1px 7px",
+                                  fontSize: "11px",
+                                  fontWeight: 700,
+                                }}
+                              >
+                                {item.size.includes("ml") ? `Volume: ${item.size}` : `Size: ${item.size}`}
+                              </span>
+                            )}
 
                             <span className="small text-muted">
                               Product
