@@ -44,8 +44,8 @@ spring:
 
   # Email - Gmail SMTP
   mail:
-    host: ${MAIL_HOST}
-    port: ${MAIL_PORT}
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
     username: ${MAIL_USERNAME}
     password: ${MAIL_PASSWORD}
     properties:
@@ -56,7 +56,7 @@ spring:
             enable: true
             required: true
           ssl:
-            trust: ${MAIL_HOST}
+            trust: ${MAIL_HOST:smtp.gmail.com}
           connectiontimeout: 5000
           timeout: 5000
           writetimeout: 5000
@@ -64,14 +64,14 @@ spring:
 # Application
 app:
   frontend:
-    url: ${FRONTEND_URL}
+    url: ${FRONTEND_URL:https://techstore-catalog.vercel.app}
 
   admin:
     email: ${ADMIN_EMAIL}
 
   jwt:
     secret: ${JWT_SECRET}
-    expiration-ms: ${JWT_EXPIRATION_MS}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
 
 # Razorpay
 razorpay:

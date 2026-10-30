@@ -45,12 +45,25 @@ public class SecurityConfig {
 
         allowedOrigins.add("http://localhost:5173");
         allowedOrigins.add("http://localhost:3000");
+        allowedOrigins.add("https://techstore-catalog.vercel.app");
 
         // Production frontend from environment
         if (frontendUrl != null && !frontendUrl.isBlank()) {
-            allowedOrigins.add(frontendUrl);
+            if (frontendUrl.contains(",")) {
+                for (String u : frontendUrl.split(",")) {
+                    if (!u.trim().isBlank()) allowedOrigins.add(u.trim());
+                }
+            } else {
+                allowedOrigins.add(frontendUrl.trim());
+            }
         }
 
+        config.setAllowedOriginPatterns(List.of(
+                "http://localhost:*",
+                "https://techstore-catalog.vercel.app",
+                "https://*.vercel.app",
+                "https://*.onrender.com"
+        ));
         config.setAllowedOrigins(allowedOrigins);
 
         config.setAllowedMethods(List.of(
@@ -67,7 +80,9 @@ public class SecurityConfig {
                 "Content-Type",
                 "Accept",
                 "Origin",
-                "X-Requested-With"
+                "X-Requested-With",
+                "Access-Control-Request-Method",
+                "Access-Control-Request-Headers"
         ));
 
         config.setExposedHeaders(List.of(
