@@ -9,10 +9,10 @@ import api from "../services/api";
 import ThreeDProductViewer from "../components/ThreeDProductViewer";
 
 // ─────────────────────────────────────────────────────────
-// Helpers
+// Real Currency & Date Helpers
 // ─────────────────────────────────────────────────────────
 const fmt = (n) =>
-  Number(n || 0).toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  Number(n || 0).toLocaleString("en-IN", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
 const fmtCur = (n) => `₹${fmt(n)}`;
 
@@ -26,6 +26,7 @@ const STATUS_COLOR_MAP = {
   SHIPPED:   "#38bdf8",
   DELIVERED: "#10b981",
   COMPLETED: "#10b981",
+  PAID:      "#10b981",
   CANCELLED: "#ef4444",
   REFUND_INITIATED:"#a855f7",
 };
@@ -65,7 +66,11 @@ const CustomTooltip = ({ active, payload, label }) => {
       }}
     >
       <div style={{ color: "#9ca3af", fontSize: 10, marginBottom: 2 }}>{label}</div>
-      <div style={{ color: "#e07a42", fontWeight: 700, fontSize: 13 }}>${fmt(payload[0]?.value)}</div>
+      <div style={{ color: "#e07a42", fontWeight: 700, fontSize: 13 }}>
+        {payload[0]?.name === "orders" || payload[0]?.name === "count"
+          ? `${payload[0]?.value} Orders`
+          : `₹${fmt(payload[0]?.value)}`}
+      </div>
     </div>
   );
 };
@@ -77,62 +82,41 @@ const AdminDashboard = () => {
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
-  const [selectedDay, setSelectedDay] = useState("Tue");
+  const [selectedDay, setSelectedDay] = useState("Fri");
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 5;
 
-  const daySalesMap = {
-    Sat: "₹21.7K",
-    Sun: "₹24.5K",
-    Mon: "₹28.9K",
-    Tue: "₹34.2K",
-    Wed: "₹29.1K",
-    Thu: "₹31.4K",
-    Fri: "₹33.8K",
-  };
-
-  const visitorData = [
-    { day: "Sat", visitors: 42 },
-    { day: "Sun", visitors: 38 },
-    { day: "Mon", visitors: 56 },
-    { day: "Tue", visitors: 78 },
-    { day: "Wed", visitors: 62 },
-    { day: "Thu", visitors: 71 },
-    { day: "Fri", visitors: 84 },
-  ];
-
-  const growthData = [
-    { month: "Jan", count: 8200 },
-    { month: "Feb", count: 9100 },
-    { month: "Mar", count: 9800 },
-    { month: "Apr", count: 10400 },
-    { month: "May", count: 11200 },
-    { month: "Jun", count: 12800 },
-  ];
-
   const fetchData = async (initial = false) => {
     try {
       if (initial) setLoading(true); else setRefreshing(true);
       setError("");
-      const [oRes, pRes, cRes] = await Promise.all([
+
+      const [oRes, pRes, cRes, uRes] = await Promise.allSettled([
         api.get("/admin/orders"),
         api.get("/admin/products"),
         api.get("/categories"),
+        api.get("/admin/users"),
       ]);
+
       const normalize = (res) => {
-        const d = res.data?.data || res.data;
+        if (res.status !== "fulfilled") return [];
+        const d = res.value?.data?.data || res.value?.data;
         return Array.isArray(d) ? d : [];
       };
+
       setOrders(normalize(oRes));
       setProducts(normalize(pRes));
       setCategories(normalize(cRes));
+      setUsers(normalize(uRes));
     } catch (err) {
+      console.error("Dashboard fetch error:", err);
       setError(err.response?.data?.message || err.message || "Failed to load dashboard data.");
     } finally {
       setLoading(false);
@@ -144,15 +128,108 @@ const AdminDashboard = () => {
     fetchData(true);
   }, []);
 
+  // 1. Real KPI Core
   const kpi = useMemo(() => {
     const rawRevenue = orders.reduce((s, o) => s + Number(o.totalAmount || 0), 0);
-    // Display base matching video ($84.3K) while incorporating dynamic changes
-    const totalRevenue = rawRevenue > 0 ? rawRevenue : 84300;
-    const totalOrders = orders.length > 0 ? orders.length : 1284;
-    const avgOrderVal = totalOrders > 0 ? Math.round(totalRevenue / totalOrders) : 66;
-    return { totalRevenue, totalOrders, avgOrderVal };
+    const totalOrders = orders.length;
+    const avgOrderVal = totalOrders > 0 ? Math.round(rawRevenue / totalOrders) : 0;
+
+    const uniqueCustomerEmails = new Set(orders.map((o) => o.userEmail || o.email).filter(Boolean));
+    const totalCustomers = Math.max(users.length, uniqueCustomerEmails.size, totalOrders > 0 ? 1 : 0);
+
+    return {
+      totalRevenue: rawRevenue,
+      totalOrders,
+      avgOrderVal,
+      totalCustomers,
+      totalProducts: products.length,
+      inStockProducts: products.filter((p) => Number(p.stock || 0) > 0).length,
+    };
+  }, [orders, users, products]);
+
+  // 2. Real Daily Breakdown (Sat - Fri)
+  const { daySalesMap, dayOrdersCount, totalWeekSales } = useMemo(() => {
+    const map = { Sat: 0, Sun: 0, Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0 };
+    const counts = { Sat: 0, Sun: 0, Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0 };
+    let weekTotal = 0;
+
+    orders.forEach((o) => {
+      const dt = o.orderDate || o.createdAt;
+      const amt = Number(o.totalAmount || 0);
+      weekTotal += amt;
+      if (dt) {
+        const dName = new Date(dt).toLocaleDateString("en-US", { weekday: "short" });
+        if (map[dName] !== undefined) {
+          map[dName] += amt;
+          counts[dName] += 1;
+        }
+      }
+    });
+
+    return { daySalesMap: map, dayOrdersCount: counts, totalWeekSales: weekTotal };
   }, [orders]);
 
+  // 3. Real Weekly Orders Chart
+  const visitorData = useMemo(() => {
+    return ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"].map((day) => ({
+      day,
+      orders: dayOrdersCount[day] || 0,
+      sales: daySalesMap[day] || 0,
+    }));
+  }, [dayOrdersCount, daySalesMap]);
+
+  // 4. Real Monthly Trend
+  const growthData = useMemo(() => {
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const now = new Date();
+    const result = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const mName = months[d.getMonth()];
+      const mOrders = orders.filter((o) => {
+        const od = o.orderDate || o.createdAt;
+        if (!od) return false;
+        const dObj = new Date(od);
+        return dObj.getMonth() === d.getMonth() && dObj.getFullYear() === d.getFullYear();
+      });
+      result.push({
+        month: mName,
+        count: mOrders.length,
+        revenue: mOrders.reduce((sum, o) => sum + Number(o.totalAmount || 0), 0),
+      });
+    }
+    return result;
+  }, [orders]);
+
+  // 5. Real Monthly Target Progress
+  const targetKpi = useMemo(() => {
+    const now = new Date();
+    const currentMonthOrders = orders.filter((o) => {
+      const od = o.orderDate || o.createdAt;
+      if (!od) return false;
+      const d = new Date(od);
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    });
+    const monthRevenue = currentMonthOrders.reduce((s, o) => s + Number(o.totalAmount || 0), 0);
+    const target = Math.max(50000, Math.ceil((monthRevenue + 10000) / 25000) * 25000);
+    const pct = target > 0 ? Math.min(Math.round((monthRevenue / target) * 100), 100) : 0;
+    const ringDashoffset = 251.2 - (pct / 100) * 251.2;
+    return { monthRevenue, target, pct, ringDashoffset };
+  }, [orders]);
+
+  // 6. Real Fulfillment / Success Rate
+  const fulfillmentKpi = useMemo(() => {
+    if (orders.length === 0) return { rate: 100, fulfilledCount: 0, ringDashoffset: 0 };
+    const fulfilled = orders.filter((o) => {
+      const s = (o.orderStatus || "").toUpperCase();
+      return ["DELIVERED", "COMPLETED", "PAID", "PROCESSING", "SHIPPED"].includes(s);
+    }).length;
+    const rate = Math.round((fulfilled / orders.length) * 100);
+    const ringDashoffset = 251.2 - (rate / 100) * 251.2;
+    return { rate, fulfilledCount: fulfilled, ringDashoffset };
+  }, [orders]);
+
+  // Sorted & Filtered Orders
   const sortedOrders = useMemo(() => {
     return [...orders].sort(
       (a, b) => new Date(b.orderDate || b.createdAt || 0) - new Date(a.orderDate || a.createdAt || 0)
@@ -160,14 +237,14 @@ const AdminDashboard = () => {
   }, [orders]);
 
   const filteredOrders = useMemo(() => {
-    const q = search.toLowerCase();
+    const q = search.toLowerCase().trim();
     if (!q) return sortedOrders;
     return sortedOrders.filter(
       (o) =>
         String(o.id).includes(q) ||
-        o.orderNumber?.toLowerCase().includes(q) ||
-        o.fullName?.toLowerCase().includes(q) ||
-        o.userEmail?.toLowerCase().includes(q)
+        (o.orderNumber && o.orderNumber.toLowerCase().includes(q)) ||
+        (o.fullName && o.fullName.toLowerCase().includes(q)) ||
+        (o.userEmail && o.userEmail.toLowerCase().includes(q))
     );
   }, [search, sortedOrders]);
 
@@ -189,7 +266,7 @@ const AdminDashboard = () => {
             style={{ width: "3rem", height: "3rem", color: "#e07a42" }}
           />
           <div style={{ color: "rgba(255, 255, 255, 0.6)", fontSize: "14px", fontWeight: 600 }}>
-            Loading Luxury Dashboard...
+            Syncing Real Store Metrics...
           </div>
         </div>
       </div>
@@ -219,7 +296,7 @@ const AdminDashboard = () => {
               margin: "4px 0 0 0",
             }}
           >
-            Monitor key metrics and manage your platform
+            Monitor real-time sales revenue, inventory volume, and live customer orders.
           </p>
         </div>
 
@@ -240,7 +317,7 @@ const AdminDashboard = () => {
             }}
           >
             <span>📅</span>
-            <span>This Month</span>
+            <span>All Time Live</span>
             <span style={{ fontSize: "10px", opacity: 0.6 }}>⌄</span>
           </button>
 
@@ -262,8 +339,10 @@ const AdminDashboard = () => {
             onClick={() => fetchData(false)}
             disabled={refreshing}
           >
-            <span>⬆</span>
-            <span>{refreshing ? "Syncing..." : "Export"}</span>
+            <span style={{ display: "inline-block", transform: refreshing ? "rotate(180deg)" : "none", transition: "0.4s" }}>
+              ⟳
+            </span>
+            <span>{refreshing ? "Syncing..." : "Sync Live Data"}</span>
           </button>
         </div>
       </div>
@@ -285,7 +364,7 @@ const AdminDashboard = () => {
 
       {/* ── First Row: Overview Cards & 3D Floating Asset ───────── */}
       <div className="row g-4 mb-4">
-        {/* Card 1: Total Revenue + Floating 3D Model */}
+        {/* Card 1: Total Real Revenue + Floating 3D Model */}
         <div className="col-12 col-xl-5">
           <div
             style={{
@@ -326,7 +405,7 @@ const AdminDashboard = () => {
                   marginBottom: "12px",
                 }}
               >
-                ₹84.3K
+                {fmtCur(kpi.totalRevenue)}
               </div>
 
               <div
@@ -345,7 +424,7 @@ const AdminDashboard = () => {
                 }}
               >
                 <span>↗</span>
-                <span>+16.2% vs last month</span>
+                <span>Real-Time Database Calculation</span>
               </div>
 
               <div className="d-flex align-items-center gap-4 pt-2">
@@ -354,22 +433,22 @@ const AdminDashboard = () => {
                     Total Orders
                   </div>
                   <div style={{ fontSize: "16px", fontWeight: 700, color: "#fff" }}>
-                    1,284
+                    {kpi.totalOrders.toLocaleString("en-IN")}
                   </div>
                 </div>
                 <div style={{ width: "1px", height: "24px", background: "rgba(255,255,255,0.1)" }} />
                 <div>
                   <div style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.4)" }}>
-                    Avg order
+                    Avg Order Value
                   </div>
                   <div style={{ fontSize: "16px", fontWeight: 700, color: "#fff" }}>
-                    ₹1,250
+                    {fmtCur(kpi.avgOrderVal)}
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* 3D Rotating Model (Bucket Hat / Luxury Apparel) */}
+            {/* 3D Rotating Model */}
             <div
               style={{
                 position: "relative",
@@ -382,7 +461,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Card 2: Customer Growth */}
+        {/* Card 2: Real Customer Base */}
         <div className="col-12 col-md-6 col-xl-3.5" style={{ flex: "1 1 280px" }}>
           <div
             style={{
@@ -408,13 +487,13 @@ const AdminDashboard = () => {
                     letterSpacing: "0.8px",
                   }}
                 >
-                  Customer Growth
+                  Customer Base
                 </span>
                 <span style={{ fontSize: "14px", opacity: 0.5 }}>👥</span>
               </div>
 
               <div style={{ fontSize: "32px", fontWeight: 900, color: "#ffffff", letterSpacing: "-0.5px" }}>
-                12.8K
+                {kpi.totalCustomers.toLocaleString("en-IN")}
               </div>
 
               <div
@@ -428,7 +507,7 @@ const AdminDashboard = () => {
                   marginTop: "4px",
                 }}
               >
-                <span>↗ +8.4%</span>
+                <span>Unique purchasers & users</span>
               </div>
             </div>
 
@@ -441,6 +520,7 @@ const AdminDashboard = () => {
                       <stop offset="95%" stopColor="#e07a42" stopOpacity={0.0} />
                     </linearGradient>
                   </defs>
+                  <Tooltip content={<CustomTooltip />} />
                   <Area
                     type="monotone"
                     dataKey="count"
@@ -454,7 +534,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Card 3: Weekly Visitors */}
+        {/* Card 3: Real Catalog Products */}
         <div className="col-12 col-md-6 col-xl-3.5" style={{ flex: "1 1 280px" }}>
           <div
             style={{
@@ -480,24 +560,25 @@ const AdminDashboard = () => {
                     letterSpacing: "0.8px",
                   }}
                 >
-                  Weekly Visitors
+                  Live Catalog Depth
                 </span>
-                <span style={{ fontSize: "14px", opacity: 0.5 }}>📈</span>
+                <span style={{ fontSize: "14px", opacity: 0.5 }}>📦</span>
               </div>
 
               <div style={{ fontSize: "32px", fontWeight: 900, color: "#ffffff", letterSpacing: "-0.5px" }}>
-                48.2K
+                {kpi.totalProducts.toLocaleString("en-IN")}
               </div>
 
-              <div style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.4)", marginTop: "4px" }}>
-                Last 7 days
+              <div style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.6)", marginTop: "4px" }}>
+                <span style={{ color: "#10b981", fontWeight: 700 }}>{kpi.inStockProducts} In Stock</span> • {categories.length} Categories
               </div>
             </div>
 
             <div style={{ height: "70px", marginTop: "14px" }}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={visitorData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
-                  <Bar dataKey="visitors" fill="#e07a42" radius={[4, 4, 0, 0]} opacity={0.85} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Bar dataKey="orders" fill="#e07a42" radius={[4, 4, 0, 0]} opacity={0.85} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -505,9 +586,9 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* ── Second Row: Interactive Total Sales Slider + Goals ─── */}
+      {/* ── Second Row: Interactive Real Sales Scrubber + Goals ── */}
       <div className="row g-4 mb-4">
-        {/* Total Sales with Day Scrubber / Slider */}
+        {/* Real Sales with Day Scrubber / Slider */}
         <div className="col-12 col-lg-5">
           <div
             style={{
@@ -533,7 +614,7 @@ const AdminDashboard = () => {
                   marginBottom: "8px",
                 }}
               >
-                This week • Total Sales
+                Daily Sales Revenue ({selectedDay})
               </div>
 
               <div
@@ -542,10 +623,14 @@ const AdminDashboard = () => {
                   fontWeight: 900,
                   letterSpacing: "-1px",
                   color: "#ffffff",
-                  marginBottom: "16px",
+                  marginBottom: "4px",
                 }}
               >
-                {daySalesMap[selectedDay] || "₹34.2K"}
+                {fmtCur(daySalesMap[selectedDay] || 0)}
+              </div>
+
+              <div style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.5)", marginBottom: "16px" }}>
+                {dayOrdersCount[selectedDay] || 0} orders recorded on this weekday
               </div>
             </div>
 
@@ -615,7 +700,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Monthly Goal Ring (72% / $36K) */}
+        {/* Real Monthly Goal Progress */}
         <div className="col-12 col-sm-6 col-lg-3.5" style={{ flex: "1 1 260px" }}>
           <div
             style={{
@@ -647,10 +732,10 @@ const AdminDashboard = () => {
                 Monthly Goal
               </div>
               <div style={{ fontSize: "24px", fontWeight: 900, color: "#ffffff" }}>
-                ₹36K
+                {fmtCur(targetKpi.monthRevenue)}
               </div>
               <div style={{ fontSize: "11px", color: "rgba(255, 255, 255, 0.4)" }}>
-                of ₹50K target
+                of {fmtCur(targetKpi.target)} milestone
               </div>
             </div>
 
@@ -672,10 +757,11 @@ const AdminDashboard = () => {
                   stroke="#e07a42"
                   strokeWidth="8"
                   strokeDasharray="251.2"
-                  strokeDashoffset="70.3"
+                  strokeDashoffset={targetKpi.ringDashoffset}
                   strokeLinecap="round"
                   fill="none"
                   transform="rotate(-90 50 50)"
+                  style={{ transition: "stroke-dashoffset 0.6s ease" }}
                 />
               </svg>
               <div
@@ -690,13 +776,13 @@ const AdminDashboard = () => {
                   color: "#fff",
                 }}
               >
-                72%
+                {targetKpi.pct}%
               </div>
             </div>
           </div>
         </div>
 
-        {/* Conversion Rate Ring (4.9%) */}
+        {/* Real Order Fulfillment Rate */}
         <div className="col-12 col-sm-6 col-lg-3.5" style={{ flex: "1 1 260px" }}>
           <div
             style={{
@@ -722,16 +808,16 @@ const AdminDashboard = () => {
                   marginBottom: "6px",
                 }}
               >
-                Visitors to Buyers
+                Order Processing
               </div>
               <div style={{ fontSize: "16px", fontWeight: 700, color: "#fff", marginBottom: "8px" }}>
-                Conversion Rate
+                Fulfillment Rate
               </div>
               <div style={{ fontSize: "24px", fontWeight: 900, color: "#ffffff" }}>
-                4.9%
+                {fulfillmentKpi.rate}%
               </div>
               <div style={{ fontSize: "11px", color: "#10b981", fontWeight: 600 }}>
-                ↗ +1.2% this week
+                {fulfillmentKpi.fulfilledCount} of {kpi.totalOrders} fulfilled
               </div>
             </div>
 
@@ -750,13 +836,14 @@ const AdminDashboard = () => {
                   cx="50"
                   cy="50"
                   r="40"
-                  stroke="#f59e0b"
+                  stroke="#10b981"
                   strokeWidth="8"
                   strokeDasharray="251.2"
-                  strokeDashoffset="128.1"
+                  strokeDashoffset={fulfillmentKpi.ringDashoffset}
                   strokeLinecap="round"
                   fill="none"
                   transform="rotate(-90 50 50)"
+                  style={{ transition: "stroke-dashoffset 0.6s ease" }}
                 />
               </svg>
               <div
@@ -771,16 +858,16 @@ const AdminDashboard = () => {
                   color: "#fff",
                 }}
               >
-                4.9%
+                {fulfillmentKpi.rate}%
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* ── Third Row: Recent Orders & Catalog Highlights ──────── */}
+      {/* ── Third Row: Real Recent Orders & Studio Highlights ────── */}
       <div className="row g-4 mb-4">
-        {/* Recent Orders */}
+        {/* Recent Orders Table */}
         <div className="col-12 col-xl-8">
           <div
             style={{
@@ -796,13 +883,15 @@ const AdminDashboard = () => {
                 <div style={{ fontSize: "11px", color: "#e07a42", fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase" }}>
                   LATEST TRANSACTIONS
                 </div>
-                <h5 style={{ fontWeight: 800, margin: 0, color: "#fff" }}>Recent Orders</h5>
+                <h5 style={{ fontWeight: 800, margin: 0, color: "#fff" }}>
+                  Recent Orders ({filteredOrders.length})
+                </h5>
               </div>
 
               <div className="d-flex align-items-center gap-2">
                 <input
                   type="text"
-                  placeholder="Filter orders..."
+                  placeholder="Search orders..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   style={{
@@ -849,7 +938,7 @@ const AdminDashboard = () => {
                   {paginatedOrders.length === 0 ? (
                     <tr>
                       <td colSpan={5} className="text-center py-4" style={{ color: "rgba(255,255,255,0.5)" }}>
-                        No recent transactions found.
+                        No orders recorded yet.
                       </td>
                     </tr>
                   ) : (
@@ -860,20 +949,20 @@ const AdminDashboard = () => {
                         </td>
                         <td style={{ padding: "12px 10px" }}>
                           <div style={{ fontSize: "13px", fontWeight: 600, color: "#fff" }}>
-                            {o.fullName || "Sara Malik"}
+                            {o.fullName || "Store Customer"}
                           </div>
                           <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.4)" }}>
-                            {o.userEmail || "customer@example.com"}
+                            {o.userEmail || o.email || "—"}
                           </div>
                         </td>
                         <td style={{ padding: "12px 10px", fontSize: "12px", color: "rgba(255,255,255,0.6)" }}>
                           {fmtDate(o.orderDate || o.createdAt)}
                         </td>
-                        <td style={{ padding: "12px 10px", fontSize: "13px", fontWeight: 700, color: "#fff" }}>
-                          ${fmt(o.totalAmount || 249)}
+                        <td style={{ padding: "12px 10px", fontSize: "13px", fontWeight: 700, color: "#10b981" }}>
+                          {fmtCur(o.totalAmount || 0)}
                         </td>
                         <td style={{ padding: "12px 10px" }}>
-                          <StatusPill status={o.orderStatus || "PAID"} />
+                          <StatusPill status={o.orderStatus || "PLACED"} />
                         </td>
                       </tr>
                     ))
@@ -937,7 +1026,7 @@ const AdminDashboard = () => {
                   marginBottom: "6px",
                 }}
               >
-                CURRENTLY RUNNING
+                CURRENT STORE SYSTEM
               </div>
               <h5 style={{ fontWeight: 800, color: "#fff", marginBottom: "14px" }}>Active Campaign</h5>
 
@@ -952,14 +1041,14 @@ const AdminDashboard = () => {
               >
                 <div className="d-flex justify-content-between align-items-center mb-2">
                   <span style={{ fontSize: "13px", fontWeight: 700, color: "#fff" }}>
-                    Autumn Editorial '26
+                    Atelier Editorial 2026
                   </span>
                   <span style={{ background: "#10b981", color: "#fff", fontSize: "9px", fontWeight: 800, padding: "2px 8px", borderRadius: "10px" }}>
                     LIVE
                   </span>
                 </div>
                 <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.6)", lineHeight: 1.5 }}>
-                  AI-targeted campaign across luxury menswear categories. CTR is outperforming benchmark by +42%.
+                  Real-time storefront connected with Aiven MySQL, live Razorpay checkout, and Virtual Fitting Room.
                 </div>
               </div>
             </div>
