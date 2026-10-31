@@ -1,0 +1,74 @@
+name: CI/CD Pipeline - Build & Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  # ==========================================
+  # 1. Backend CI: Spring Boot, JUnit 5, Redis
+  # ==========================================
+  backend-ci:
+    name: Backend CI (Java 17 / Spring Boot / Redis)
+    runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
+
+      - name: Run Backend Tests (JUnit 5 & Mockito)
+        env:
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+        run: mvn clean test -f product_catalog-backend/pom.xml
+
+      - name: Build Spring Boot Executable JAR
+        run: mvn package -DskipTests -f product_catalog-backend/pom.xml
+
+  # ==========================================
+  # 2. Frontend CI: React, Vitest, Vite Build
+  # ==========================================
+  frontend-ci:
+    name: Frontend CI (Node 20 / React / Vitest / Vite)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: product_catalog-frontend/package-lock.json
+
+      - name: Install Frontend Dependencies
+        run: npm ci --prefix product_catalog-frontend
+
+      - name: Run Frontend Tests (Vitest)
+        run: npm test --prefix product_catalog-frontend
+
+      - name: Build Production Frontend Bundle (Vite)
+        run: npm run build --prefix product_catalog-frontend
