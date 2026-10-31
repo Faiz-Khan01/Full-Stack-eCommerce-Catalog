@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.Set;
 
 @Entity
@@ -13,7 +14,9 @@ import java.util.Set;
 @AllArgsConstructor
 @EqualsAndHashCode(exclude = "products") // CRITICAL: Prevents circular loop
 @ToString(exclude = "products")          // Prevents loop during logging
-public class Category {
+public class Category implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
