@@ -1,15 +1,294 @@
-<div align="center"> <h1>🚀 TechStore PRO</h1> <h3>High-Performance eCommerce & Order Fulfillment Platform</h3> <p> A full-stack eCommerce ecosystem engineered with <strong>Spring Boot, React.js (Vite), and MySQL</strong>, designed to deliver modern retail, payment, fulfillment, shipping, customer support, and administrative capabilities. </p> <p> <a href="https://github.com/Faiz-Khan01/TechStore"> <img src="https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github" alt="GitHub"> </a> <img src="https://img.shields.io/badge/Java-17-orange?style=for-the-badge&logo=openjdk" alt="Java 17"> <img src="https://img.shields.io/badge/Spring%20Boot-3.x-6DB33F?style=for-the-badge&logo=springboot" alt="Spring Boot"> <img src="https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react" alt="React"> <img src="https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql" alt="MySQL"> <img src="https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker" alt="Docker"> </p> <p> <strong>Live Demo</strong> • <strong>Portfolio</strong> • <strong>API Documentation</strong> • <strong>Docker Deployment</strong> </p> </div> <hr> <h2>📖 Table of Contents</h2> <ul> <li><a href="#-platform-overview">Platform Overview</a></li> <li><a href="#-core-features">Core Features</a></li> <li><a href="#-customer-storefront">Customer Storefront</a></li> <li><a href="#-smart-delivery-location-detection">Smart Delivery Location Detection</a></li> <li><a href="#-customer-support">Customer Support</a></li> <li><a href="#-shipping-logistics--courier-tracking">Shipping & Courier Tracking</a></li> <li><a href="#-admin-control-center">Admin Control Center</a></li> <li><a href="#-automated-pdf-tax-invoices">PDF Tax Invoices</a></li> <li><a href="#-system-architecture">System Architecture</a></li> <li><a href="#-technology-stack">Technology Stack</a></li> <li><a href="#-rest-api-reference">REST API Reference</a></li> <li><a href="#-local-installation">Local Installation</a></li> <li><a href="#-docker-deployment">Docker Deployment</a></li> <li><a href="#-authentication--authorization">Authentication & Authorization</a></li> <li><a href="#-performance-architecture">Performance Architecture</a></li> <li><a href="#-author--connect">Author & Connect</a></li> </ul> <hr> <h2>🌟 Platform Overview</h2> <p> <strong>TechStore PRO</strong> is an end-to-end eCommerce and order fulfillment platform designed for modern retail operations. </p> <p> The platform goes beyond traditional product browsing and checkout by integrating the complete order lifecycle — from product discovery and payment processing to shipping, courier assignment, parcel tracking, customer support, inventory management, invoicing, and administrative operations. </p> <h3>Key Capabilities</h3> <ul> <li>Full-featured customer storefront</li> <li>Secure authentication and role-based authorization</li> <li>Razorpay online payments and Cash on Delivery</li> <li>Indian pincode-based delivery location detection</li> <li>Automated shipping fee calculation</li> <li>Courier assignment and AWB generation</li> <li>Order lifecycle and shipment tracking</li> <li>Delivery milestone history and audit trails</li> <li>Customer support ticket management</li> <li>Transactional email notifications</li> <li>Automated PDF tax invoice generation</li> <li>Inventory and low-stock management</li> <li>Administrative analytics dashboard</li> <li>Docker-based deployment</li> <li>RESTful backend architecture</li> </ul> <p> The frontend uses a modern <strong>dark glassmorphism design system</strong> with backdrop blur, emerald/cyan visual accents, responsive layouts, animated interactions, and route-level code splitting. </p> <hr> <h2>✨ Core Features</h2> <h3>🛍️ Customer Storefront</h3> <h4>Modern Navigation</h4> <ul> <li>Glassmorphism navigation interface</li> <li>Real-time shopping cart badge</li> <li>Wishlist counter</li> <li>Indian pincode-based location detection</li> <li>Animated dropdown menus</li> <li>Responsive navigation</li> </ul> <h4>Product Catalog</h4> <ul> <li>Category-based filtering</li> <li>Multi-field product search</li> <li>Price-based sorting</li> <li>Detailed product specifications</li> <li>Responsive product layouts</li> <li>Dynamic category navigation</li> </ul> <h4>Shopping Cart & Checkout</h4> <ul> <li>Database-backed cart synchronization</li> <li>Local state fallback</li> <li>Real-time quantity controls</li> <li>Automatic shipping fee calculation</li> <li>Order summary and checkout workflow</li> <li>Persistent shopping experience</li> </ul> <h4>💳 Payment Methods</h4> <ul> <li> <strong>Razorpay Online Payments</strong> <ul> <li>UPI</li> <li>Credit/Debit Cards</li> <li>Net Banking</li> <li>Wallets</li> </ul> </li> <li><strong>Cash on Delivery (COD)</strong></li> </ul> <hr> <h2>📍 Smart Delivery Location Detection</h2> <p> TechStore PRO provides an Indian pincode-based delivery location detection system that allows customers to determine their delivery location before completing checkout. </p> <h3>How It Works</h3> <pre> Customer Opens "Choose Your Location" │ ▼ Enter Indian Pincode │ ▼ Validate Pincode │ ▼ Resolve Postal Location │ ▼ Identify City / District / State │ ▼ Display Delivery Availability </pre> <h3>Example</h3> <table> <tr> <td>
-<strong>Choose Your Location</strong>
+# 🚀 TechStore PRO — Enterprise Full-Stack E-Commerce & Virtual Fitting Room Platform
 
-<p> Select a delivery location to see product availability and delivery options. </p> <p><strong>Enter Indian Pincode</strong></p>
-<code>440001</code>
+<div align="center">
 
-<p> <strong>Detected Location:</strong><br> Amravati, Maharashtra<br> India </p> </td> </tr> </table> <p> This functionality improves the checkout experience by automatically resolving the customer's city, district, state, and postal location. </p> <hr> <h2>🎧 Customer Support</h2> <p> TechStore PRO includes an integrated <strong>Customer Support Ticket System</strong> that allows customers to create, track, and manage support requests directly from the platform. </p> <h3>Support Workflow</h3> <pre> Customer │ ▼ Create Support Ticket │ ├── Category ├── Priority ├── Subject └── Issue Description │ ▼ Support Team Review │ ├── OPEN ├── IN PROGRESS └── RESOLVED │ ▼ Support Response </pre> <h3>Support Categories</h3> <ul> <li>Order</li> <li>Payment</li> <li>Product</li> <li>Return</li> <li>Refund</li> <li>Delivery</li> <li>Account</li> <li>Coupon</li> <li>Other</li> </ul> <h3>Priority Levels</h3> <ul> <li>Low</li> <li>Medium</li> <li>High</li> </ul> <h3>Ticket Information</h3> <table> <thead> <tr> <th>Field</th> <th>Description</th> </tr> </thead> <tbody> <tr> <td>Subject</td> <td>Short and specific summary of the issue. Maximum 120 characters.</td> </tr> <tr> <td>Issue Description</td> <td>Detailed explanation including relevant order or product information. Maximum 2,000 characters.</td> </tr> </tbody> </table> <blockquote> ⚠️ Customers should never share passwords or sensitive payment information through support tickets. </blockquote> <h3>Support Ticket Lifecycle</h3> <ol> <li>Customer creates a support ticket.</li> <li>The ticket is stored in the MySQL <code>support_tickets</code> table.</li> <li>A unique ticket ID is generated.</li> <li>Administrators review the request.</li> <li>Administrators can update the ticket status.</li> <li>Administrators can respond to the customer.</li> <li>Response timestamps are recorded.</li> <li>Customers can access the ticket history for future communication.</li> </ol> <h3>Support Ticket Data Model</h3> <table> <thead> <tr> <th>Field</th> <th>Description</th> </tr> </thead> <tbody> <tr><td><code>id</code></td><td>Unique support ticket ID</td></tr> <tr><td><code>category</code></td><td>Support issue category</td></tr> <tr><td><code>created_at</code></td><td>Ticket creation timestamp</td></tr> <tr><td><code>email</code></td><td>Customer email</td></tr> <tr><td><code>message</code></td><td>Customer issue description</td></tr> <tr><td><code>priority</code></td><td>Ticket priority</td></tr> <tr><td><code>status</code></td><td>Current ticket status</td></tr> <tr><td><code>subject</code></td><td>Short issue summary</td></tr> <tr><td><code>updated_at</code></td><td>Last modification timestamp</td></tr> <tr><td><code>replied_at</code></td><td>Support response timestamp</td></tr> <tr><td><code>reply_message</code></td><td>Response from support team</td></tr> </tbody> </table> <hr> <h2>🚚 Shipping, Logistics & Courier Tracking</h2> <p> TechStore PRO provides a complete order fulfillment workflow with visual lifecycle tracking and courier management. </p> <pre> PLACED ↓ PROCESSING ↓ SHIPPED ↓ DELIVERED </pre> <h3>Shipping Capabilities</h3> <ul> <li>Four-stage order progress tracker</li> <li>Automated courier assignment</li> <li>AWB/tracking number generation</li> <li>Courier-specific tracking links</li> <li>Delivery milestone history</li> <li>Shipment event timestamps</li> <li>Transit hub information</li> <li>Tiered shipping fee calculation</li> <li>Order cancellation</li> <li>Automatic inventory restoration</li> <li>Refund status tracking</li> <li>Transactional email notifications</li> </ul> <h3>Supported Courier Providers</h3> <ul> <li>Delhivery</li> <li>BlueDart</li> <li>DTDC</li> <li>Shadowfax</li> <li>Ekart</li> <li>FedEx</li> </ul> <h3>Shipping Charges</h3> <table> <thead> <tr> <th>Order Value</th> <th>Shipping Charge</th> </tr> </thead> <tbody> <tr> <td>Below ₹500</td> <td>₹50 Standard Shipping</td> </tr> <tr> <td>₹500 and above</td> <td><strong>FREE Shipping</strong></td> </tr> </tbody> </table> <h3>Order Cancellation & Inventory Restoration</h3> <ol> <li>Order status is updated.</li> <li>Purchased inventory is automatically restored.</li> <li>Refund status is tracked when applicable.</li> <li>Customer receives a cancellation notification.</li> </ol> <hr> <h2>🛡️ Admin Control Center</h2> <p> The administrative portal provides centralized control over store operations, orders, inventory, customers, products, support, payments, and analytics. </p> <h3>📊 Dashboard</h3> <p><code>/admin/dashboard</code></p> <ul> <li>Real-time store KPIs</li> <li>Seven-month revenue analytics</li> <li>Recharts area charts</li> <li>Order status distribution</li> <li>Donut/pie charts</li> <li>Low-stock warnings</li> <li>Top-selling product metrics</li> </ul> <h3>📦 Order & Shipping Management</h3> <p><code>/admin/orders</code></p> <ul> <li>View all orders</li> <li>Fulfill orders</li> <li>Update order lifecycle states</li> <li>Assign courier partners</li> <li>Generate tracking numbers</li> <li>Review delivery history</li> <li>Manage cancellations</li> <li>Manage refund status</li> </ul> <h3>🏷️ Product Management</h3> <p><code>/admin/products</code></p> <ul> <li>Create products</li> <li>Update products</li> <li>Delete products</li> <li>Assign categories</li> <li>Preview product images</li> <li>Adjust inventory inline</li> </ul> <h3>🗂️ Category Management</h3> <p><code>/admin/categories</code></p> <ul> <li>Create categories</li> <li>Update categories</li> <li>Delete categories</li> <li>Manage descriptions</li> <li>Configure cover banners</li> <li>View product counts</li> </ul> <h3>📊 Inventory Management</h3> <p><code>/admin/inventory</code></p> <ul> <li>Interactive stock adjustment</li> <li>Low-stock indicators</li> <li>Out-of-stock indicators</li> <li>Restock dialogs</li> <li>Inventory monitoring</li> </ul> <h3>👤 Customer Directory</h3> <ul> <li>Customer profiles</li> <li>Lifetime spending metrics</li> <li>Order history</li> <li>Customer contact information</li> <li>Detailed order inspection</li> </ul> <h3>🎧 Support Management</h3> <ul> <li>View customer tickets</li> <li>Filter by category</li> <li>Filter by priority</li> <li>Filter by status</li> <li>Respond to customers</li> <li>Update ticket status</li> <li>Review communication history</li> </ul> <h3>⚙️ Operations Settings</h3> <p><code>/admin/settings</code></p> <ul> <li>Store profile configuration</li> <li>Shipping thresholds</li> <li>COD availability</li> <li>Razorpay availability</li> <li>Notification preferences</li> </ul> <hr> <h2>📄 Automated PDF Tax Invoices</h2> <p> TechStore PRO includes a custom-branded invoice generation system built with <strong>jsPDF</strong> and <strong>jsPDF-AutoTable</strong>. </p> <h3>Invoice Includes</h3> <ul> <li>Order number</li> <li>Customer billing information</li> <li>Itemized product details</li> <li>Product quantities</li> <li>Pricing breakdown</li> <li>Shipping charges</li> <li>Grand total</li> <li>Payment status</li> <li>Tax invoice formatting</li> </ul> <hr> <h2>🏗️ System Architecture</h2> <pre> ┌───────────────────────────────────────────────┐ │ React 18 Single Page App │ │ Vite + Glassmorphism + Custom CSS │ └──────────────────────┬────────────────────────┘ │ │ HTTPS / REST JSON │ Bearer JWT ▼ ┌───────────────────────────────────────────────┐ │ Spring Boot 3.x Backend API │ │ Java 17 │ ├───────────────────────────────────────────────┤ │ Spring Security + JWT │ │ Order & Shipping Service │ │ Courier Tracking Adapter │ │ Inventory & Stock Service │ │ Customer Support Service │ │ Pincode Location Service │ │ Email Notification Service │ └──────────────────────┬────────────────────────┘ │ │ Spring Data JPA / │ Hibernate ▼ ┌───────────────────────────────────────────────┐ │ MySQL 8.0 │ │ │ │ Users • Products • Categories • Cart │ │ Orders • Payments • Reviews • Support │ └───────────────────────────────────────────────┘ </pre> <hr> <h2>🛠️ Technology Stack</h2> <h3>Frontend</h3> <table> <thead> <tr> <th>Technology</th> <th>Purpose</th> </tr> </thead> <tbody> <tr><td><strong>React 18</strong></td><td>Component-based UI with Hooks and Context API</td></tr> <tr><td><strong>Vite 7</strong></td><td>Fast development server and optimized production builds</td></tr> <tr><td><strong>React Router 7</strong></td><td>Client-side routing and protected routes</td></tr> <tr><td><strong>Recharts</strong></td><td>Interactive administrative analytics</td></tr> <tr><td><strong>jsPDF</strong></td><td>PDF invoice generation</td></tr> <tr><td><strong>jsPDF-AutoTable</strong></td><td>Structured invoice tables</td></tr> <tr><td><strong>SweetAlert2</strong></td><td>Notifications and confirmation dialogs</td></tr> <tr><td><strong>Axios</strong></td><td>REST API communication and JWT interceptors</td></tr> <tr><td><strong>Bootstrap 5</strong></td><td>Responsive layout utilities</td></tr> <tr><td><strong>Custom CSS</strong></td><td>Dark glassmorphism design system</td></tr> <tr><td><strong>Indian Postal API</strong></td><td>Pincode-based location resolution</td></tr> </tbody> </table> <h3>Backend</h3> <table> <thead> <tr> <th>Technology</th> <th>Purpose</th> </tr> </thead> <tbody> <tr><td><strong>Java 17 LTS</strong></td><td>Backend runtime</td></tr> <tr><td><strong>Spring Boot 3.x</strong></td><td>Enterprise application framework</td></tr> <tr><td><strong>Spring Security</strong></td><td>Authentication, authorization and security filters</td></tr> <tr><td><strong>JWT</strong></td><td>Stateless authentication</td></tr> <tr><td><strong>Spring Data JPA</strong></td><td>Data persistence and ORM</td></tr> <tr><td><strong>Hibernate</strong></td><td>Object-relational mapping</td></tr> <tr><td><strong>MySQL 8.0</strong></td><td>Relational database</td></tr> <tr><td><strong>Razorpay Java SDK</strong></td><td>Payment and refund integration</td></tr> <tr><td><strong>Spring Mail</strong></td><td>Transactional email delivery</td></tr> <tr><td><strong>Maven</strong></td><td>Dependency management and build lifecycle</td></tr> </tbody> </table> <hr> <h2>🌐 REST API Reference</h2> <blockquote> <strong>Note:</strong> Keep these endpoint mappings synchronized with the actual controller mappings in the backend implementation. </blockquote> <h3>🔐 Authentication & Users</h3> <table> <thead> <tr> <th>Method</th> <th>Endpoint</th> <th>Description</th> <th>Access</th> </tr> </thead> <tbody> <tr><td><code>POST</code></td><td><code>/api/auth/register</code></td><td>Register customer account</td><td>Public</td></tr> <tr><td><code>POST</code></td><td><code>/api/auth/login</code></td><td>Authenticate user and issue JWT</td><td>Public</td></tr> <tr><td><code>GET</code></td><td><code>/api/users/profile</code></td><td>Retrieve authenticated profile</td><td>User / Admin</td></tr> </tbody> </table> <h3>🛍️ Products & Categories</h3> <table> <thead> <tr> <th>Method</th> <th>Endpoint</th> <th>Description</th> <th>Access</th> </tr> </thead> <tbody> <tr><td>GET</td><td><code>/api/products</code></td><td>Retrieve active products</td><td>Public</td></tr> <tr><td>GET</td><td><code>/api/products/{id}</code></td><td>Retrieve product details</td><td>Public</td></tr> <tr><td>GET</td><td><code>/api/categories</code></td><td>Retrieve categories</td><td>Public</td></tr> <tr><td>POST</td><td><code>/api/admin/products</code></td><td>Create product</td><td>Admin</td></tr> <tr><td>PUT</td><td><code>/api/admin/products/{id}</code></td><td>Update product</td><td>Admin</td></tr> <tr><td>DELETE</td><td><code>/api/admin/products/{id}</code></td><td>Delete product</td><td>Admin</td></tr> <tr><td>POST</td><td><code>/api/admin/categories</code></td><td>Create category</td><td>Admin</td></tr> <tr><td>PUT</td><td><code>/api/admin/categories/{id}</code></td><td>Update category</td><td>Admin</td></tr> <tr><td>DELETE</td><td><code>/api/admin/categories/{id}</code></td><td>Delete category</td><td>Admin</td></tr> </tbody> </table> <h3>📍 Location & Delivery</h3> <table> <thead> <tr> <th>Method</th> <th>Endpoint</th> <th>Description</th> <th>Access</th> </tr> </thead> <tbody> <tr> <td>GET</td> <td><code>/api/location/pincode/{pincode}</code></td> <td>Resolve Indian pincode information</td> <td>Public / User</td> </tr> </tbody> </table> <h3>🛒 Shopping Cart</h3> <table> <thead> <tr> <th>Method</th> <th>Endpoint</th> <th>Description</th> <th>Access</th> </tr> </thead> <tbody> <tr><td>GET</td><td><code>/api/cart?email={email}</code></td><td>Retrieve customer cart</td><td>User</td></tr> <tr><td>POST</td><td><code>/api/cart/add/{productId}?email={email}</code></td><td>Add product to cart</td><td>User</td></tr> <tr><td>PUT</td><td><code>/api/cart/update/{productId}</code></td><td>Update cart quantity</td><td>User</td></tr> <tr><td>DELETE</td><td><code>/api/cart/remove/{productId}</code></td><td>Remove cart item</td><td>User</td></tr> <tr><td>DELETE</td><td><code>/api/cart/clear</code></td><td>Clear cart</td><td>User</td></tr> </tbody> </table> <h3>🎧 Customer Support</h3> <table> <thead> <tr> <th>Method</th> <th>Endpoint</th> <th>Description</th> <th>Access</th> </tr> </thead> <tbody> <tr><td>POST</td><td><code>/api/support/tickets</code></td><td>Create support ticket</td><td>User</td></tr> <tr><td>GET</td><td><code>/api/support/tickets</code></td><td>Retrieve customer tickets</td><td>User / Admin</td></tr> <tr><td>GET</td><td><code>/api/support/tickets/{id}</code></td><td>Retrieve ticket details</td><td>User / Admin</td></tr> <tr><td>PUT</td><td><code>/api/admin/support/tickets/{id}</code></td><td>Update ticket or reply</td><td>Admin</td></tr> <tr><td>GET</td><td><code>/api/admin/support/tickets</code></td><td>Retrieve all tickets</td><td>Admin</td></tr> </tbody> </table> <h3>📦 Orders & Shipping</h3> <table> <thead> <tr> <th>Method</th> <th>Endpoint</th> <th>Description</th> <th>Access</th> </tr> </thead> <tbody> <tr><td>POST</td><td><code>/api/orders</code></td><td>Create order and calculate shipping</td><td>User</td></tr> <tr><td>GET</td><td><code>/api/orders/user/{email}</code></td><td>Retrieve customer order history</td><td>User</td></tr> <tr><td>GET</td><td><code>/api/orders/track/{query}</code></td><td>Track order or AWB</td><td>Public / User</td></tr> <tr><td>POST</td><td><code>/api/orders/{id}/cancel</code></td><td>Cancel order and restore stock</td><td>User / Admin</td></tr> <tr><td>GET</td><td><code>/api/admin/orders</code></td><td>Retrieve all orders</td><td>Admin</td></tr> <tr><td>PUT</td><td><code>/api/admin/orders/{id}/shipping</code></td><td>Update shipping, courier and AWB</td><td>Admin</td></tr> <tr><td>PUT</td><td><code>/api/admin/orders/{id}/status</code></td><td>Update order or refund status</td><td>Admin</td></tr> <tr><td>GET</td><td><code>/api/admin/inventory/low-stock</code></td><td>Retrieve low-stock products</td><td>Admin</td></tr> <tr><td>PUT</td><td><code>/api/admin/inventory/{id}?stock={qty}</code></td><td>Update inventory</td><td>Admin</td></tr> </tbody> </table> <h3>💳 Payments</h3> <table> <thead> <tr> <th>Method</th> <th>Endpoint</th> <th>Description</th> <th>Access</th> </tr> </thead> <tbody> <tr><td>POST</td><td><code>/api/payment/create-order</code></td><td>Create Razorpay payment order</td><td>User</td></tr> <tr><td>POST</td><td><code>/api/payment/verify</code></td><td>Verify payment signature</td><td>User</td></tr> </tbody> </table> <hr> <h2>⚙️ Local Installation</h2> <h3>Prerequisites</h3> <ul> <li>Java JDK 17+</li> <li>Node.js 18+</li> <li>npm</li> <li>MySQL Server 8.0+</li> <li>Maven 3.8+</li> </ul> <h3>1. Clone the Repository</h3> <pre><code>git clone https://github.com/Faiz-Khan01/TechStore.git cd TechStore</code></pre> <h3>2. Create the Database</h3> <pre><code>CREATE DATABASE product_catalog;</code></pre> <h3>3. Configure Backend</h3> <p> Edit: </p> <pre><code>product_catalog-backend/src/main/resources/application.yml</code></pre> <pre><code>spring: datasource: url: jdbc:mysql://localhost:3306/product_catalog?createDatabaseIfNotExist=true&amp;useSSL=false username: root password: your_mysql_password
-jpa:
-hibernate:
-ddl-auto: update
+[![Live Demo](https://img.shields.io/badge/Demo-techstore--catalog.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://techstore-catalog.vercel.app)
+[![API Status](https://img.shields.io/badge/API-Render%20Cloud-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://full-stack-ecommerce-catalog.onrender.com)
+[![Database](https://img.shields.io/badge/Database-Aiven%20MySQL%208.0-FF5E00?style=for-the-badge&logo=mysql&logoColor=white)](https://aiven.io)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
-server:
-port: 8082</code></pre>
+**A production-ready, full-stack luxury eCommerce ecosystem built with Spring Boot 3, React 18 (Vite), Aiven Cloud MySQL, and Razorpay.**  
+Featuring an **Interactive 3D Virtual Fitting Room**, **AI Personal Stylist**, **Smart Sizing Engine**, **Executive Admin Analytics**, and **Logistics Tracking**.
 
-<h3>4. Start the Backend</h3> <pre><code>cd product_catalog-backend mvn clean spring-boot:run</code></pre> <p> <strong>Backend:</strong> <code>http://localhost:8082</code> </p> <h3>5. Start the Frontend</h3> <pre><code>cd product_catalog-frontend npm install npm run dev</code></pre> <p> <strong>Frontend:</strong> <code>http://localhost:5173</code> </p> <hr> <h2>🐳 Docker Deployment</h2> <p> The project includes Dockerfiles and a root-level <strong>docker-compose.yml</strong> for containerized deployment. </p> <h3>Start the Complete Stack</h3> <pre><code>docker-compose up --build -d</code></pre> <h3>Services</h3> <table> <thead> <tr> <th>Container</th> <th>Description</th> <th>Port</th> </tr> </thead> <tbody> <tr><td><code>ecom_mysql</code></td><td>MySQL 8.0 Database</td><td>3306</td></tr> <tr><td><code>ecom_backend</code></td><td>Spring Boot REST API</td><td>8082</td></tr> <tr><td><code>ecom_frontend</code></td><td>React SPA served through Nginx</td><td>5173 → 80</td></tr> </tbody> </table> <h3>Stop the Environment</h3> <pre><code>docker-compose down</code></pre> <hr> <h2>🔐 Authentication & Authorization</h2> <p> TechStore PRO implements a multi-layer authentication and authorization architecture. </p> <h3>Google OAuth 2.0</h3> <ul> <li>One-click Google Sign-In</li> <li>Automatic profile synchronization</li> <li>JWT session issuance</li> </ul> <h3>Email & Password Authentication</h3> <ul> <li>Secure registration and login</li> <li>BCrypt password hashing</li> <li>Email validation</li> <li>HMAC-SHA256 signed JWT tokens</li> </ul> <h3>Role-Based Access Control</h3> <table> <thead> <tr> <th>Capability</th> <th>Customer</th> <th>Administrator</th> </tr> </thead> <tbody> <tr><td>Google OAuth / Email Authentication</td><td>✅</td><td>✅</td></tr> <tr><td>Browse Products & Categories</td><td>✅</td><td>✅</td></tr> <tr><td>Shopping Cart & Checkout</td><td>✅</td><td>✅</td></tr> <tr><td>Pincode Location Detection</td><td>✅</td><td>✅</td></tr> <tr><td>Order History & Tracking</td><td>✅</td><td>✅</td></tr> <tr><td>Customer Support Tickets</td><td>✅</td><td>✅</td></tr> <tr><td>Order Cancellation & Restocking</td><td>✅</td><td>✅</td></tr> <tr><td>Dashboard Analytics</td><td>❌</td><td>✅</td></tr> <tr><td>Order Fulfillment & Courier Assignment</td><td>❌</td><td>✅</td></tr> <tr><td>Product & Category Management</td><td>❌</td><td>✅</td></tr> <tr><td>Inventory Management</td><td>❌</td><td>✅</td></tr> <tr><td>Customer Directory</td><td>❌</td><td>✅</td></tr> <tr><td>Support Ticket Administration</td><td>❌</td><td>✅</td></tr> <tr><td>Store Operations & Payment Settings</td><td>❌</td><td>✅</td></tr> </tbody> </table> <hr> <h2>⚡ Performance Architecture</h2> <h3>Stateless JWT Authorization</h3> <p> Bearer tokens are used for authenticated API requests, with Axios interceptors handling authorization and common <code>401</code> / <code>403</code> responses. </p> <h3>React Context Architecture</h3> <ul> <li><code>AuthProvider</code> — centralized authentication state</li> <li><code>CartProvider</code> — centralized shopping cart state</li> </ul> <h3>Dynamic Code Splitting</h3> <p> Route-level <code>React.lazy()</code> loading and custom Rollup chunking reduce the initial JavaScript payload. </p> <table> <tr> <td><strong>Initial Chunk</strong></td> <td>~44.9 kB</td> </tr> <tr> <td><strong>Gzipped</strong></td> <td>~11.4 kB</td> </tr> </table> <h3>Smart Location UX</h3> <p> Pincode input dynamically resolves Indian postal information and displays the corresponding delivery location to the customer. </p> <hr> <h2>👨‍💻 Author & Connect</h2> <div align="center"> <h3>Faiz Khan</h3> <p> <strong>Java Backend Developer & Full Stack Software Engineer</strong> </p> <p> <a href="https://faiz-khan-portfolio-omega.vercel.app"> 🌐 Portfolio </a> &nbsp;•&nbsp; <a href="https://www.linkedin.com/in/faiz-khan-dev"> 💼 LinkedIn </a> &nbsp;•&nbsp; <a href="https://github.com/Faiz-Khan01"> 🐙 GitHub </a> &nbsp;•&nbsp; <a href="mailto:faizkhan966563@gmail.com"> 📧 Email </a> </p> </div> <hr> <div align="center"> <h3>⭐ Support the Project</h3> <p> If you found <strong>TechStore PRO</strong> useful or interesting, consider giving the repository a star on GitHub. </p> <p> <strong>Built with Java • Spring Boot • React • MySQL • Docker</strong> </p> </div>
+[Explore Live Storefront ➔](https://techstore-catalog.vercel.app) • [View Backend API ➔](https://full-stack-ecommerce-catalog.onrender.com)
+
+</div>
+
+---
+
+## 📑 Table of Contents
+
+- [Key Highlights & New Features](#-key-highlights--new-features)
+- [System Architecture](#-system-architecture)
+- [Core Features & Modules](#-core-features--modules)
+  - [1. 🧥 3D Virtual Fitting Room](#1--3d-virtual-fitting-room)
+  - [2. 🤖 AI Personal Stylist & Fragrance Concierge](#2--ai-personal-stylist--fragrance-concierge)
+  - [3. 📏 Smart Sizing & Volume Engine](#3--smart-sizing--volume-engine)
+  - [4. 🛡️ Executive Admin Management Suite](#4-️-executive-admin-management-suite)
+  - [5. 💳 Razorpay & Indian Currency (₹ INR)](#5--razorpay--indian-currency--inr)
+  - [6. 🚚 Courier Tracking & Pincode Resolution](#6--courier-tracking--pincode-resolution)
+  - [7. 📄 Automated PDF Tax Invoices](#7--automated-pdf-tax-invoices)
+- [Technology Stack](#-technology-stack)
+- [REST API Reference](#-rest-api-reference)
+- [Local Installation & Setup](#-local-installation--setup)
+- [Docker Deployment](#-docker-deployment)
+- [Environment Configuration](#-environment-configuration)
+- [Author & Connect](#-author--connect)
+
+---
+
+## 🌟 Key Highlights & New Features
+
+| Feature | Description |
+| :--- | :--- |
+| **🧥 3D Virtual Fitting Room** | Interactive studio draped onto a 3D mannequin bust with live size scaling, garment removal, wardrobe carousel, and instant *Add Outfit to Cart*. |
+| **🤖 AI Personal Stylist** | Real-time catalog search concierge with interactive product mini-cards, fit recommendations, and direct fitting room transfer. |
+| **📏 Smart Sizing Engine** | Automatic variant mapping: Apparel (`S - XL`), Pants (`30" - 36"`), Footwear (`UK 7 - 11`), Perfumes (`50ml - 150ml`). |
+| **🗂️ Admin Taxonomy Suite** | Redesigned Category Manager with Executive KPIs, dual Grid/Table views, category inspector drawer, and 6 curated high-res cover presets. |
+| **📊 Real-Time Admin Analytics** | 100% database-calculated dashboard metrics (live revenue, customer base, weekday sales scrubber, fulfillment rate ring, no hardcoded stats). |
+| **🇮🇳 Indian Rupee (₹ INR) & Razorpay** | Native INR currency formatting across cart, checkout, invoices, and payment gateway (UPI, Netbanking, Cards, COD). |
+| **☁️ Cloud-Ready Architecture** | Deployed across Vercel (Frontend), Render (Spring Boot Docker Backend), and Aiven (Cloud MySQL). |
+
+---
+
+## 🏗️ System Architecture
+
+```text
+┌────────────────────────────────────────────────────────────────────────┐
+│                        React 18 SPA (Vite)                             │
+│       Vercel Edge CDN • Tailwind/Glassmorphism • Three.js 3D Viewers    │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │ HTTPS / REST JSON
+                                    │ Bearer JWT / CORS Managed
+                                    ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│                    Spring Boot 3.2.5 Backend API                       │
+│                       Render Docker Container                          │
+├───────────────────────────────────┬────────────────────────────────────┤
+│  • Spring Security 6 (Stateless)  │  • Razorpay SDK Integration        │
+│  • Dynamic CORS Configuration     │  • Transactional Gmail SMTP        │
+│  • Order Fulfillment & Logistics  │  • Support Ticket Service          │
+│  • Inventory & Low-Stock Alerts   │  • Pincode Location Resolution     │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │ JDBC / Spring Data JPA
+                                    ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│                       Aiven Cloud MySQL 8.0                            │
+│           Users • Products • Categories • Orders • Payments            │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 💎 Core Features & Modules
+
+### 1. 🧥 3D Virtual Fitting Room
+- **3D Mannequin Draping**: Drapes actual catalog product imagery onto an atelier bust model.
+- **Dynamic Size Scaling**: Size selection alters garment scaling visually in real-time.
+- **Wardrobe Rack**: Browse and wear saved items from your personal rack.
+- **Garment Removal**: Click `✕` on the floating piece badge, clear individual items, or reset the fitting room.
+- **Add Outfit to Cart**: Adds worn item and chosen size to cart with automatic guest/user synchronization.
+
+### 2. 🤖 AI Personal Stylist & Fragrance Concierge
+- **Live Catalog Exploration**: Queries active inventory to recommend specific apparel, footwear, and perfumes.
+- **Interactive Mini-Cards**: Product suggestions inside chat with thumbnail, `₹` price, **"🧥 Fit"** (opens fitting room), and **"↗ View"** buttons.
+- **Smart Conversational Presets**: Sizing guide, outerwear consultation, fragrance notes, and order tracking.
+
+### 3. 📏 Smart Sizing & Volume Engine
+- **Apparel (Shirts, Jackets, Tees)**: `S (38")`, `M (40")`, `L (42")`, `XL (44")`
+- **Bottoms (Pants, Trousers, Jeans)**: `S (30")`, `M (32")`, `L (34")`, `XL (36")`
+- **Footwear (Sneakers, Shoes, Loafers)**: `UK 7 (EU 41)` to `UK 11 (EU 45)`
+- **Fragrances (Perfumes, Colognes)**: `50 ml (Travel Spray)`, `100 ml (Signature Flacon)`, `150 ml (Atelier Edition)`
+- **Interactive Size Selector**: Integrated into Product Detail, Cart, and Checkout summaries.
+
+### 4. 🛡️ Executive Admin Management Suite
+- **📊 Real-Time Analytics Dashboard**:
+  - Live revenue, order count, and customer metrics computed directly from database records.
+  - Interactive weekday sales scrubber (Sat - Fri).
+  - Dynamic monthly revenue goal progress ring.
+  - Live order fulfillment and processing rate indicator.
+  - Recent transactions table formatted in Indian Rupees (`₹`).
+- **🗂️ Category Taxonomy Manager**:
+  - Dual view modes: **Luxury Grid (⊞)** with product previews & **High-Density Table (☰)** with density bars.
+  - Category Inspector Drawer to view all products assigned to a department.
+  - Curated 1-click Unsplash luxury cover presets.
+- **🏷️ Product & Inventory Control**:
+  - AI Assistant studio drawer, 3D product turntable viewer, stock level badges, and low-stock alerts.
+
+### 5. 💳 Razorpay & Indian Currency (₹ INR)
+- **Unified Indian Currency (`₹`)**: Consistent formatting across all user touchpoints.
+- **Razorpay Checkout**: Seamless UPI (GPay, PhonePe, Paytm), Credit/Debit Cards, Net Banking, and COD.
+- **Webhook & Signature Verification**: SHA-256 HMAC cryptographic signature validation.
+
+### 6. 🚚 Courier Tracking & Pincode Resolution
+- **Indian Pincode API**: Auto-populates City, District, and State upon 6-digit pincode entry.
+- **Multi-Courier Integration**: Delhivery, BlueDart, DTDC, Shadowfax, Ekart, and FedEx.
+- **Interactive Tracking**: Visual 4-stage timeline (`PLACED` ➔ `PROCESSING` ➔ `SHIPPED` ➔ `DELIVERED`).
+
+### 7. 📄 Automated PDF Tax Invoices
+- Built using **jsPDF** and **jsPDF-AutoTable**.
+- Itemized product breakdown, GST calculations, shipping fee, courier AWB, and printable PDF invoice download.
+
+---
+
+## 🛠️ Technology Stack
+
+### Frontend Architecture
+- **Framework**: React 18 (Vite 7)
+- **Routing**: React Router 7
+- **Styling**: Tailwind CSS + Custom Dark/Light Glassmorphism Theme System
+- **3D Graphics**: Three.js / Canvas 3D Viewer
+- **Visual Analytics**: Recharts (Area, Bar, Pie Charts)
+- **PDF Generation**: jsPDF, jsPDF-AutoTable
+- **UI Alerts**: SweetAlert2, React Hot Toast
+
+### Backend Architecture
+- **Language & Runtime**: Java 17 LTS
+- **Framework**: Spring Boot 3.2.5
+- **Security**: Spring Security 6, Stateless JWT (JJWT 0.11.5), BCrypt
+- **ORM & Data**: Spring Data JPA, Hibernate Core
+- **Database**: Aiven Cloud MySQL 8.0 (SSL required)
+- **Payments**: Razorpay Java SDK 1.4.3
+- **Mailing**: Spring Mail (Gmail SMTP TLS)
+- **Build Tool**: Apache Maven 3.9+
+
+---
+
+## 🌐 REST API Reference
+
+### 🔐 Authentication (`/api/auth`)
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/auth/register` | Register customer account | Public |
+| `POST` | `/api/auth/login` | Authenticate user & receive JWT token | Public |
+| `GET` | `/api/users/profile` | Fetch authenticated profile details | User / Admin |
+
+### 🛍️ Products & Categories
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/products` | Retrieve active catalog products | Public |
+| `GET` | `/api/products/{id}` | Get product details by ID | Public |
+| `GET` | `/api/categories` | Retrieve all categories | Public |
+| `POST` | `/api/admin/products` | Create new catalog item | Admin |
+| `PUT` | `/api/admin/products/{id}` | Update product specifications | Admin |
+| `DELETE`| `/api/admin/products/{id}` | Delete product | Admin |
+| `POST` | `/api/admin/categories` | Create new department | Admin |
+| `PUT` | `/api/admin/categories/{id}` | Update category metadata | Admin |
+| `DELETE`| `/api/admin/categories/{id}` | Delete category | Admin |
+
+### 🛒 Shopping Cart (`/api/cart`)
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/cart?email={email}` | Fetch user cart items | User |
+| `POST` | `/api/cart/add/{productId}?email={email}` | Add item to cart | User |
+| `PUT` | `/api/cart/update/{productId}` | Update item quantity | User |
+| `DELETE`| `/api/cart/remove/{productId}` | Remove item from cart | User |
+| `DELETE`| `/api/cart/clear` | Clear shopping cart | User |
+
+### 📦 Orders & Logistics
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/orders` | Place order (COD or Pre-paid) | User |
+| `GET` | `/api/orders/user/{email}` | Customer order history | User |
+| `GET` | `/api/orders/track/{query}` | Track by Order ID or Courier AWB | Public |
+| `POST` | `/api/orders/{id}/cancel` | Cancel order & restore inventory | User / Admin |
+| `GET` | `/api/admin/orders` | View all customer orders | Admin |
+| `PUT` | `/api/admin/orders/{id}/shipping` | Assign courier & AWB tracking number | Admin |
+| `PUT` | `/api/admin/orders/{id}/status` | Update order/refund status | Admin |
+
+### 💳 Payments (`/api/payment`)
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/payment/create-order` | Generate Razorpay order ID | User |
+| `POST` | `/api/payment/verify` | Verify cryptographic payment signature | User |
+
+---
+
+## ⚙️ Local Installation & Setup
+
+### Prerequisites
+- **Java JDK 17+**
+- **Node.js 18+ & npm**
+- **MySQL 8.0+** (or Aiven Cloud MySQL URI)
+- **Maven 3.8+**
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/Faiz-Khan01/Full-Stack-eCommerce-Catalog.git
+cd Full-Stack-eCommerce-Catalog
+```
+
+### 2. Configure Environment Variables
+Copy `.env.example` to `.env` in the backend root:
+```properties
+PORT=8082
+FRONTEND_URL=http://localhost:5173
+
+# Database (Local or Aiven Cloud)
+DB_URL=jdbc:mysql://localhost:3306/product_catalog?createDatabaseIfNotExist=true&useSSL=false
+DB_USERNAME=root
+DB_PASSWORD=your_password
+
+# JWT & Security
+JWT_SECRET=your_32_char_secret_key_here_12345
+JWT_EXPIRATION_MS=86400000
+ADMIN_EMAIL=admin@example.com
+
+# Razorpay
+RAZORPAY_KEY_ID=your_razorpay_key
+RAZORPAY_KEY_SECRET=your_razorpay_secret
+
+# Mail
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your_email@gmail.com
+MAIL_PASSWORD=your_app_password
+```
+
+### 3. Run Backend
+```bash
+cd product_catalog-backend
+mvn clean spring-boot:run
+```
+*Backend runs on:* `http://localhost:8082`
+
+### 4. Run Frontend
+```bash
+cd ../product_catalog-frontend
+npm install
+npm run dev
+```
+*Frontend runs on:* `http://localhost:5173`
+
+---
+
+## 🐳 Docker Deployment
+
+To launch the complete application stack (Backend, Frontend, and MySQL) in Docker containers:
+
+```bash
+docker-compose up --build -d
+```
+
+| Container | Service | Port Mapping |
+| :--- | :--- | :--- |
+| `ecom_backend` | Spring Boot 3 API | `8082:8082` |
+| `ecom_frontend` | React SPA (Nginx) | `5173:80` |
+| `ecom_mysql` | MySQL 8.0 Database | `3306:3306` |
+
+---
+
+## 👨‍💻 Author & Connect
+
+<div align="center">
+
+### **Faiz Khan**
+*Full Stack Software Engineer • Java & Spring Boot Developer*
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-faiz--khan-0A66C2?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/faiz-khan-743ba62a8)
+[![GitHub](https://img.shields.io/badge/GitHub-Faiz--Khan01-181717?style=for-the-badge&logo=github)](https://github.com/Faiz-Khan01)
+[![Email](https://img.shields.io/badge/Email-faizkhan966563@gmail.com-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:faizkhan966563@gmail.com)
+
+⭐ **If you find this project helpful or inspiring, please give this repository a star!** ⭐
+
+</div>
