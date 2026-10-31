@@ -1,280 +1,459 @@
-# 🚀 TechStore PRO — Enterprise Full-Stack E-Commerce & Virtual Fitting Room Platform
+# 🚀 TechStore PRO — Enterprise Full-Stack Luxury E-Commerce & Virtual Fitting Room Studio
 
 <div align="center">
 
-[![Live Demo](https://img.shields.io/badge/Demo-techstore--catalog.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://techstore-catalog.vercel.app)
-[![API Status](https://img.shields.io/badge/API-Render%20Cloud-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://full-stack-ecommerce-catalog.onrender.com)
-[![Database](https://img.shields.io/badge/Database-Aiven%20MySQL%208.0-FF5E00?style=for-the-badge&logo=mysql&logoColor=white)](https://aiven.io)
-[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
+![TechStore PRO Banner](https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1600&auto=format&fit=crop&q=80)
 
-**A production-ready, full-stack luxury eCommerce ecosystem built with Spring Boot 3, React 18 (Vite), Aiven Cloud MySQL, and Razorpay.**  
-Featuring an **Interactive 3D Virtual Fitting Room**, **AI Personal Stylist**, **Smart Sizing Engine**, **Executive Admin Analytics**, and **Logistics Tracking**.
+### *Next-Generation Haute Couture & Tech Retail Ecosystem*
 
-[Explore Live Storefront ➔](https://techstore-catalog.vercel.app) • [View Backend API ➔](https://full-stack-ecommerce-catalog.onrender.com)
+[![Live Storefront](https://img.shields.io/badge/Live%20Storefront-techstore--catalog.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://techstore-catalog.vercel.app)
+[![Backend REST API](https://img.shields.io/badge/Backend%20API-Render%20Cloud-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://full-stack-ecommerce-catalog.onrender.com)
+[![Aiven MySQL 8.0](https://img.shields.io/badge/Database-Aiven%20Cloud%20MySQL-FF5E00?style=for-the-badge&logo=mysql&logoColor=white)](https://aiven.io)
+[![Java 17](https://img.shields.io/badge/Java-17%20LTS-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
+[![Spring Boot 3.2.5](https://img.shields.io/badge/Spring%20Boot-3.2.5-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![React 18](https://img.shields.io/badge/React-18.3-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev)
+[![Razorpay](https://img.shields.io/badge/Payments-Razorpay%20UPI%20%26%20Cards-02042B?style=for-the-badge&logo=razorpay&logoColor=white)](https://razorpay.com)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+
+**An enterprise-grade, full-stack luxury eCommerce and apparel platform engineered with Spring Boot 3, React 18 (Vite), Aiven Cloud MySQL, and Razorpay.**  
+Features an **Interactive 3D Virtual Fitting Room**, **AI Personal Stylist**, **Smart Sizing & Volume Engine**, **Executive Real-Time Admin Suite**, **Automated Courier Logistics**, and **GST-Compliant PDF Invoicing**.
+
+[Explore Storefront ➔](https://techstore-catalog.vercel.app) • [View Backend Health ➔](https://full-stack-ecommerce-catalog.onrender.com) • [Admin Console ➔](https://techstore-catalog.vercel.app/admin/dashboard)
 
 </div>
 
 ---
 
+## ⚡ Live Deployments & Demo Access
+
+| Environment | Service | Platform | URL |
+| :--- | :--- | :--- | :--- |
+| **Frontend Storefront** | Client Single Page Application (React 18 + Vite) | **Vercel** Edge CDN | [techstore-catalog.vercel.app](https://techstore-catalog.vercel.app) |
+| **Backend REST API** | Microservice-ready Spring Boot 3 Web Application | **Render** Cloud Containers | [full-stack-ecommerce-catalog.onrender.com](https://full-stack-ecommerce-catalog.onrender.com) |
+| **Relational Database** | Managed MySQL 8.0 Instance (SSL Required) | **Aiven** Cloud | `mysql-230ef735-faizkhan966563-8d25.e.aivencloud.com:14977` |
+
+### 🔑 Demo Credentials
+- **Admin Access**: Sign in with email `ukharry128@gmail.com` or `faizkhan966563@gmail.com` to access `/admin/dashboard`.
+- **Customer Access**: Use one-click **Google Sign-In** or register a new customer account instantly.
+
+---
+
 ## 📑 Table of Contents
 
-- [Key Highlights & New Features](#-key-highlights--new-features)
-- [System Architecture](#-system-architecture)
-- [Core Features & Modules](#-core-features--modules)
-  - [1. 🧥 3D Virtual Fitting Room](#1--3d-virtual-fitting-room)
-  - [2. 🤖 AI Personal Stylist & Fragrance Concierge](#2--ai-personal-stylist--fragrance-concierge)
-  - [3. 📏 Smart Sizing & Volume Engine](#3--smart-sizing--volume-engine)
-  - [4. 🛡️ Executive Admin Management Suite](#4-️-executive-admin-management-suite)
-  - [5. 💳 Razorpay & Indian Currency (₹ INR)](#5--razorpay--indian-currency--inr)
-  - [6. 🚚 Courier Tracking & Pincode Resolution](#6--courier-tracking--pincode-resolution)
-  - [7. 📄 Automated PDF Tax Invoices](#7--automated-pdf-tax-invoices)
-- [Technology Stack](#-technology-stack)
-- [REST API Reference](#-rest-api-reference)
-- [Local Installation & Setup](#-local-installation--setup)
-- [Docker Deployment](#-docker-deployment)
-- [Environment Configuration](#-environment-configuration)
-- [Author & Connect](#-author--connect)
+1. [🌟 Feature Matrix](#-feature-matrix)
+2. [🏗️ Architecture & Data Flow](#-architecture--data-flow)
+3. [🧥 Deep Dive: Core Platform Modules](#-deep-dive-core-platform-modules)
+   - [1. 3D Virtual Fitting Room Studio](#1-3d-virtual-fitting-room-studio)
+   - [2. AI Personal Stylist & Fragrance Concierge](#2-ai-personal-stylist--fragrance-concierge)
+   - [3. Smart Sizing & Volume Matrix](#3-smart-sizing--volume-matrix)
+   - [4. Razorpay Payment Gateway & INR Pricing](#4-razorpay-payment-gateway--inr-pricing)
+   - [5. Courier Tracking & Pincode Resolution](#5-courier-tracking--pincode-resolution)
+   - [6. Executive Admin Operations Suite](#6-executive-admin-operations-suite)
+   - [7. AI Model Photo & Video Motion Studio](#7-ai-model-photo--video-motion-studio)
+   - [8. Customer Support Ticketing System](#8-customer-support-ticketing-system)
+   - [9. Promotional Coupons & Discount Engine](#9-promotional-coupons--discount-engine)
+   - [10. Verified Reviews & Star Ratings](#10-verified-reviews--star-ratings)
+   - [11. Automated GST Tax Invoicing (PDF)](#11-automated-gst-tax-invoicing-pdf)
+   - [12. Dual Authentication & Role Security](#12-dual-authentication--role-security)
+4. [🛠️ Technology Stack](#-technology-stack)
+5. [🌐 Complete REST API Documentation](#-complete-rest-api-documentation)
+6. [💾 Database Schema & ER Diagram](#-database-schema--er-diagram)
+7. [⚙️ Local Development Setup](#-local-development-setup)
+8. [🐳 Docker Containerization](#-docker-containerization)
+9. [☁️ Cloud Deployment Guide](#-cloud-deployment-guide)
+10. [👨‍💻 Author & Connect](#-author--connect)
 
 ---
 
-## 🌟 Key Highlights & New Features
+## 🌟 Feature Matrix
 
-| Feature | Description |
-| :--- | :--- |
-| **🧥 3D Virtual Fitting Room** | Interactive studio draped onto a 3D mannequin bust with live size scaling, garment removal, wardrobe carousel, and instant *Add Outfit to Cart*. |
-| **🤖 AI Personal Stylist** | Real-time catalog search concierge with interactive product mini-cards, fit recommendations, and direct fitting room transfer. |
-| **📏 Smart Sizing Engine** | Automatic variant mapping: Apparel (`S - XL`), Pants (`30" - 36"`), Footwear (`UK 7 - 11`), Perfumes (`50ml - 150ml`). |
-| **🗂️ Admin Taxonomy Suite** | Redesigned Category Manager with Executive KPIs, dual Grid/Table views, category inspector drawer, and 6 curated high-res cover presets. |
-| **📊 Real-Time Admin Analytics** | 100% database-calculated dashboard metrics (live revenue, customer base, weekday sales scrubber, fulfillment rate ring, no hardcoded stats). |
-| **🇮🇳 Indian Rupee (₹ INR) & Razorpay** | Native INR currency formatting across cart, checkout, invoices, and payment gateway (UPI, Netbanking, Cards, COD). |
-| **☁️ Cloud-Ready Architecture** | Deployed across Vercel (Frontend), Render (Spring Boot Docker Backend), and Aiven (Cloud MySQL). |
+| Capability | Customer Storefront | Admin Control Suite |
+| :--- | :---: | :---: |
+| **Interactive 3D Virtual Fitting Room** | ✅ Full Mannequin Studio | ✅ Preview in Product Studio |
+| **AI Personal Stylist & In-Chat Mini Cards** | ✅ Live Fragrance & Apparel Advisor | ✅ AI Catalog Management Assistant |
+| **Smart Sizing Engine (S-XL, 30-36", UK 7-11, 50-150ml)** | ✅ Dynamic Variant Selector | ✅ SKU & Variant Inventory Control |
+| **Unified Indian Rupee (`₹` INR) & Razorpay** | ✅ UPI, Netbanking, Cards, COD | ✅ Transaction & Settlement View |
+| **Indian Pincode Auto-Location Detection** | ✅ Real-Time Postal Resolution | ❌ N/A |
+| **Order Tracking & Multi-Courier AWB Links** | ✅ Visual 4-Stage Timeline | ✅ Assign Courier & Dispatch AWB |
+| **Automated Tax Invoice Generation** | ✅ 1-Click Client-Side PDF Download | ✅ Download Invoices per Order |
+| **Support Ticket Desk & Audit Logs** | ✅ Create & Monitor Support Tickets | ✅ Triage, Prioritize & Reply to Tickets |
+| **Inventory Low-Stock Warning System** | ❌ N/A | ✅ Live Threshold & Restock Dialog |
+| **Category Taxonomy & Hierarchy Control** | ❌ N/A | ✅ Dual Grid/Table + 6 Luxury Presets |
+| **Verified Product Reviews & Ratings** | ✅ Submit Ratings with Stars | ✅ Moderate & Inspect Reviews |
+| **Promotional Coupon Discount Engine** | ✅ Apply at Cart & Checkout | ✅ Manage Promo Codes & Caps |
+| **Adaptive Glassmorphic Dark/Light Mode** | ✅ Instant Theme Toggle | ✅ Consistent Admin Dark Theme |
 
 ---
 
-## 🏗️ System Architecture
+## 🏗️ Architecture & Data Flow
 
 ```text
-┌────────────────────────────────────────────────────────────────────────┐
-│                        React 18 SPA (Vite)                             │
-│       Vercel Edge CDN • Tailwind/Glassmorphism • Three.js 3D Viewers    │
-└───────────────────────────────────┬────────────────────────────────────┘
-                                    │ HTTPS / REST JSON
-                                    │ Bearer JWT / CORS Managed
-                                    ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│                    Spring Boot 3.2.5 Backend API                       │
-│                       Render Docker Container                          │
-├───────────────────────────────────┬────────────────────────────────────┤
-│  • Spring Security 6 (Stateless)  │  • Razorpay SDK Integration        │
-│  • Dynamic CORS Configuration     │  • Transactional Gmail SMTP        │
-│  • Order Fulfillment & Logistics  │  • Support Ticket Service          │
-│  • Inventory & Low-Stock Alerts   │  • Pincode Location Resolution     │
-└───────────────────────────────────┬────────────────────────────────────┘
-                                    │ JDBC / Spring Data JPA
-                                    ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│                       Aiven Cloud MySQL 8.0                            │
-│           Users • Products • Categories • Orders • Payments            │
-└────────────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                                 CLIENT LAYER (Browser)                                 │
+│  React 18.3 (Vite 7) • React Router 7 • Tailwind CSS • Three.js 3D • Recharts • jsPDF  │
+└───────────────────────────────────────────┬────────────────────────────────────────────┘
+                                            │ HTTPS / REST JSON
+                                            │ Bearer JWT / CORS Managed
+                                            ▼
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                            APPLICATION LAYER (Spring Boot 3.2.5)                       │
+│  Render Docker Container • Java 17 LTS • Tomcat 10.1 • Spring Security 6               │
+├───────────────────────────────────────────┬────────────────────────────────────────────┤
+│  • JwtAuthFilter (Stateless Bearer JWT)   │  • Razorpay Java SDK 1.4.3                 │
+│  • Spring Security CORS Configuration     │  • Spring Mail (Gmail SMTP TLS 587)        │
+│  • Catalog & Virtual Fitting Room API     │  • Courier AWB & Tracking Adapter          │
+│  • Order Fulfillment & Inventory Engine   │  • Customer Support Ticket Triage Service  │
+│  • Indian Postal Pincode Resolver         │  • Coupon & Pricing Promotion Calculation  │
+└───────────────────────────────────────────┬────────────────────────────────────────────┘
+                                            │ JDBC / SSL Mode Required
+                                            │ Hibernate ORM / Spring Data JPA
+                                            ▼
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                             PERSISTENCE LAYER (Aiven Cloud)                            │
+│  MySQL 8.0 Cloud Database • Connection Pooling (HikariCP) • InnoDB                     │
+│  Tables: users • products • categories • orders • order_items • support_tickets • ...  │
+└────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 💎 Core Features & Modules
+## 🧥 Deep Dive: Core Platform Modules
 
-### 1. 🧥 3D Virtual Fitting Room
-- **3D Mannequin Draping**: Drapes actual catalog product imagery onto an atelier bust model.
-- **Dynamic Size Scaling**: Size selection alters garment scaling visually in real-time.
-- **Wardrobe Rack**: Browse and wear saved items from your personal rack.
-- **Garment Removal**: Click `✕` on the floating piece badge, clear individual items, or reset the fitting room.
-- **Add Outfit to Cart**: Adds worn item and chosen size to cart with automatic guest/user synchronization.
+### 1. 3D Virtual Fitting Room Studio
+- **3D Sculpted Atelier Mannequin Bust**: Renders high-fashion garments draped directly onto a three-dimensional bust model with real-time lighting and shadow effects.
+- **Dynamic Scale Adjustment**: Selecting different sizes (`S`, `M`, `L`, `XL` or shoes `UK 7–11`) seamlessly scales the garment visually on the mannequin.
+- **Active Garment Removal Controls**:
+  - `✕` button on the floating active piece badge to remove the worn garment.
+  - `✕` on individual wardrobe rack thumbnails to remove them from your personal wardrobe.
+  - **"Clear"** button in the wardrobe header to reset the entire fitting studio.
+- **Add Outfit to Cart**:
+  - Persists the active garment with chosen size into `guestCart` (for guest visitors) and synchronizes with `/api/cart/add/...` for authenticated users.
+  - Fires real-time `cartUpdated` events to immediately update the navigation badge, followed by an interactive **"View Cart 🛒"** confirmation popup.
 
-### 2. 🤖 AI Personal Stylist & Fragrance Concierge
-- **Live Catalog Exploration**: Queries active inventory to recommend specific apparel, footwear, and perfumes.
-- **Interactive Mini-Cards**: Product suggestions inside chat with thumbnail, `₹` price, **"🧥 Fit"** (opens fitting room), and **"↗ View"** buttons.
-- **Smart Conversational Presets**: Sizing guide, outerwear consultation, fragrance notes, and order tracking.
+### 2. AI Personal Stylist & Fragrance Concierge
+- **Real-Time Catalog Search**: Powered by dynamic catalog queries, the AI assistant analyzes queries for specific departments (Perfumes, Shoes, Jackets, Pants).
+- **Interactive In-Chat Product Mini-Cards**:
+  - Renders thumbnail image, title, Indian Rupee price (`₹`), **"🧥 Fit"** button (sends product directly to the Virtual Fitting Room), and **"↗ View"** button (opens Product Detail).
+- **Domain-Specific Styling Presets**:
+  - *Perfumes*: Recommends signature 50ml, 100ml, and 150ml flacons with scent notes and occasions.
+  - *Outerwear & Apparel*: Provides chest and shoulder measurement recommendations.
+  - *Footwear*: Advises on UK/EU shoe conversions.
+  - *Order Assistance*: Directs customers to live tracking.
 
-### 3. 📏 Smart Sizing & Volume Engine
-- **Apparel (Shirts, Jackets, Tees)**: `S (38")`, `M (40")`, `L (42")`, `XL (44")`
-- **Bottoms (Pants, Trousers, Jeans)**: `S (30")`, `M (32")`, `L (34")`, `XL (36")`
-- **Footwear (Sneakers, Shoes, Loafers)**: `UK 7 (EU 41)` to `UK 11 (EU 45)`
-- **Fragrances (Perfumes, Colognes)**: `50 ml (Travel Spray)`, `100 ml (Signature Flacon)`, `150 ml (Atelier Edition)`
-- **Interactive Size Selector**: Integrated into Product Detail, Cart, and Checkout summaries.
+### 3. Smart Sizing & Volume Matrix
+The platform features an intelligent, category-aware sizing engine (`productSizes.js`) that automatically assigns the correct variant structure based on item attributes:
 
-### 4. 🛡️ Executive Admin Management Suite
-- **📊 Real-Time Analytics Dashboard**:
-  - Live revenue, order count, and customer metrics computed directly from database records.
-  - Interactive weekday sales scrubber (Sat - Fri).
-  - Dynamic monthly revenue goal progress ring.
-  - Live order fulfillment and processing rate indicator.
-  - Recent transactions table formatted in Indian Rupees (`₹`).
-- **🗂️ Category Taxonomy Manager**:
-  - Dual view modes: **Luxury Grid (⊞)** with product previews & **High-Density Table (☰)** with density bars.
-  - Category Inspector Drawer to view all products assigned to a department.
-  - Curated 1-click Unsplash luxury cover presets.
-- **🏷️ Product & Inventory Control**:
-  - AI Assistant studio drawer, 3D product turntable viewer, stock level badges, and low-stock alerts.
+| Category | Available Sizes | Details | Scale Factor |
+| :--- | :--- | :--- | :--- |
+| **Apparel** *(Shirts, Jackets, Tees)* | `S`, `M`, `L`, `XL` | Chest: 38", 40", 42", 44" | 0.94x → 1.12x |
+| **Bottoms** *(Pants, Trousers, Jeans)* | `S (30")`, `M (32")`, `L (34")`, `XL (36")` | Waist measurements | 0.94x → 1.12x |
+| **Footwear** *(Shoes, Boots, Sneakers)*| `UK 7`, `UK 8`, `UK 9`, `UK 10`, `UK 11` | EU 41 through EU 45 | 0.94x → 1.08x |
+| **Fragrances** *(Perfumes, Colognes)* | `50 ml`, `100 ml`, `150 ml` | Travel Spray, Signature, Atelier | 0.95x → 1.08x |
+| **Accessories** *(Watches, Bags, Belts)*| `Standard` | One Size / Bespoke Fit | 1.00x |
 
-### 5. 💳 Razorpay & Indian Currency (₹ INR)
-- **Unified Indian Currency (`₹`)**: Consistent formatting across all user touchpoints.
-- **Razorpay Checkout**: Seamless UPI (GPay, PhonePe, Paytm), Credit/Debit Cards, Net Banking, and COD.
-- **Webhook & Signature Verification**: SHA-256 HMAC cryptographic signature validation.
+Integrated seamlessly into:
+- **Product Detail Page**: Selectable pill buttons with dynamic modal **"Size Guide 📏"**.
+- **Cart & Checkout**: Size and volume badges persist under each item (e.g. `Size: UK 9`, `Volume: 100 ml`).
 
-### 6. 🚚 Courier Tracking & Pincode Resolution
-- **Indian Pincode API**: Auto-populates City, District, and State upon 6-digit pincode entry.
-- **Multi-Courier Integration**: Delhivery, BlueDart, DTDC, Shadowfax, Ekart, and FedEx.
-- **Interactive Tracking**: Visual 4-stage timeline (`PLACED` ➔ `PROCESSING` ➔ `SHIPPED` ➔ `DELIVERED`).
+### 4. Razorpay Payment Gateway & INR Pricing
+- **Unified Indian Rupee (`₹` INR)**: Consistent currency formatting across storefront, admin, cart, checkout, emails, and invoices.
+- **Complete Razorpay Checkout Integration**:
+  - Instant UPI payments (Google Pay, PhonePe, Paytm, BHIM).
+  - Credit & Debit Cards (Visa, Mastercard, RuPay, Amex).
+  - Net Banking across 50+ Indian banks.
+  - Cash on Delivery (COD) with automated validation.
+- **Cryptographic Webhook & Signature Verification**: Validates `razorpay_signature` using HMAC-SHA256 with the backend API secret before marking orders as `PAID`.
 
-### 7. 📄 Automated PDF Tax Invoices
-- Built using **jsPDF** and **jsPDF-AutoTable**.
-- Itemized product breakdown, GST calculations, shipping fee, courier AWB, and printable PDF invoice download.
+### 5. Courier Tracking & Pincode Resolution
+- **Indian Postal Pincode API**: Typing a 6-digit Indian pincode instantly resolves and autofills City, District, and State on checkout and location modals.
+- **Multi-Courier Support**: Supports automated AWB linking for **Delhivery**, **BlueDart**, **DTDC**, **Shadowfax**, **Ekart**, and **FedEx**.
+- **Visual Order Lifecycle**:
+  ```text
+  [PLACED] ➔ [PROCESSING] ➔ [SHIPPED] ➔ [DELIVERED]
+  ```
+- Public order tracking at `/track` by either Order Number (`ORD-2026-XXXX`) or Courier AWB number.
+
+### 6. Executive Admin Operations Suite
+- **📊 Real-Time Analytics Dashboard (`/admin/dashboard`)**:
+  - **Zero Mock Numbers**: Revenue, order count, unique customers, and catalog inventory calculated live from database records.
+  - **Weekday Sales Scrubber**: Interactive slider to inspect sales revenue for Sat, Sun, Mon, Tue, Wed, Thu, and Fri.
+  - **Revenue Goal Progress Ring**: Dynamic SVG circle tracking progress against monthly revenue targets.
+  - **Order Fulfillment Rate**: Live percentage of completed vs total orders.
+  - **Recent Transactions**: Filterable table with direct customer emails and Indian Rupee totals.
+- **🗂️ Redesigned Category Taxonomy Manager (`/admin/categories`)**:
+  - Executive KPI cards (Total Departments, Cataloged Products, Category Density Index).
+  - Dual View Modes: **Luxury Grid (⊞)** with product preview thumbnails & **High-Density Table (☰)** with density meters.
+  - Category Inspector Drawer: Click *"👁️ Products"* to inspect all items assigned to a category.
+  - Curated 1-Click Unsplash Cover Presets: Apparel, Footwear, Fragrances, Watches, Bags, and Electronics.
+- **🏷️ Product & Inventory Control (`/admin/products`, `/admin/inventory`)**:
+  - Create, update, and delete products with SKU, compare prices, cost prices, and category assignments.
+  - Low-stock and out-of-stock badges with inline restock dialogs.
+- **👥 Customer Directory (`/admin/customers`)**:
+  - Customer lifetime spending, order frequency, and contact information.
+
+### 7. AI Model Photo & Video Motion Studio
+- **Generative Model Photography**: Studio modal inside product administration with curated lifestyle prompts and diverse model demographics.
+- **Video Motion Presets**:
+  - Turntable 360° product rotation
+  - Runway model walk with garment flow
+  - Macro fabric zoom and lighting shifts
+  - High-fashion editorial lookbook panning
+
+### 8. Customer Support Ticketing System
+- **Customer Self-Service (`/contact`)**:
+  - File tickets with Priority (`LOW`, `MEDIUM`, `HIGH`) and Category (`ORDER`, `PAYMENT`, `PRODUCT`, `RETURN`, `DELIVERY`, etc.).
+- **Admin Support Desk (`/admin/support`)**:
+  - Real-time ticket queue, priority filtering, status toggling (`OPEN`, `IN_PROGRESS`, `RESOLVED`), and direct customer reply threads.
+
+### 9. Promotional Coupons & Discount Engine
+- Apply discount promo codes at Cart and Checkout.
+- Percentage-based or fixed-value deductions with minimum cart thresholds and expiration dates.
+
+### 10. Verified Reviews & Star Ratings
+- 5-star customer review system on product pages with verified purchaser badges, review timestamps, and average rating breakdowns.
+
+### 11. Automated GST Tax Invoicing (PDF)
+- Client-side PDF generation using **jsPDF** & **jsPDF-AutoTable**.
+- Branded header, company GST details, customer billing address, itemized product table, tax breakdown, and courier tracking details.
+
+### 12. Dual Authentication & Role Security
+- **Google OAuth 2.0**: One-click social sign-in with automatic user provisioning and profile synchronization.
+- **Email & Password**: BCrypt password hashing, role-based authorization (`ROLE_USER`, `ROLE_ADMIN`), and stateless JWT token issuance.
 
 ---
 
 ## 🛠️ Technology Stack
 
-### Frontend Architecture
-- **Framework**: React 18 (Vite 7)
-- **Routing**: React Router 7
-- **Styling**: Tailwind CSS + Custom Dark/Light Glassmorphism Theme System
-- **3D Graphics**: Three.js / Canvas 3D Viewer
-- **Visual Analytics**: Recharts (Area, Bar, Pie Charts)
-- **PDF Generation**: jsPDF, jsPDF-AutoTable
-- **UI Alerts**: SweetAlert2, React Hot Toast
+```text
+┌────────────────────────────────────────────────────────────────────────┐
+│                              FRONTEND STACK                            │
+├───────────────────────┬────────────────────────────────────────────────┤
+│ Framework             │ React 18.3.1 (Vite 7.3.6)                      │
+│ Routing               │ React Router 7.0                               │
+│ State Management      │ React Context API + LocalStorage Sync          │
+│ Styling & Design      │ Tailwind CSS + Glassmorphism CSS Architecture  │
+│ 3D Visualization      │ Three.js 0.160 + HTML5 Canvas                  │
+│ Data Visualization    │ Recharts 2.12 (Responsive Area & Bar Charts)   │
+│ PDF Generation        │ jsPDF 2.5.1 + jsPDF-AutoTable 3.8.2            │
+│ Dialogs & Toasts      │ SweetAlert2 11.10                              │
+│ HTTP Client           │ Axios 1.6 with JWT Request Interceptors        │
+└───────────────────────┴────────────────────────────────────────────────┘
 
-### Backend Architecture
-- **Language & Runtime**: Java 17 LTS
-- **Framework**: Spring Boot 3.2.5
-- **Security**: Spring Security 6, Stateless JWT (JJWT 0.11.5), BCrypt
-- **ORM & Data**: Spring Data JPA, Hibernate Core
-- **Database**: Aiven Cloud MySQL 8.0 (SSL required)
-- **Payments**: Razorpay Java SDK 1.4.3
-- **Mailing**: Spring Mail (Gmail SMTP TLS)
-- **Build Tool**: Apache Maven 3.9+
+┌────────────────────────────────────────────────────────────────────────┐
+│                              BACKEND STACK                             │
+├───────────────────────┬────────────────────────────────────────────────┤
+│ Language & Runtime    │ Java 17 LTS (Eclipse Adoptium OpenJDK)         │
+│ Core Framework        │ Spring Boot 3.2.5                              │
+│ Security Architecture │ Spring Security 6.2 + JJWT 0.11.5              │
+│ Data Access & ORM     │ Spring Data JPA + Hibernate Core 6.4           │
+│ Connection Pooling    │ HikariCP 5.0                                   │
+│ Relational Database   │ MySQL 8.0 (Connector/J 8.3)                    │
+│ Payment Integration   │ Razorpay Java SDK 1.4.3                        │
+│ Transactional Emails  │ Spring Mail + Jakarta Mail (Gmail SMTP 587)    │
+│ Build Tool            │ Apache Maven 3.9+                              │
+└───────────────────────┴────────────────────────────────────────────────┘
+```
 
 ---
 
-## 🌐 REST API Reference
+## 🌐 Complete REST API Documentation
 
 ### 🔐 Authentication (`/api/auth`)
 | Method | Endpoint | Description | Access |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/api/auth/register` | Register customer account | Public |
-| `POST` | `/api/auth/login` | Authenticate user & receive JWT token | Public |
-| `GET` | `/api/users/profile` | Fetch authenticated profile details | User / Admin |
+| `POST` | `/api/auth/register` | Register customer with name, email & password | Public |
+| `POST` | `/api/auth/login` | Authenticate customer or admin and return JWT | Public |
+| `GET` | `/api/users/profile` | Retrieve profile of authenticated token owner | User / Admin |
 
-### 🛍️ Products & Categories
+### 🛍️ Products & Catalog (`/api/products`)
 | Method | Endpoint | Description | Access |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/api/products` | Retrieve active catalog products | Public |
-| `GET` | `/api/products/{id}` | Get product details by ID | Public |
-| `GET` | `/api/categories` | Retrieve all categories | Public |
-| `POST` | `/api/admin/products` | Create new catalog item | Admin |
-| `PUT` | `/api/admin/products/{id}` | Update product specifications | Admin |
-| `DELETE`| `/api/admin/products/{id}` | Delete product | Admin |
-| `POST` | `/api/admin/categories` | Create new department | Admin |
-| `PUT` | `/api/admin/categories/{id}` | Update category metadata | Admin |
-| `DELETE`| `/api/admin/categories/{id}` | Delete category | Admin |
+| `GET` | `/api/products` | Get list of all active products | Public |
+| `GET` | `/api/products/{id}` | Get detailed product specifications by ID | Public |
+| `GET` | `/api/products/category/{catId}`| Get products belonging to a category | Public |
+| `POST` | `/api/admin/products` | Create product (name, price, stock, category, etc.) | Admin |
+| `PUT` | `/api/admin/products/{id}` | Update product details or inventory | Admin |
+| `DELETE`| `/api/admin/products/{id}` | Delete product permanently | Admin |
+
+### 🗂️ Categories (`/api/categories`)
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/categories` | Retrieve all product departments | Public |
+| `POST` | `/api/admin/categories` | Create new category department | Admin |
+| `PUT` | `/api/admin/categories/{id}` | Update category name, description, cover image | Admin |
+| `DELETE`| `/api/admin/categories/{id}` | Delete category department | Admin |
 
 ### 🛒 Shopping Cart (`/api/cart`)
 | Method | Endpoint | Description | Access |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/api/cart?email={email}` | Fetch user cart items | User |
-| `POST` | `/api/cart/add/{productId}?email={email}` | Add item to cart | User |
-| `PUT` | `/api/cart/update/{productId}` | Update item quantity | User |
-| `DELETE`| `/api/cart/remove/{productId}` | Remove item from cart | User |
-| `DELETE`| `/api/cart/clear` | Clear shopping cart | User |
+| `GET` | `/api/cart?email={email}` | Retrieve customer's active shopping cart | User |
+| `POST` | `/api/cart/add/{id}?email={email}`| Add product and selected size to cart | User |
+| `PUT` | `/api/cart/update/{id}` | Increment, decrement, or set item quantity | User |
+| `DELETE`| `/api/cart/remove/{id}` | Remove specific product from cart | User |
+| `DELETE`| `/api/cart/clear` | Empty all items from cart | User |
 
-### 📦 Orders & Logistics
+### 📦 Orders & Fulfillment (`/api/orders`)
 | Method | Endpoint | Description | Access |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/api/orders` | Place order (COD or Pre-paid) | User |
-| `GET` | `/api/orders/user/{email}` | Customer order history | User |
-| `GET` | `/api/orders/track/{query}` | Track by Order ID or Courier AWB | Public |
-| `POST` | `/api/orders/{id}/cancel` | Cancel order & restore inventory | User / Admin |
-| `GET` | `/api/admin/orders` | View all customer orders | Admin |
-| `PUT` | `/api/admin/orders/{id}/shipping` | Assign courier & AWB tracking number | Admin |
-| `PUT` | `/api/admin/orders/{id}/status` | Update order/refund status | Admin |
+| `POST` | `/api/orders` | Place order (COD or Pre-paid Razorpay) | User |
+| `GET` | `/api/orders/user/{email}` | Retrieve customer's order history | User |
+| `GET` | `/api/orders/track/{query}` | Public track by Order Number or Courier AWB | Public |
+| `POST` | `/api/orders/{id}/cancel` | Cancel order and automatically restore inventory | User / Admin |
+| `GET` | `/api/admin/orders` | Retrieve all platform orders for administration | Admin |
+| `PUT` | `/api/admin/orders/{id}/shipping` | Assign courier service and AWB tracking number | Admin |
+| `PUT` | `/api/admin/orders/{id}/status` | Update order state (`PROCESSING`, `DELIVERED`, etc.) | Admin |
 
-### 💳 Payments (`/api/payment`)
+### 💳 Razorpay Payments (`/api/payment`)
 | Method | Endpoint | Description | Access |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/api/payment/create-order` | Generate Razorpay order ID | User |
-| `POST` | `/api/payment/verify` | Verify cryptographic payment signature | User |
+| `POST` | `/api/payment/create-order` | Create Razorpay order entity with amount in paise | User |
+| `POST` | `/api/payment/verify` | Verify HMAC-SHA256 signature for payment success | User |
+
+### 🎧 Support Tickets (`/api/support`)
+| Method | Endpoint | Description | Access |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/support/tickets` | File new support request | User |
+| `GET` | `/api/support/tickets` | Retrieve customer's support tickets | User |
+| `GET` | `/api/admin/support/tickets` | View all customer tickets in admin portal | Admin |
+| `PUT` | `/api/admin/support/tickets/{id}`| Respond to ticket and update status | Admin |
 
 ---
 
-## ⚙️ Local Installation & Setup
+## 💾 Database Schema & ER Diagram
 
-### Prerequisites
-- **Java JDK 17+**
-- **Node.js 18+ & npm**
-- **MySQL 8.0+** (or Aiven Cloud MySQL URI)
-- **Maven 3.8+**
+```text
+  ┌──────────────┐          ┌───────────────────┐          ┌──────────────────┐
+  │  categories  │          │     products      │          │      users       │
+  ├──────────────┤          ├───────────────────┤          ├──────────────────┤
+  │ id (PK)      │◄───1:N───┤ id (PK)           │          │ id (PK)          │
+  │ name         │          │ name              │          │ name             │
+  │ description  │          │ price             │          │ email (UQ)       │
+  │ image_url    │          │ stock             │          │ password         │
+  └──────────────┘          │ category_id (FK)  │          │ role             │
+                            │ sku               │          └────────┬─────────┘
+                            │ image_url         │                   │
+                            └─────────┬─────────┘                   │ 1:N
+                                      │                             │
+                                      │ 1:N                         ▼
+                            ┌─────────▼─────────┐          ┌──────────────────┐
+                            │    order_items    │          │      orders      │
+                            ├───────────────────┤          ├──────────────────┤
+                            │ id (PK)           │          │ id (PK)          │
+                            │ order_id (FK)     │◄───1:N───┤ order_number (UQ)│
+                            │ product_id (FK)   │          │ user_id (FK)     │
+                            │ quantity          │          │ total_amount     │
+                            │ price             │          │ order_status     │
+                            │ size              │          │ payment_method   │
+                            └───────────────────┘          │ courier_name     │
+                                                           │ tracking_number  │
+                                                           │ shipping_address │
+                                                           └──────────────────┘
+```
 
-### 1. Clone the Repository
+---
+
+## ⚙️ Local Development Setup
+
+### 1. Clone Repository
 ```bash
 git clone https://github.com/Faiz-Khan01/Full-Stack-eCommerce-Catalog.git
 cd Full-Stack-eCommerce-Catalog
 ```
 
-### 2. Configure Environment Variables
-Copy `.env.example` to `.env` in the backend root:
-```properties
-PORT=8082
-FRONTEND_URL=http://localhost:5173
+### 2. Backend Setup
+1. Open `product_catalog-backend/src/main/resources/application.yml` or create `.env` in `product_catalog-backend`:
+   ```properties
+   PORT=8082
+   FRONTEND_URL=http://localhost:5173
+   
+   # Database Configuration (Aiven Cloud MySQL or Local MySQL)
+   DB_URL=jdbc:mysql://localhost:3306/product_catalog?createDatabaseIfNotExist=true&useSSL=false
+   DB_USERNAME=root
+   DB_PASSWORD=your_mysql_password
+   
+   # Security & JWT
+   JWT_SECRET=your_32_character_secret_key_here_12345
+   JWT_EXPIRATION_MS=86400000
+   ADMIN_EMAIL=admin@example.com
+   
+   # Payment Gateway (Razorpay Test Keys)
+   RAZORPAY_KEY_ID=rzp_test_your_key_id
+   RAZORPAY_KEY_SECRET=your_razorpay_secret
+   
+   # Mail (Gmail SMTP App Password)
+   MAIL_HOST=smtp.gmail.com
+   MAIL_PORT=587
+   MAIL_USERNAME=your_gmail@gmail.com
+   MAIL_PASSWORD=your_gmail_app_password
+   ```
+2. Build and start the backend service:
+   ```bash
+   cd product_catalog-backend
+   mvn clean spring-boot:run
+   ```
+   *Spring Boot will launch at:* `http://localhost:8082`
 
-# Database (Local or Aiven Cloud)
-DB_URL=jdbc:mysql://localhost:3306/product_catalog?createDatabaseIfNotExist=true&useSSL=false
-DB_USERNAME=root
-DB_PASSWORD=your_password
-
-# JWT & Security
-JWT_SECRET=your_32_char_secret_key_here_12345
-JWT_EXPIRATION_MS=86400000
-ADMIN_EMAIL=admin@example.com
-
-# Razorpay
-RAZORPAY_KEY_ID=your_razorpay_key
-RAZORPAY_KEY_SECRET=your_razorpay_secret
-
-# Mail
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=587
-MAIL_USERNAME=your_email@gmail.com
-MAIL_PASSWORD=your_app_password
-```
-
-### 3. Run Backend
-```bash
-cd product_catalog-backend
-mvn clean spring-boot:run
-```
-*Backend runs on:* `http://localhost:8082`
-
-### 4. Run Frontend
-```bash
-cd ../product_catalog-frontend
-npm install
-npm run dev
-```
-*Frontend runs on:* `http://localhost:5173`
+### 3. Frontend Setup
+1. Create `product_catalog-frontend/.env.local`:
+   ```properties
+   VITE_API_BASE_URL=http://localhost:8082/api
+   VITE_RAZORPAY_KEY_ID=rzp_test_your_key_id
+   ```
+2. Install dependencies and start the Vite development server:
+   ```bash
+   cd ../product_catalog-frontend
+   npm install
+   npm run dev
+   ```
+   *Frontend will launch at:* `http://localhost:5173`
 
 ---
 
-## 🐳 Docker Deployment
+## 🐳 Docker Containerization
 
-To launch the complete application stack (Backend, Frontend, and MySQL) in Docker containers:
+To run the entire full-stack ecosystem (Frontend, Backend, and MySQL) in isolated Docker containers:
 
 ```bash
 docker-compose up --build -d
 ```
 
-| Container | Service | Port Mapping |
-| :--- | :--- | :--- |
-| `ecom_backend` | Spring Boot 3 API | `8082:8082` |
-| `ecom_frontend` | React SPA (Nginx) | `5173:80` |
-| `ecom_mysql` | MySQL 8.0 Database | `3306:3306` |
+### Container Status & Port Mappings
+| Service | Container Name | Port Mapping | Description |
+| :--- | :--- | :--- | :--- |
+| **Frontend** | `ecom_frontend` | `5173:80` | React SPA served via Nginx with reverse proxy |
+| **Backend** | `ecom_backend` | `8082:8082` | Spring Boot 3 Java runtime container |
+| **Database** | `ecom_mysql` | `3306:3306` | MySQL 8.0 with persistent storage volume |
+
+To view logs or stop containers:
+```bash
+docker-compose logs -f
+docker-compose down
+```
+
+---
+
+## ☁️ Cloud Deployment Guide
+
+### Vercel (Frontend SPA)
+1. Import repository in [Vercel Dashboard](https://vercel.com).
+2. Set **Root Directory** to `product_catalog-frontend`.
+3. Configure Environment Variables:
+   - `VITE_API_BASE_URL` = `https://full-stack-ecommerce-catalog.onrender.com/api`
+   - `VITE_RAZORPAY_KEY_ID` = `rzp_test_your_key_id`
+4. Deploy!
+
+### Render (Spring Boot Docker Backend)
+1. Create a **Web Service** in [Render Dashboard](https://render.com).
+2. Connect repository and set **Root Directory** to `product_catalog-backend`.
+3. Choose **Docker** as the runtime environment.
+4. Add Environment Variables:
+   - `DB_URL` = Aiven Cloud MySQL connection URI with `?sslMode=REQUIRED`
+   - `DB_USERNAME` = `avnadmin`
+   - `DB_PASSWORD` = Your Aiven MySQL password
+   - `FRONTEND_URL` = `https://techstore-catalog.vercel.app`
+   - `JWT_SECRET`, `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `ADMIN_EMAIL`
+5. Deploy!
 
 ---
 
@@ -283,12 +462,17 @@ docker-compose up --build -d
 <div align="center">
 
 ### **Faiz Khan**
-*Full Stack Software Engineer • Java & Spring Boot Developer*
+*Full Stack Software Engineer • Java & Spring Boot Specialist • React Developer*
+
+Nagpur, Maharashtra, India • [faizkhan966563@gmail.com](mailto:faizkhan966563@gmail.com)
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-faiz--khan-0A66C2?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/faiz-khan-743ba62a8)
 [![GitHub](https://img.shields.io/badge/GitHub-Faiz--Khan01-181717?style=for-the-badge&logo=github)](https://github.com/Faiz-Khan01)
+[![Portfolio](https://img.shields.io/badge/Portfolio-Live-brightgreen?style=for-the-badge&logo=vercel)](https://faiz-khan-portfolio-omega.vercel.app)
 [![Email](https://img.shields.io/badge/Email-faizkhan966563@gmail.com-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:faizkhan966563@gmail.com)
 
-⭐ **If you find this project helpful or inspiring, please give this repository a star!** ⭐
+---
+
+⭐ **If you find TechStore PRO inspiring or useful for your projects, please star this repository!** ⭐
 
 </div>
